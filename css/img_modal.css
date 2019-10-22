@@ -1,0 +1,63 @@
+.imgBlock {
+  position: relative;
+  display: block;
+}
+
+.imgBlock:hover img {
+  -webkit-transform: scale(1, 1);
+          transform: scale(1, 1);
+  opacity: 0.5;
+}
+
+.imgBlock:hover .img-modal {
+  opacity: 0.8;
+  -webkit-transform: scale(1);
+          transform: scale(1);
+}
+
+.img-container {
+  overflow: hidden;
+}
+
+.img-container img {
+  width: 100%;
+  height: auto;
+  -webkit-transform: scale(1, 1);
+          transform: scale(1, 1);
+  /* transition: opacity .5s, -webkit-transform 0.5s;
+  transition: opacity .5s, transform 0.5s; */
+  transition: opacity .5s, transform 0.5s, -webkit-transform 0.5s;
+}
+
+.img-modal {
+  position: absolute;
+  border: 0px solid white;
+  top: 0rem;
+  left: 0rem;
+  right: 0rem;
+  bottom: 0rem;
+  padding: 2.5rem 1rem 2rem; 
+  opacity: 0;
+  /* transition: opacity 0.5s, -webkit-transform 0.5s;
+  transition: opacity 0.5s, transform 0.5s; */
+  transition: opacity 0.5s, transform 0.5s, -webkit-transform 0.5s;
+  -webkit-transform: scale(1);
+          transform: scale(1);
+  background-color: #2b95be;
+}
+.img-modal h5, .img-modal p {
+  color: white;
+  text-align: center;
+}
+.img-modal h5 {
+  font-family: Lato;
+  font-weight: normal;
+  font-size: 1.8rem;
+  margin-top: 0;
+  margin-bottom: 1.6rem;
+}
+.img-modal p {
+  font-family: Source Sans Pro;
+  font-size: 1rem;
+  line-height: 1.5;
+}
