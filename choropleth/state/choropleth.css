@@ -1,0 +1,48 @@
+/* Legend Font Style */
+body {
+	font: 11px sans-serif;
+	background-color: #ffffff;
+}
+        
+/* Legend Position Style */
+.legend {
+	position:absolute;
+	left:20px;
+	top:0px;
+}
+
+.axis text {
+	font: 10px sans-serif;
+}
+
+.axis line, .axis path {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+/*Style for Custom Tooltip */
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    min-width: 100px;
+    height: auto;
+    padding: 12px;
+    font-size: 14px;
+    background: rgba(43,43,43, 0.8);
+    color: #fff;
+    border-radius: 5px;
+    pointer-events: none;
+    line-height: 1;
+}
+
+.tooltip p {
+    margin: 5px;
+}
+
+.q0-7{fill:rgb(247,247,247)}
+.q1-7{fill:rgb(217,217,217)}
+.q2-7{fill:rgb(189,189,189)}
+.q3-7{fill:rgb(150,150,150)}
+.q4-7{fill:rgb(115,115,115)}
+.q5-7{fill:rgb(82,82,82)}
+.q6-7{fill:rgb(37,37,37)}

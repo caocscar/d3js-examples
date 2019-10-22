@@ -1,0 +1,66 @@
+/*HTML Vertical Lengend*/
+
+h3 {
+    margin-top: 15px;
+}
+.country-name {
+    margin: 0 !important;
+}
+
+.key-dot {
+    display: inline-block;
+    height: 10px;
+    margin-right: .5em;
+    width: 10px;
+}
+
+.legend {
+    margin-right:20px;
+}
+
+.queens { background: #1F77B4;}
+.kings { background: #FF7F0E;}
+.bronx { background: #2CA02C;
+}
+
+/*HTML Horizonal Legend*/
+.country-name {
+    margin: 0 !important;
+}
+.key-dot {
+    display: inline-block;
+    height: 10px;
+    margin-right: .5em;
+    width: 10px;
+}
+
+.uk { background: #1F77B4;}
+.denmark { background: #FF7F0E;}
+.germany { background: #2CA02C;
+}
+
+#legend2{
+    overflow:hidden;
+}
+.legend2 {
+    float:left;
+    margin-right: 1em;
+}
+
+/*D3 Vertical Legend*/
+
+/*D3 Horizonal Legend2*/
+.legends5 {
+    float:left;
+    margin-right: 1em;
+}
+/*D3 Horizonal Legend3*/
+.legends6{
+    float:left;
+    margin-right:1em;
+}
+/*D3 Reusable Legend3*/
+ .legends7 {
+    float:left;
+    margin-right:1em;
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.background {
+  fill: none;
+  pointer-events: all;
+}
+
+.states {
+  fill: #aaa;
+}
+
+.states .active {
+  fill: orange;
+}
+
+.state-borders {
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.counties {
+  fill: #eff3ff;
+  stroke: white;
+}
+
+.counties .active {
+  fill: yellow;
+}
+
+.legend {
+	position: absolute;
+	left: 20px;
+	top: 0px;
+}
+
+</style>
+<body>
+<script src="//d3js.org/d3.v5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.min.js"></script>
+<script src="//d3js.org/topojson.v3.min.js"></script>
+<script>
+
+var width = 960,
+    height = 600,
+    centered;
+
+var color = d3.scaleThreshold()
+    .domain([1,2,3,4,5])
+    .range(d3.schemeBlues[6]);
+
+var path = d3.geoPath();
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("rect")
+    .attr("class", "background")
+    .attr("width", width)
+    .attr("height", height)
+    .on("click", clicked);
+
+var g = svg.append("g");
+
+var promises = [];
+promises.push(d3.json("https://d3js.org/us-10m.v1.json"))
+promises.push(d3.csv("choropleth_county.csv"))
+promises.push(d3.csv("county_names.csv"))
+
+var json = d3.map();
+var county_names = d3.map();
+
+Promise.all(promises).then(function(p) {
+
+  // grab promise from list
+  const us = p[0];
+  const data = p[1];
+  const names = p[2];
+
+  // construct mapping by iterating through list
+  for (var i=0; i<data.length; i++) {
+      json.set(data[i].fips, parseInt(data[i].value) )
+  }
+  for (var j=0; j<names.length; j++) {
+      county_names.set(names[j].fips, names[j].name)
+  }
+
+  g.append("g")
+      .attr("class", "counties")
+    .selectAll("path")
+      .data(topojson.feature(us, us.objects.counties).features)
+    .enter().append("path")
+      .attr("d", path)
+      .on("click", clicked)
+      .attr("fill", function(d) {
+        return color(json.get(d.id))
+      })
+    .append("title") // Tooltip
+      .text(function(d) { 
+        var ct = json.has(d.id) ? json.get(d.id) : 0
+        var nom = county_names.has(d.id) ? county_names.get(d.id) : 'NotListed' 
+        return nom + ": " + ct
+      });
+
+  g.append("path")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "state-borders")
+      .attr("d", path);
+
+  // legend
+  var legendSVG = d3.select("body")
+      .append("svg")
+      .attr("width",100)
+      .attr("height",160);
+
+  legendSVG.append("g")
+      .attr("class", "legend")
+      .attr("transform", "translate(10,10)");
+
+  var legendOptions = d3.legendColor()
+      .labelFormat(d3.format(".0f"))
+      .title("County Sales")
+      .labels(['0','1','2','3','4','5+'])
+      .titleWidth(200)
+      .scale(color)
+      ;
+
+  legendSVG.select(".legend")
+    .call(legendOptions);
+});
+
+function clicked(d) {
+  var x, y, k;
+
+  if (d && centered !== d) {
+    var centroid = path.centroid(d);
+    x = centroid[0];
+    y = centroid[1];
+    k = 4;
+    centered = d;
+  } else {
+    x = width / 2;
+    y = height / 2;
+    k = 1;
+    centered = null;
+  }
+
+  g.selectAll("path")
+      .classed("active", centered && function(d) { return d === centered; });
+
+  g.transition()
+      .duration(750)
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+      .style("stroke-width", 1.5 / k + "px");
+}
+
+</script>

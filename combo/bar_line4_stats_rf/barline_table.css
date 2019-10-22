@@ -1,0 +1,15 @@
+.bar {
+  fill: #499bdd;
+  clip-path: url(#clip); /* clip bar with rectangle */
+}
+
+.avgLine {
+  fill: none;
+  stroke: #73000A;
+  stroke-width: 2px;
+  clip-path: url(#clip); /* clip line with rectangle */
+}
+
+.summary {
+  color: rgb(214, 106, 57);
+}

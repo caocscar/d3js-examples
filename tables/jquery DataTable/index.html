@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery DataTable Bootstrap 4 styling using d3.js v5</title>
+  <script src="http://d3js.org/d3.v5.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"> 
+  <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"> -->
+
+  <script src="make_table.js"></script>
+</head>
+<body>
+
+<div id='container'></div>
+<script>
+
+async function make_html_table(file) {
+
+  const data = await d3.csv("sagarin.txt")
+	var table_plot = makeTable()
+		.datum(data)
+		.sortBy('Rank', true)
+		.filterCols(['WvsTop50', 'LvsTop50', 'Recent', 'Recent_Rank']);
+	d3.select('#container').call(table_plot);
+
+};
+
+make_html_table();
+
+</script>
+</body>

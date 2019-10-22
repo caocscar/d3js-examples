@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="//d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+  <script>
+    async function make_table(filename) {
+      var data = await d3.csv(filename);
+      // two level nested map (groupby) count
+      var df = d3.nest()
+          .key(d => d.AY) // level 1
+          .key(d => d.Term) // level 2
+          .rollup(v => v.length) // count
+          .entries(data); // bind data
+      console.table(df)
+    }
+    make_table('Clients.csv');
+  </script>
+</body>
+</html>

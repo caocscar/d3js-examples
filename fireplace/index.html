@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delaware Fireplace</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+<script>
+// set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 20, left: 50},
+    width = 1595/2 + margin.left + margin.right,
+    height = 990/2 + margin.top + margin.bottom;
+
+// set the ranges
+let x = d3.scaleLinear()
+    .domain([0, 31+98+30.5])
+    .range([0, width]);
+let y = d3.scaleLinear()
+    .domain([0, 57.5+41.5])
+    .range([height, 0]);
+let yR = d3.scaleLinear()
+    .domain([0, 57.5+41.5])
+    .range([0, height]);
+
+let svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Add the X Axis
+svg.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x).ticks(20));
+// Add the Y Axis
+svg.append("g")
+    .call(d3.axisLeft(y));
+  
+let wall = svg.append('g')
+  .append('rect')
+    .attr('width', width)
+    .attr('height', height)
+    .style('fill', 'D8BFD8')
+    
+let brick = svg.append('g')
+    .attr("transform", `translate(${x(31)},0)`)
+  .append('rect')
+    .attr('width', x(98))
+    .attr('height', height)
+    .style('fill', '#F5FFFA')
+
+let hearth = svg.append('g')
+    .attr("transform", `translate(${x(31)},${height-yR(8)})`)
+  .append('rect')
+    .attr('width', x(98))
+    .attr('height', yR(8))
+    .style('fill', 'F0F8FF')
+
+let fireplace = svg.append('g')
+    .attr("transform", `translate(${x(31+28.5)},${height-yR(34)})`)
+  .append('rect')
+    .attr('width', x(41))
+    .attr('height', yR(34-8))
+    .style('fill', 'black')
+
+const alpha = 0.7
+const Overhang = 3
+const mantleH = 57.5
+let mantle = svg.append('g')
+    .attr("transform", `translate(0,${height-yR(mantleH)})`)
+  .append('rect')
+    .attr('width', x(31+98+Overhang))
+    .attr('height', yR(2.25))
+    .style('fill', '#B22222')
+    .style('opacity', alpha)
+
+const angle = 45
+const h2 = (31-Overhang)/Math.tan(angle*Math.PI/180)
+console.log(h2)
+const wR2 = 34
+let upperRight = svg.append('g')
+    .attr("transform", `translate(${width-x(wR2)},${height-yR(mantleH+h2)})`)
+  .append('rect')
+    .attr('width', x(wR2))
+    .attr('height', yR(1.5))
+    .style('fill', '#B22222')
+    .style('opacity', alpha)
+
+const h1 = 14
+const offset = h1*(31-Overhang)/h2
+let midRight = svg.append('g')
+    .attr("transform", `translate(${width-x(wR2)-x(31-Overhang-offset)},${height-yR(mantleH+h1)})`)
+  .append('rect')
+    .attr('width', x(wR2))
+    .attr('height', yR(1.5))
+    .style('fill', '#B22222')
+    .style('opacity', alpha)
+
+const hL = h1
+const single = true
+let wL2 = single ? 34+offset/2 : wR2
+const fudge = single ? 1.5 : 2
+let upperLeft = svg.append('g')
+    .attr("transform", `translate(0,${height-yR(mantleH+hL*fudge)})`)
+  .append('rect')
+    .attr('width', x(wL2))
+    .attr('height', yR(1.5))
+    .style('fill', '#B22222')
+    .style('opacity', alpha)
+
+const padding = hL*Math.tan(angle*Math.PI/180)
+let midLeft = svg.append('g')
+    .attr("transform", `translate(0,${height-yR(mantleH+hL)})`)
+  .append('rect')
+    .attr('width', x(wL2+padding))
+    .attr('height', yR(1.5))
+    .style('fill', '#B22222')
+    .style('opacity', single ? 0 : alpha)
+
+let cabinet = svg.append('g')
+    .attr("transform", `translate(0,${height-yR(34)})`)
+  .append('rect')
+    .attr('width', x(31))
+    .attr('height', yR(34))
+    .style('fill', 'purple')
+    .style('opacity', alpha)
+
+let wood = svg.append('g')
+    .attr("transform", `translate(${width-x(30.5)},${height-yR(34)})`)
+  .append('rect')
+    .attr('width', x(30.5))
+    .attr('height', yR(34))
+    .style('fill', 'brown')
+    .style('opacity', alpha)
+
+</script>
+</body>

@@ -1,0 +1,45 @@
+tspan {
+  font: 16px sans-serif;
+  text-anchor: middle;
+}
+
+.total {
+  font-size: 3em;
+  text-anchor: middle;
+}
+
+.chart_title {
+  font-size: 2em;
+  text-anchor: middle;  
+}
+
+.age-group {
+  font-weight: 700;
+}
+
+/* HTML table */
+table {
+  width: 600px;
+  border-collapse: collapse;
+  margin: 0px auto;
+}
+/* Zebra striping */
+tr:nth-of-type(odd) {
+  background: whitesmoke;
+}
+tr:nth-of-type(even) {
+  background: rgb(29, 202, 255);
+}
+th {
+  background: rgb(50, 12, 116);
+  color: white;
+  font-weight: bold;
+  cursor: s-resize;
+  background-repeat: no-repeat;
+  background-position: 3% center;
+}
+td, th {
+  padding: 6px;
+  border: 1px solid #ccc;
+  text-align: left;
+}

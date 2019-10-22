@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bar Line Combo in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter2/1.4.7/crossfilter.min.js"></script>
+    <link rel="stylesheet" href="barline_table.css">
+    <script src="barlinestats.js"></script>
+</head>
+<body>
+<form>
+  <label><input type="radio" name="dataset" value="Bay">Bay</label>
+  <label><input type="radio" name="dataset" value="Clinton">Clinton</label>
+  <label><input type="radio" name="dataset" value="Houghton">Houghton</label>
+  <label><input type="radio" name="dataset" value="Ottawa">Ottawa</label>
+</form>
+<h1 class="summary" id="N"></h1>
+<h3 class="summary" id="Np"></h3>
+<h3 class="summary" id="Pct"></h3>
+<h4 class="summary" id="dayRange1"></h4>
+<h4 class="summary" id="dayRange2"></h4>
+<script>   
+  makeDashboard('fake.csv');
+</script>
+</body>

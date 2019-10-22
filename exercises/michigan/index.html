@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="//d3js.org/topojson.v3.min.js"></script>
+    <link rel="stylesheet" href="michigan.css">
+</head>
+<body>
+<script>
+		
+//Width and height of map
+let width = 500;
+let height = width;
+
+//Create SVG element and append map to the SVG
+let svg = d3.select("body")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// Append Div for tooltip to SVG
+let tooltipDiv = d3.select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("display", "none");
+
+// Load topojson data
+async function make_map(filename) {
+  const MItopo = await d3.json(filename)
+  // convert to geojson
+  const MIgeo = topojson.feature(MItopo, MItopo.objects.collection)
+
+  // D3 Projection
+  let projection = d3.geoMercator()
+      .fitSize([width, height], MIgeo)
+
+  // Define path generator
+  let path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+      .projection(projection);
+
+  // Bind the data to the SVG and create one path per GeoJSON feature
+  svg.selectAll("path")
+      .data(MIgeo.features)
+    .enter().append("path")
+      .attr('class', 'county')
+      .attr("d", path)
+      .on("mouseover", d => {
+          tooltipDiv.transition().duration(200)
+              .style("display", null);
+          tooltipDiv.html("<p>" + d.properties.name + ": " + d.properties.county + "</p>")
+              .style("left", (d3.event.pageX+10 ) + "px")
+              .style("top", (d3.event.pageY-20) + "px");
+      })
+      .on("mouseout", () => {
+          tooltipDiv.transition().duration(500)
+              .style("display", "none");
+      });
+};
+make_map("gz_2010_us_050_00_5m_MI_counties.topojson");
+
+</script>
+</body>
+</html>

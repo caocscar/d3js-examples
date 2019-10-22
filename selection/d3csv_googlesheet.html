@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="//d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+  <script>
+    const parseDate = d3.timeParse("%m/%d/%y");
+    async function read_google_sheet() {
+      let data = await d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vT4Ct6soKGWLJqC5sBk3vL3lvmH2t2GfCBe0xUgewKgDJ14v21NX5bdZ0oJfZRYcc-Ac4SClwtwopUE/pub?gid=0&single=true&output=csv', type);
+    }
+    function type(d) {      
+      d.hour = +d.hour;
+      d.date = d3.timeHour.offset(parseDate(d.date), +d.hour);
+      d.year = d.date.getFullYear();
+      d.month = d.date.getMonth();
+      d.day = d.date.getDate();
+      d.weekday = d.date.getDay();
+      d.usage = +d.usage;
+      return d
+    }
+    read_google_sheet();
+  </script>
+</body>
+</html>

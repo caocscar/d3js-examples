@@ -1,0 +1,29 @@
+<script src="http://d3js.org/d3.v5.min.js"></script>
+<svg width="600" height="600">
+    <circle cx="100" cy="90" r="10"></circle>
+    <circle cx="200" cy="90" r="10"></circle>
+    <circle cx="300" cy="90" r="10"></circle>
+</svg>
+<script>
+    var circle = d3.selectAll("circle")
+    circle.attr('fill', 'orange')
+    circle.attr("cy", d => Math.random() * 500)
+    circle.data([169, 64, 289]);
+    circle.attr('r', d => Math.sqrt(d));
+    circle.attr("cx", (d,i) => i * 200 + 50 );
+
+    var svg = d3.select("svg");
+
+    // add new elements
+    var circle = svg.selectAll("circle").data([1, 64, 81, 169, 225, 67])
+
+    circle.enter().append("circle")
+            .attr("cy", 60)
+            .attr("cx", (d,i) => i * 100 + 30)
+            .attr("r", d => Math.sqrt(d));
+
+    // remove extra elements
+    var circle = svg.selectAll("circle").data([1, 64, 81])
+    circle.exit().remove();
+
+</script>

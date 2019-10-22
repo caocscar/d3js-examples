@@ -1,0 +1,42 @@
+.bar {
+  fill: #ebc312;
+  clip-path: url(#clip); /* clip bar with rectangle */
+}
+
+.avgLine {
+  fill: none;
+  stroke: #73000A;
+  stroke-width: 2px;
+  clip-path: url(#clip); /* clip line with rectangle */
+}
+
+.area {
+  fill: #ebc312;
+  clip-path: url(#clip);
+}
+
+.axis{
+  font-size: 14px;
+}
+
+.brush .extent {
+  stroke:#fff;
+  fill-opacity:0.125;
+  shape-rendering:crispEdges;
+}
+
+div.tooltip {	
+  position: absolute;			
+  text-align: center;			
+  width: 60px;					
+  height: 28px;					
+  padding: 2px;				
+  font: 12px sans-serif;		
+  background: lightsteelblue;	
+  border: 0px;		
+  border-radius: 8px;			
+  pointer-events: none;			
+}
+/* .summary{
+  font-weight: bold;
+} */

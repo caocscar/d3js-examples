@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="//d3js.org/topojson.v3.min.js"></script>
+    <link rel="stylesheet" href="michigan.css">
+</head>
+<body>
+<svg height="10" width="10" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs> 
+    <pattern id="diagonal-stripe-2" patternUnits="userSpaceOnUse" width="10" height="10"> 
+      <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsMTAgbDEwLC0xMAogICAgICAgICAgIE05LDExIGwyLC0yJyBzdHJva2U9J2JsYWNrJyBzdHJva2Utd2lkdGg9JzInLz4KPC9zdmc+" x="0" y="0" width="10" height="10"> 
+      </image> 
+    </pattern> 
+  </defs> 
+</svg>
+<script>
+		
+//Width and height of map
+let width = 550;
+let height = width;
+
+//Create SVG element and append map to the SVG
+let svg = d3.select("body")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// Append Div for tooltip to SVG
+let tooltipDiv = d3.select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("display", "none");
+
+// Load topojson data
+async function make_map(filename) {
+  
+  const MItopo = await d3.json(filename)
+  const cities = await d3.csv('cities.csv',type)
+  // convert to geojson
+  const MIgeo = topojson.feature(MItopo, MItopo.objects.collection)
+
+  // D3 Projection
+  let projection = d3.geoMercator()
+      .fitSize([width, height], MIgeo)
+
+  // Define path generator
+  let path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+      .projection(projection);
+
+  // Bind the data to the SVG and create one path per GeoJSON feature
+  svg.selectAll("path")
+      .data(MIgeo.features)
+    .enter().append("path")
+      .attr('class', 'county')
+      .attr("d", path)
+      .style('fill', d => {
+        const fips = (parseInt(d.properties.county) + 1) / 2
+        return (fips % 2) ? 'url(#diagonal-stripe-2)' : 'blue'
+      })
+      .on("mouseover", d => {
+          tooltipDiv.transition().duration(200)
+              .style("display", null);
+          tooltipDiv.html(`<p>${d.properties.name}</p>`)
+              .style("left", (d3.event.pageX+10 ) + "px")
+              .style("top", (d3.event.pageY-20) + "px");
+      })
+      .on("mouseout", () => {
+          tooltipDiv.transition().duration(500)
+              .style("display", "none");
+      })
+      .on('click', clicked);
+
+  var selected;
+  function clicked(d) {
+    selected = (d && selected !== d) ? d : null
+    svg.selectAll('.county')
+      .classed('actived', function(d) {return d === selected})
+  }
+
+  // Add points to map
+  svg.selectAll('circle')
+      .data(cities)
+    .enter().append('circle')
+      .attr('class', 'city')
+      .attr('r', '4')
+      .attr('cx', d => projection([d.lng,d.lat])[0])
+      .attr('cy', d => projection([d.lng,d.lat])[1])
+      .on('mouseover', function(d) {
+        d3.select(this).attr('r', '5')
+        tooltipDiv.transition().duration(200)
+            .style("display", null);
+        tooltipDiv.html(`<p>${d.name}</p>`)
+            .style("left", (d3.event.pageX+10 ) + "px")
+            .style("top", (d3.event.pageY-20) + "px");
+      })
+      .on('mouseout', function(d) {
+        d3.select(this).attr('r', '4')
+        tooltipDiv.transition().duration(500)
+            .style("display", "none");
+      })
+};
+
+function type(d) {
+  d.lat = +d.lat;
+  d.lng = +d.lng;
+  return d
+}
+make_map("gz_2010_us_050_00_5m_MI_counties.topojson");
+
+</script>
+</body>
+</html>

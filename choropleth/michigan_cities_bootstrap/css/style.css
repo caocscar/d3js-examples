@@ -1,0 +1,176 @@
+.navbar{
+  border-radius: 0;
+  margin-bottom: 0;
+  background-color: black;
+  opacity:1;
+}
+.navbar a:hover{
+  color: black !important;
+  background-color: #CCC !important;
+}
+.navbar .active{
+  font-weight: bold;
+}
+.navbar a{
+  color:#FFFFFF !important;
+}
+
+.row.content {
+  height:auto;
+}
+.sidenav{
+  /* padding-top: 170px; */
+  background-color:#1F3551;
+  height: 100%;
+}
+.footer{
+  position: absolute;
+  background-color: black;
+  right: 0;
+  left: 0;
+  /* bottom: -200; */
+  padding: 45px;
+  width: 100%;
+}
+li{
+  list-style: none;
+}
+#wayne, #timetable {
+  width: 70vw;
+  margin: 5px;
+}
+#race, #age, #gender{
+  width: 100%;
+  margin: 5px;
+}
+section{
+  margin-top: 40px;
+}
+table {
+border-collapse: collapse;
+}
+
+th {
+background-color: #2E4B70;
+color: white;
+text-align: center;
+
+}
+
+table, th, td {
+padding: 10px;
+font-weight: 400;
+text-transform: capitalize;
+}
+
+th{
+font-weight: 600;
+}
+.container-top-buffer{
+margin-top:20px;
+}
+.top-buffer{
+margin-top:50px;
+margin-bottom: 25px;
+}
+.section-buffer{
+margin-top: 60px;
+}
+
+.list-group-item-action{
+  font-size: 20px !important;
+  margin: 5px;
+}
+
+.list-group-item-text a{
+color: white !important;
+}
+.list-group-item-text a:hover{
+background-color:#B5CEEE!important;
+color: #1F3551 !important;
+}
+.list-group-item-text a:focus{
+background-color:#B5CEEE!important;
+color: #1F3551 !important;
+text-decoration: none;
+text-transform: uppercase;
+font-weight: bold;
+}
+
+.list-group a{
+  background-color: #1F3551 !important;
+  color: white !important;
+  font-size: 14px;
+  border: none;
+}
+.list-group{
+  background-color: #1F3551 !important;
+  border: none;
+}
+.centerimage img{
+width:100%;
+padding: 5px;
+}
+
+h2{
+font-weight: bold;
+}
+#datasource{
+font-weight: bold;
+}
+#number-incidents{
+font-size: 80px;
+}
+#number-change{
+color: red;
+font-weight: bold;
+font-size: 36px;
+}
+#up-down{
+color: red;
+font-weight: bold;
+font-size: 36px;
+}
+
+#change-percent{
+font-weight: bold;
+color: red;
+}
+
+hr{
+border-color: black;
+border-radius: 2px;
+
+}
+.rightbuff{
+  background-color:#2E4B70;
+  height: 100%;
+}
+
+.footstyle{
+  background-color: black;
+  color: white;
+}
+input[type=text] {
+  padding: 10px;
+  margin: 10px;;
+  font-size: 17px;
+}
+
+.searchbar{
+  margin: 50px;
+}
+
+.sidebuff{
+  height: 100%;
+  background-color:#2E4B70;
+}
+
+@media screen and (min-width:700px){
+.row.content{
+  height:750px;
+}
+.sidenav{
+  padding-top: 50px;
+}
+}

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="bar.css">
+</head>
+<body>
+<svg class="chart"></svg>
+<script>
+
+let margin = {top: 80, right: 80, bottom: 30+50, left: 120},
+    width = 900 - margin.left - margin.right,
+    height = 900 - margin.top - margin.bottom;
+
+let y = d3.scaleBand()
+    .range([height, 0])
+    .padding(0.33)
+
+let x = d3.scaleLinear()
+    .range([0, width]);
+
+let xAxis = d3.axisTop(x)
+
+let yAxis = d3.axisLeft(y)
+    .ticks(8)
+    .tickFormat('')
+
+let chart = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+data = [
+  {'team':'Yankees', 'src':'NewYork_Yankees', 'value':103},
+  {'team':'Rays', 'src':'TampaBay_Rays', 'value':96},
+  {'team':'Twins', 'src':'Minnesota_Twins', 'value':103},
+  {'team':'Astros', 'src':'Houston_Astros', 'value':107},
+  {'team':'Athletics', 'src':'Oakland_Athletics', 'value':97},
+  {'team':'Braves', 'src':'Atlanta_Braves', 'value':97},
+  {'team':'Nationals', 'src':'Washington_Nationals', 'value':93},
+  {'team':'Cardinals', 'src':'StLouis_Cardinals', 'value':91},
+  {'team':'Brewers', 'src':'Milwaukee_Brewers', 'value':89},
+  {'team':'Dodgers', 'src':'LosAngeles_Dodgers', 'value':106},
+  {'team':'Indians', 'src':'Cleveland_Indians', 'value':93},
+]
+
+data.map((d,i) => {
+  d.id = i
+  return d
+})
+y.domain(data.map(d => d.team).reverse());
+x.domain([0, d3.max(data, d => d.value)]);
+
+// add axes
+chart.append("g")
+    .attr("class", "x axis")
+    .attr("transform", `translate(0,0)`)
+    .call(xAxis);
+
+chart.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+// add the x-axis gridlines
+let gridlines = d3.axisTop(x)
+    .tickSize(-height)
+    .tickFormat("")
+
+chart.append("g")			
+    .attr("class", "grid")
+    .call(gridlines)
+
+// set up bar groups
+let bar = chart.selectAll(".bar")
+  .data(data)
+  .join("g")
+    .attr("class", "bar")
+    .attr("transform", (d,i) => `translate(0,${y(d.team)})`)
+
+// adding bars
+bar.append('rect')
+    .attr("width", (d,i) => x(d.value))
+    .attr("height", y.bandwidth())
+    .style('fill', d => d3.interpolateRdYlBu((d.value-47*1.5)/(107-47*1.5)))
+
+// bar labels
+bar.append('text')
+    .attr('class', 'team')
+    .attr('x', -10)
+    .attr('y', y.bandwidth()/2 + 5)
+    .text(d => d.team)
+
+const imgsize = 50
+bar.append("svg:image")
+    .attr('class', 'logo')
+    .attr('x', d => x(d.value) + 5)
+    .attr('y', -5)
+    .attr('width', imgsize)
+    .attr('height', imgsize)
+    .attr("xlink:href", d => `http://www.capsinfo.com/images/MLB_Team_Logos/${d.src}.png`)
+
+bar.append('text')
+    .attr('class', 'barlabel')
+    .attr('x', d => x(d.value) + 10 + imgsize)
+    .attr('y', y.bandwidth()/2 + 5)
+    .text(d => d.value)
+
+// labels
+labels = chart.append('g')
+    .attr('class', 'label')
+
+// x label
+labels.append('text')
+    .attr('transform', `translate(${width/2},-40)`)
+    .text('Count')
+
+// y label
+ylabel = labels.append('text')
+    .attr('transform', `translate(-80,${height/2}) rotate(-90)`) // order matters
+    .text('Teams')
+
+const z = 0.97*(height / data.length)
+const a = 2*z
+const k = 10
+let divisions = chart.selectAll('.divisions')
+  .data([a,a+z*1,a+z*3,a+z*5,a+z*7])
+  .join('line')
+    .attr('class', 'divisions')
+    .attr('x1', 0)
+    .attr('x2', width-150)
+    .attr('y1', d => d+k)
+    .attr('y2', d => d+k)
+
+// clipping rectangle; not sure why it doesn't match the area clipped
+chart.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr('x', -imgsize-10)
+    .attr('y', 0)
+    .attr("width", width+300)
+    .attr("height", height-z+85)    
+
+let sort = false
+// sorting transition
+setInterval(function() {  
+  sort = !sort
+  if (sort) {
+    data.sort((a,b) => d3.descending(a.value,b.value));
+  } else {
+    data.sort((a,b) => d3.ascending(a.id,b.id));
+  }
+  y.domain(data.map(d => d.team).reverse());
+  d3.selectAll('.bar').transition().duration(750)
+      .delay((d,i) => i*150)
+      .attr("transform", (d,i) => `translate(0,${y(d.team)})`)
+      .on('start', (d,i) => {
+        if (sort && i == 0) {
+          divisions.transition().duration(500)
+              .style('opacity', 0)
+        }
+      })
+      .on('end', (d,i) => {
+        if (!sort && i == 9) {
+          divisions.transition().duration(500)
+              .style('opacity', 1)
+        }
+      })
+  ylabel.transition().duration(500)
+      .style('opacity', 0)
+    .transition().duration(500)
+      .delay(500)
+      .style('opacity', 1)
+      .text(sort ? 'Rank' : 'Teams')
+}, 5000);
+
+</script>
+</body>
+</html>

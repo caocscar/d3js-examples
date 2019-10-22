@@ -1,0 +1,15 @@
+.row.content {
+  height:auto;
+  padding-top: 40px;
+}
+
+@media screen and (min-width:700px){
+.row.content{
+  height:750px;
+  padding-top: 0px;
+}
+
+@media screen and (min-width:1000px){
+.row.content{
+  height:800px;
+}

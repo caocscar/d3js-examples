@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery DataTable Bootstrap 4 styling using d3.js v5</title>
+  <script src="http://d3js.org/d3.v5.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"> 
+</head>
+<body>
+<script>
+
+async function make_html_table(filename) {
+
+  const data = await d3.csv(filename)
+
+  let table = d3.select('body')
+    .append('table')
+    .attr('id', 'data-table') 
+    .attr('class', 'table table-striped table-bordered')
+    .style('width','100%')
+
+  table.append('thead').append('tr')
+    .selectAll('th')
+      .data(data.columns)
+    .enter().append('th')
+      .text(d => d)
+  
+  table.append('tbody').selectAll('tr')
+      .data(data)
+    .enter().append('tr')
+    .selectAll('td')
+      .data((d,i) => d3.values(d) ).enter()
+      .append('td')
+      .text(d => d)
+
+  $(document).ready(function() {
+    $('#data-table').DataTable();
+  } );
+};
+
+make_html_table('sagarin.txt');
+
+</script>
+</body>
+</html>

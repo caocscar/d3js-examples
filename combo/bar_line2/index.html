@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bar Line Combo in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="barline.css">
+</head>
+<body>
+<script>
+// set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 110, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+    margin2 = {top: 230, right: 20, bottom: 30, left: 40},
+    height2 = 300 - margin2.top - margin2.bottom;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+
+// parse the date / time
+const parseDate = d3.timeParse("%m/%d/%Y");
+
+// set the ranges
+let x = d3.scaleTime().range([0, width]),
+    y = d3.scaleLinear().range([height, 0]),
+    x2 = d3.scaleTime().range([0, width]),
+    y2 = d3.scaleLinear().range([height2, 0]);
+
+var xAxis = d3.axisBottom(x),
+    yAxis = d3.axisRight(y),
+    xAxis2 = d3.axisBottom(x2);
+
+// Add brush in x-dimension
+var brush = d3.brushX()
+    .extent([[0, 0], [width, height2]])
+    .on("brush", brushed)
+    .on("end", brushended) // add brush snapping
+
+// Not sure
+var zoom = d3.zoom()
+    .scaleExtent([1, Infinity])
+    .translateExtent([[0, 0], [width, height]])
+    .extent([[0, 0], [width, height]])
+
+// define the focus moving avg
+var movingAvg1 = d3.line()
+    .x(d => x(d.date))
+    .y(d => y(d.avg))
+
+// define the context moving avg
+var movingAvg2 = d3.line()
+    .x(d => x2(d.date))
+    .y(d => y2(d.avg))
+
+// focus is the micro level view
+var focus = svg.append("g")
+    .attr("class", "focus")
+    .attr("transform", `translate(${margin.left},${margin.top})`)
+
+// context is the macro level view
+var context = svg.append("g")
+    .attr("class", "context")
+    .attr("transform", `translate(${margin2.left},${margin2.top})`);
+
+// clipping rectangle
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+    .append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    
+async function make_line_chart(filename) {
+  const data = await d3.csv(filename, type);
+  const movingAvgData = movingAverage(data, 7);
+
+  // scale the range of the data
+  endDate = d3.timeDay.offset(d3.max(data, d => d.date),1)
+  x.domain([d3.min(data, d => d.date), endDate]);
+  y.domain([0, d3.max(data, d => d.value)]);
+  x2.domain(x.domain());
+  y2.domain(y.domain());
+
+  // add the focus bar chart
+  focus.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", d => x(d3.timeHour.offset(d.date,1)))
+      .attr("y", d => y(d.value))
+      .attr("width", width / data.length * 22/24)
+      .attr("height", d => height - y(d.value))
+
+  // add the focus moving avg line path
+  focus.append('path')
+      .datum(movingAvgData)
+      .attr('class', 'avgLine')
+      .attr('d', movingAvg1)
+      
+  // add the focus x-axis
+  focus.append("g")
+      .attr("class", "axis--x")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+  // add the focus y-axis
+  focus.append("g")
+      .attr("class", "axis--y")
+      .attr('transform', `translate(${width},0)`)
+      .call(yAxis);
+
+  // add the context bar chart
+  context.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", d => x2(d3.timeHour.offset(d.date,1)))
+      .attr("y", d => y2(d.value))
+      .attr("width", width / data.length * 22/24)
+      .attr("height", d => height2 - y2(d.value))
+
+  // add the context moving avg line path
+  context.append('path')
+      .datum(movingAvgData)
+      .attr('class', 'avgLine')
+      .attr('d', movingAvg2)
+      
+  // add the context x-axis
+  context.append("g")
+      .attr("class", "axis--x")
+      .attr("transform", `translate(0,${height2})`)
+      .call(xAxis2);
+
+  // add the context brush
+  beginDate = d3.timeDay.offset(endDate, -14)
+  context.append("g")
+      .attr("class", "brush")
+      .call(brush)
+      .call(brush.move, [x(beginDate), x(endDate)]); // initialize brush selection
+      
+};
+
+// brush function
+function brushed() {
+  const selection = d3.event.selection || x2.range(); // default brush selection
+  x.domain(selection.map(x2.invert, x2)); // new focus x-domain
+  ms = x.domain()[1] - x.domain()[0]
+  days = ms / 1000 / 60 / 60 / 24
+  focus.selectAll(".bar")
+      .attr("x", d => x(d3.timeHour.offset(d.date,1)))
+      .attr("width", width / days * 22/24)
+
+  focus.select(".avgLine")
+      .attr("d", movingAvg1);
+  focus.select(".axis--x")
+      .call(xAxis)
+}
+
+// brush snapping function
+function brushended() {
+  if (!d3.event.sourceEvent) return; // Only transition after input.
+  if (!d3.event.selection) brushed(); // Empty selection returns default brush
+  let d0 = d3.event.selection.map(x2.invert),
+      d1 = d0.map(d3.timeDay.round);
+
+  // If empty when rounded, use floor & ceil instead.
+  if (d1[0] >= d1[1]) {
+      d1[0] = d3.timeDay.floor(d0[0]);
+      d1[1] = d3.timeDay.offset(d1[0]);
+  }
+
+  d3.select(this)
+    .transition()
+    .call(d3.event.target.move, d1.map(x2));
+}
+
+function type(d) {
+  d.date = parseDate(d.date);
+  d.value = +d.value || 0;
+  return d;
+}
+
+// calculates simple moving average over N days
+// assumes no missing dates (best dataset format)
+function movingAverage(data, N) {
+  const data2 = resampleDates(data)
+  return data2.map((row, idx, total) => {
+    const startIdx = Math.max(0, idx-N+1)
+    const endIdx = idx
+    const movingWindow = total.slice(startIdx, endIdx+1)
+    const sum = movingWindow.reduce((a,b) => a + b.value, 0)
+    return {
+      key: d3.timeHour.offset(row.key, 12), // offset point by 12 hrs (noon)
+      avg: sum / movingWindow.length,
+    };
+  });
+};
+
+// resamples dates to make sure there are no missing dates
+function resampleDates(data) {
+  const startDate = d3.min(data, d => d.key)
+  const endDate = d3.max(data, d => d.key)
+  const dayRange = d3.timeDay.range(startDate, d3.timeDay.offset(endDate,1), 1)
+  return dayRange.map(day => {
+    return data.find(d => d.key >= day && d.key < d3.timeHour.offset(day,1)) || {'key':day, 'value':0}
+  })
+}
+
+make_line_chart('gas.csv');
+
+</script>
+</body>

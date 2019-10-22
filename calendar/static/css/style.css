@@ -1,0 +1,79 @@
+	body {
+	    font-family: 'Asap', sans-serif;
+	}
+
+	.contentContainer {
+	  width:960px;
+	  margin: 0 auto;
+	}
+
+	.content {
+	  float:left;
+	  width:700px;
+	}
+
+	.sidebar {
+	  float:right;
+	  padding:15px;
+	  width:180px;
+	}
+
+	.clear {
+	  clear:both;
+	}
+
+	.day {
+	  fill: none;
+	  stroke: #bbb;
+	  stroke-width: 1px;
+	}
+
+	.month {
+	  fill: none;
+	  stroke: #000;
+	  stroke-width: 2px;
+	}
+	
+	.year-title {
+	  font-size: 18px;
+	  letter-spacing: 10px;
+	}
+
+	header{
+		width: 700px;
+		margin-top: 2%;
+		text-align: center;
+	}
+
+	svg text { 
+	  font-size: 9px;
+	  text-transform: capitalize;
+	  fill: #000;
+	}
+
+	text.legendTitle{
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	text.label{
+		font-size: 10px;
+	}
+
+	 /*Style for Custom Tooltip */
+	div.tooltip {
+	    position: absolute;
+	    text-align: center;
+	    min-width: 100px;
+	    height: auto;
+	    padding: 2px;
+	    font-size: 12px;
+	    background: white;
+	    border: 1px orange solid;
+	    border-radius: 5px;
+	    pointer-events: none;
+	}
+
+	.tooltip p {
+	    margin: 5px;
+	}

@@ -1,0 +1,59 @@
+<!-- Code from d3-graph-gallery.com -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="http://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+<!-- Create a div with just a rect in svg -->
+<div id="my404">
+  <svg width="500px" height="320px"></svg>
+</div>
+<div id="my_dataviz">
+  <svg width="500px" height="320px"></svg>
+</div>
+
+<script>
+
+// Position of the circles on the X axis
+var position = [50, 100, 150, 200, 250, 300, 350, 400, 450]
+
+// Add circles at the top
+d3.select("svg")
+  .selectAll("mycircles")
+  .data(position)
+  .enter()
+  .append("circle")
+    .attr("cx", function(d){return d} )
+    .attr("cy", 20)
+    .attr("r", 10)
+
+msg = ["4","0","4"]
+d3.select("#my404").select("svg")
+    .selectAll("myletters")
+    .data(position)
+  .enter().append("text")
+    .attr("x", (d,i) => 60*i)
+    .attr("y", -50)
+    .attr("dy", ".75em")
+    .text((d,i) => msg[i]);
+
+// Animation: put them down one by one:
+d3.selectAll("circle")
+  .transition()
+  .duration(2000)
+  .attr("cy", 300)
+  .delay(function(i){return(i*10)})
+
+d3.selectAll("text")
+  .transition()
+  .duration(2000)
+  .attr("y", 50)
+  .delay(function(i){return(i*10)})
+
+</script>
+</body>
+</html>

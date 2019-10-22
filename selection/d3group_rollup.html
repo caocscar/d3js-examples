@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="//d3js.org/d3.v5.min.js"></script>
+  <script src="https://d3js.org/d3-array.v2.min.js"></script>
+</head>
+<body>
+  <script>
+    // Reference: https://github.com/d3/d3-array
+    async function make_table(filename) {
+      const data = await d3.csv(filename);
+      // single level group selection
+      g1 = d3.group(data, d => d.AY)
+      // two level group selection
+      g2 = d3.group(data, d => d.AY, d => d.Term)
+      // single level map count
+      one = d3.rollup(data, v => v.length, d => d.AY)
+      // two level map count
+      two = d3.rollup(data, v => v.length, d => d.AY, d => d.Term)
+      // single level map sum
+      summ = d3.rollup(data, v => d3.sum(v, d => d.Term), d => d.AY)
+      // two level map sum
+      summgen = d3.rollup(data, v => d3.sum(v, d => d.Term), d => d.AY, d => d.G)
+      // convert from Map to Array
+      arr = Array.from(d3.group(data, d => d.AY), ([key, value]) => ({'k':key, 'v':value}))
+    }
+    make_table('Clients.csv');
+  </script>
+</body>
+</html>

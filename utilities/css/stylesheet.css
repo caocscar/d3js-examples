@@ -1,0 +1,23 @@
+/* bar chart text */
+.chart {
+    font-weight: bold;
+    font-family: 'Helvetica';
+    text-anchor: middle;
+}
+
+
+/* text inside donut chart */
+.count {
+    font: 16px sans-serif;
+    text-anchor: middle;
+}
+
+/* text for label */
+.total {
+    font-size: 3em;
+    text-anchor: middle;
+    font-family: 'Helvetica';
+}
+.age-group {
+    font-weight: 700;
+}

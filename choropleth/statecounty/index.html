@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="//d3js.org/d3.v5.min.js"></script>
+  <script src="//d3js.org/topojson.v3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.min.js"></script>
+  <link rel="stylesheet" href="statecounty.css">
+</head>
+<body>
+<script>
+
+var width = 960,
+    height = 600,
+    centered;
+
+var color = d3.scaleThreshold()
+    .domain([1,2,5,10,20,50])
+    .range(d3.schemeBlues[7]);
+
+var path = d3.geoPath();
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("rect")
+    .attr("class", "background")
+    .attr("width", width)
+    .attr("height", height)
+    .on("click", clicked);
+
+var g = svg.append("g");
+
+var county_dict = d3.map(),
+    county_names = d3.map(),
+    state_dict = d3.map(),
+    abbr_dict = d3.map(),
+    state_names = d3.map();
+
+var promises = [];
+promises.push(d3.json("https://d3js.org/us-10m.v1.json"))
+promises.push(d3.csv("choropleth_county.csv"))
+promises.push(d3.csv("county_names.csv"))
+promises.push(d3.csv("state_fips_abbr.csv"))
+promises.push(d3.csv("choropleth_state.csv"))
+
+Promise.all(promises).then(function(p) {
+
+  // grab promise from list
+  const usa = p[0];
+  const countydata = p[1];
+  const countynames = p[2];
+  const statenames = p[3];
+  const statedata = p[4];
+
+  // construct mapping by iterating through list
+  for (var i=0; i<countydata.length; i++) {
+      county_dict.set(countydata[i].fips, parseInt(countydata[i].value) )
+  }
+  for (var j=0; j<countynames.length; j++) {
+      county_names.set(countynames[j].fips, countynames[j].name)
+  }
+  for (var k=0; k<statenames.length; k++) {
+      abbr_dict.set(statenames[k].name, statenames[k].fips)
+      state_names.set(statenames[k].fips, statenames[k].name)
+  }
+  for (var m=0; m<statedata.length; m++) {
+      state_dict.set(abbr_dict.get(statedata[m].state), parseInt(statedata[m].value) )
+  }
+
+  // county features (bottom layer)
+  g.append("g")
+      .attr("class", "counties")
+    .selectAll("path")
+    .data(topojson.feature(usa, usa.objects.counties).features)
+    .enter().append("path")
+      .attr("d", path)
+      .attr("class", "county-boundary")
+      .on("click", countyclicked)
+      .attr("fill", function(d) {
+        return color(county_dict.get(d.id))
+      })
+    .append("title") // Tooltip
+    .text(function(d) { 
+        var ct = county_dict.has(d.id) ? county_dict.get(d.id) : 0
+        var nom = county_names.has(d.id) ? county_names.get(d.id) : 'Unfound' 
+        return nom + ": " + ct
+    });
+
+  // state features (top layer)
+  g.append("g")
+      .attr("class", "states")
+    .selectAll("path")
+      .data(topojson.feature(usa, usa.objects.states).features)
+    .enter().append("path")
+      .attr("d", path)
+      // .attr("class", "state")
+      .on("click", clicked)
+      .attr("fill", d => color(state_dict.get(d.id)))
+    .append("title") // Tooltip
+    .text(function(d) { 
+        var ct = state_dict.get(d.id)
+        var nom = state_names.get(d.id) 
+        return nom + ": " + ct
+    });
+
+  // state outlines
+  // g.append("path")
+  //     .datum(topojson.mesh(usa, usa.objects.states, function(a, b) { return a !== b; }))
+  //     .attr("class", "state-borders")
+  //     .attr("d", path);
+
+  var legendSVG = d3.select("body")
+      .append("svg")
+      .attr("width",100)
+      .attr("height",160);
+
+  legendSVG.append("g")
+      .attr("class", "legend")
+      .attr("transform", "translate(0,10)");
+
+  var legendOptions = d3.legendColor()
+      .labelFormat(d3.format(".0f"))
+      .title("Sales")
+      .labels(['0','1','2-4','5-9','10-19','20-49','50+'])
+      .titleWidth(200)
+      .scale(color)
+      ;
+
+  legendSVG.select(".legend")
+    .call(legendOptions);
+});
+
+function clicked(d) {
+  var x, y, k;
+
+  if (d && centered !== d) {
+    var centroid = path.centroid(d);
+    x = centroid[0];
+    y = centroid[1];
+    k = 4;
+    centered = d;
+  } 
+  // else {
+  //   x = width / 2;
+  //   y = height / 2;
+  //   k = 1;
+  //   centered = null;
+  // }
+
+  // displays the counties
+  g.selectAll("path")
+      .classed("active", centered && function(d) { return d === centered; });
+
+  g.transition()
+      .duration(750)
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+      .style("stroke-width", 1.5 / k + "px");
+}
+
+function countyclicked(d) {
+  var x, y, k;
+
+  // zoom to county clicked
+  if (d && centered !== d) {
+    var centroid = path.centroid(d);
+    x = centroid[0];
+    y = centroid[1];
+    k = 4;
+    centered = d;
+  } else { // zoom out
+    x = width / 2;
+    y = height / 2;
+    k = 1;
+    centered = null;
+    // replace counties with state
+    g.selectAll("path")
+        .classed("active", centered && function(d) { return d === centered; });
+  }
+  g.transition()
+      .duration(750)
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+      .style("stroke-width", 1.5 / k + "px");
+}
+
+</script>
+</body>
+</html>

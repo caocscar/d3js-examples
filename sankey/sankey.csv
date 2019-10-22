@@ -1,0 +1,110 @@
+source,target,value
+Free,Amazon,90
+Free,Craigslist,105
+Free,Self,2
+Free,eBay,14
+Friends,Amazon,3
+Friends,Craigslist,5
+Friends,eBay,2
+Gift,Amazon,11
+Gift,Craigslist,6
+Gift,eBay,9
+Nancy,Amazon,54
+Nancy,Craigslist,31
+Nancy,Self,2
+Nancy,eBay,8
+Paid,Amazon,65
+Paid,Craigslist,69
+Paid,Self,4
+Paid,StubHub,5
+Paid,eBay,31
+Amazon,Appliance,1
+Amazon,Book,150
+Amazon,CD,8
+Amazon,DVD,11
+Amazon,Electronics,42
+Amazon,Furniture,1
+Amazon,Kitchen,1
+Amazon,Misc,9
+Craigslist,Appliance,24
+Craigslist,Book,1
+Craigslist,CD,1
+Craigslist,Coupon,4
+Craigslist,DVD,2
+Craigslist,Electronics,41
+Craigslist,Furniture,59
+Craigslist,Kitchen,9
+Craigslist,Misc,48
+Craigslist,Patio&Garden,17
+Craigslist,Sports,10
+Self,Book,1
+Self,Electronics,1
+Self,Misc,3
+Self,Patio&Garden,2
+Self,Sports,1
+StubHub,Misc,5
+eBay,Appliance,1
+eBay,Book,5
+eBay,Clothing,14
+eBay,Coupon,4
+eBay,DVD,2
+eBay,Electronics,14
+eBay,Kitchen,1
+eBay,Misc,18
+eBay,Sports,5
+Appliance,Delivery,3
+Appliance,Expedited,2
+Appliance,In Person,18
+Appliance,Tele-exchange,3
+Book,1st Class,33
+Book,Delivery,1
+Book,Expedited,26
+Book,In Person,1
+Book,Media,96
+CD,1st Class,6
+CD,Expedited,1
+CD,Media,2
+Clothing,1st Class,8
+Clothing,Expedited,6
+Coupon,1st Class,4
+Coupon,Email,2
+Coupon,Neutral Site,1
+Coupon,School,1
+DVD,1st Class,9
+DVD,Expedited,2
+DVD,In Person,1
+DVD,Media,2
+DVD,Out & About,1
+Electronics,1st Class,18
+Electronics,Delivery,5
+Electronics,Expedited,18
+Electronics,In Person,28
+Electronics,Neutral Site,6
+Electronics,Parcel Post,18
+Electronics,School,3
+Electronics,Tele-exchange,1
+Electronics,UPS Ground,1
+Furniture,Delivery,7
+Furniture,In Person,49
+Furniture,Neutral Site,2
+Furniture,Parcel Post,1
+Furniture,School,1
+Kitchen,1st Class,1
+Kitchen,Delivery,2
+Kitchen,Expedited,1
+Kitchen,In Person,5
+Kitchen,Neutral Site,2
+Misc,1st Class,14
+Misc,Delivery,3
+Misc,Expedited,11
+Misc,In Person,48
+Misc,Neutral Site,1
+Misc,Parcel Post,2
+Misc,School,1
+Misc,Tele-exchange,3
+Patio&Garden,In Person,18
+Patio&Garden,Tele-exchange,1
+Sports,1st Class,1
+Sports,Expedited,4
+Sports,In Person,10
+Sports,Tele-exchange,1

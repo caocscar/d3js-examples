@@ -1,0 +1,122 @@
+/* google map */
+#map {
+  height: 550px;
+  width: 100%;
+  margin-top: 1em;
+}
+
+/* bar line chart */
+.bar {
+   fill: #FFCB05;
+   stroke: none;
+}
+
+.line {
+  fill: none;
+  stroke: #00274C;
+  stroke-width: 4px;
+}
+
+.barline {
+  display: block;
+}
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.tick:nth-child(odd) text {
+  visibility: hidden;
+}
+
+.x.ticklabel {
+  text-anchor: end;
+  font-size: 12px;
+}
+
+.y.ticklabel {
+  font-size: 14px;
+}
+
+.y.label {
+  text-anchor: middle;
+  font-size: 20px;
+}
+
+.legend {
+  text-anchor: start;
+  font-size: 20px;
+}
+
+/* donut chart */
+tspan {
+  font: 16px sans-serif;
+  text-anchor: middle;
+}
+
+.arclabel.one {
+  font-weight: 600;
+}
+
+.donut_center {
+  font-size: 2em;
+  text-anchor: middle;
+}
+
+.donut_title {
+  font-size: 1.5em;
+  font-weight: 500;
+  text-anchor: middle;
+}
+
+#logos {
+  
+}
+
+/* table */
+h1, h2, h3 {
+  text-align: center;
+}
+table {
+  width: 600px;
+  border-collapse: collapse;
+  margin: 0px auto;
+}
+th {
+  background: rgb(0, 39, 76);
+  color: white;
+  font-weight: bold;
+  cursor: s-resize;
+  background-repeat: no-repeat;
+  background-position: 3% center;
+}
+td, th {
+  padding: 6px;
+  border: 1px solid rgb(0, 39, 76);
+  text-align: center;
+}
+#summary tr {
+  background: rgb(255, 203, 5);
+}
+
+/* selenium save to pdf print settings */
+@page {
+    size:  auto;   /* auto is the initial value */
+    margin: 0mm;  /* this affects the margin in the printer settings */
+}
+
+html {
+    /* background-color: #FFFFFF;  */
+    margin: 40px;  /* this affects the margin on the html before sending to printer */
+}
+
+body {
+    /* border: solid 1px red ; */
+    margin: 0mm; /* margin you want for the content */
+}

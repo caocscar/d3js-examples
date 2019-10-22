@@ -1,0 +1,25 @@
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+tspan {
+  font: 16px sans-serif;
+  text-anchor: middle;
+}
+
+.total {
+  font-size: 3em;
+  text-anchor: middle;
+}
+
+.chart_title {
+  font-size: 2em;
+  text-anchor: middle;  
+}
+
+.age-group {
+  font-weight: 700;
+}

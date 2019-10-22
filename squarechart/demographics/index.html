@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Demographics</title>
+    <link rel="stylesheet" href="css/skeleton.css" />
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link href='https://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="js/draw.js"></script>
+    <div class="container">
+        <div class="row centered">
+            <div class="six columns offset-by-three alpha">
+                <h1>how groups of people live</h1>
+            </div>
+        </div>
+        <div class="row centered">
+            <div class="six columns offset-by-three alpha">
+                <p class="desc centered">Select among the following demographics.</p>
+            </div>
+        </div>
+        <div class="row" style="margin-top:20px;">
+            <div class="two columns offset-by-four alpha">
+                <div class="row">
+                    <h3>SEX</h3>
+                </div>
+                <div class="row" id="sex">
+                    <div class="button current" data-val="2">Female</div>
+                    <div class="button" data-val="1" style="margin-right:0">Male</div>
+                </div>
+            </div>
+            <div class="four columns">
+                <div class="row" id="agegrp">
+                    <h3>age group</h3>
+                    <div class="button" data-val="1">18 to 24</div>
+                    <div class="button current" data-val="2">25 to 44</div>
+                    <div class="button" data-val="3">45 to 64</div>
+                    <div class="button" data-val="4" style="margin-right:0">65+</div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="five columns offset-by-four alpha" id="racesimp" style="margin-top:10px;">
+                <h3>Race or Origin</h3>
+                <div class="button current" data-val="1">White</div>
+                <div class="button" data-val="2">Black</div>
+                <div class="button" data-val="4">Asian</div>
+                <div class="button" data-val="3">Native</div>
+                <div class="button" data-val="5" style="margin-right:0">Hispanic</div>
+            </div>
+        </div>
+        <div class="row centered" style="margin-top:20px;">
+            <div class="four columns offset-by-four alpha">
+                <p class="desc">There are about this many people in this group&hellip;</p>
+            </div>
+        </div>
+        <div class="row centered">
+            <div class="four columns offset-by-four alpha">
+                <div id="n">0</div>
+            </div>
+        </div>
+        <div class="row centered">
+            <div class="four columns offset-by-four alpha">
+                <p class="desc centered">&hellip;and of these people, here are their percentage breakdowns.</p>
+            </div>
+        </div>
+      
+        <div class="row">
+            <div class="ten columns offset-by-one alpha" id="chart1">
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

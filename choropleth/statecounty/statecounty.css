@@ -1,0 +1,45 @@
+.background {
+  fill: none;
+  pointer-events: none;  /* default */
+}
+
+.states {
+  fill: #eff3ff;
+  stroke: pink;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.states .active {
+  fill: orange;
+  display: none;
+}
+
+/* .state-borders {
+  fill: none;
+  stroke: orange;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+} */
+
+.counties {
+  fill: #eff3ff;
+  stroke: white;
+}
+
+/* .counties .active {
+  fill: yellow;
+} */
+
+.county-boundary:hover {
+  opacity: 0.35;
+}
+
+.legend {
+	position:absolute;
+	left:20px;
+	top:0px;
+}

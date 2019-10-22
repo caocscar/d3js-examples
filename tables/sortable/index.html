@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>D3.js v5 Sortable Table</title>
+  <script src="//d3js.org/d3.v5.min.js"></script>
+  <link rel="stylesheet" href="tables.css">
+</head>
+<body>
+
+<div id="data-table"></div>
+<script>
+
+async function make_html_table(filename) {
+  const data = await d3.csv(filename);
+  let sortAscending = d3.map();
+  for (col of data.columns) {
+      sortAscending.set(col,true)
+  };
+  var collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+  var table = d3.select('#data-table').append('table');
+  var headers = table.append('thead').append('tr')
+    .selectAll('th')
+      .data(data.columns)
+    .enter().append('th')
+    .text(d => d)
+    .on('click', function(d) {
+      headers.attr('class', 'header');
+      if (sortAscending[d]) {
+        rows.sort((a,b) => collator.compare(a[d],b[d])) // sorts naturally instead of alphabetically
+        this.className = 'aes';
+      } else {
+        rows.sort((a,b) => collator.compare(b[d],a[d]))
+        this.className = 'des';
+      }
+      sortAscending[d] = !sortAscending[d];
+    });
+
+  var rows = table.append('tbody').selectAll('tr')
+      .data(data)
+    .enter().append('tr');
+    
+  rows.selectAll('td')
+      .data((d,i) => d3.values(d) )
+    .enter().append('td')
+    .text(d => d)
+};
+
+make_html_table("Addresses.csv");
+
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+h1 {
+  font: 400 120px/500px "Helvetica Neue";
+  text-align: center;
+  width: 960px;
+  height: 500px;
+  margin: 0;
+  position: absolute;
+}
+
+</style>
+<script src="//d3js.org/d3.v5.min.js"></script>
+
+<body>
+
+<form>
+  <label><input type="radio" value="value" checked>Value</label>
+  <label><input type="radio" value="week">Week</label>
+</form>
+<h1>0</h1>
+
+<script>
+
+var format = d3.format(",d");
+
+/*d3.selectAll("input")
+.on("change", update);
+
+function update() {
+  var value = this.value;
+  var t = d3.active(this)
+        .style("opacity", 0)
+        .remove();
+  d3.select("body").append("h1")
+        .style("opacity", 0)
+        .text(format(Math.random() * 1e6))
+      .transition(t).duration(1500)
+        .style("opacity", 1)
+}
+*/
+d3.select("h1")
+  .transition()
+    .duration(750)
+    .on("start", function once() {
+      var t = d3.active(this)
+          .style("opacity", 0)
+          .remove();
+
+      d3.select("body").append("h1")
+          .style("opacity", 0)
+          .text(format(Math.random() * 1e6))
+        .transition(t).duration(750)
+          .style("opacity", 1)
+//        .transition().duration(100)
+//          .delay(1500)
+//          .on("start", repeat);
+    });
+
+</script>
+</body>

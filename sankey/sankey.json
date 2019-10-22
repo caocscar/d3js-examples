@@ -1,0 +1,653 @@
+{
+  "nodes": [
+    {
+      "name": "Paid"
+    },
+    {
+      "name": "Gift"
+    },
+    {
+      "name": "Friends"
+    },
+    {
+      "name": "Free"
+    },
+    {
+      "name": "Nancy"
+    },
+    {
+      "name": "Amazon"
+    },
+    {
+      "name": "eBay"
+    },
+    {
+      "name": "Self"
+    },
+    {
+      "name": "StubHub"
+    },
+    {
+      "name": "Craigslist"
+    },
+    {
+      "name": "Book"
+    },
+    {
+      "name": "DVD"
+    },
+    {
+      "name": "Coupon"
+    },
+    {
+      "name": "CD"
+    },
+    {
+      "name": "Misc"
+    },
+    {
+      "name": "Kitchen"
+    },
+    {
+      "name": "Clothing"
+    },
+    {
+      "name": "Furniture"
+    },
+    {
+      "name": "Patio&Garden"
+    },
+    {
+      "name": "Electronics"
+    },
+    {
+      "name": "Sports"
+    },
+    {
+      "name": "Appliance"
+    },
+    {
+      "name": "Out & About"
+    },
+    {
+      "name": "Expedited"
+    },
+    {
+      "name": "Delivery"
+    },
+    {
+      "name": "Tele-exchange"
+    },
+    {
+      "name": "Parcel Post"
+    },
+    {
+      "name": "1st Class"
+    },
+    {
+      "name": "Email"
+    },
+    {
+      "name": "School"
+    },
+    {
+      "name": "Media"
+    },
+    {
+      "name": "In Person"
+    },
+    {
+      "name": "UPS Ground"
+    },
+    {
+      "name": "Neutral Site"
+    }
+  ],
+  "links": [
+    {
+      "source": "Free",
+      "target": "Amazon",
+      "value": 90
+    },
+    {
+      "source": "Free",
+      "target": "Craigslist",
+      "value": 105
+    },
+    {
+      "source": "Free",
+      "target": "Self",
+      "value": 2
+    },
+    {
+      "source": "Free",
+      "target": "eBay",
+      "value": 14
+    },
+    {
+      "source": "Friends",
+      "target": "Amazon",
+      "value": 3
+    },
+    {
+      "source": "Friends",
+      "target": "Craigslist",
+      "value": 5
+    },
+    {
+      "source": "Friends",
+      "target": "eBay",
+      "value": 2
+    },
+    {
+      "source": "Gift",
+      "target": "Amazon",
+      "value": 11
+    },
+    {
+      "source": "Gift",
+      "target": "Craigslist",
+      "value": 6
+    },
+    {
+      "source": "Gift",
+      "target": "eBay",
+      "value": 9
+    },
+    {
+      "source": "Nancy",
+      "target": "Amazon",
+      "value": 54
+    },
+    {
+      "source": "Nancy",
+      "target": "Craigslist",
+      "value": 31
+    },
+    {
+      "source": "Nancy",
+      "target": "Self",
+      "value": 2
+    },
+    {
+      "source": "Nancy",
+      "target": "eBay",
+      "value": 8
+    },
+    {
+      "source": "Paid",
+      "target": "Amazon",
+      "value": 65
+    },
+    {
+      "source": "Paid",
+      "target": "Craigslist",
+      "value": 69
+    },
+    {
+      "source": "Paid",
+      "target": "Self",
+      "value": 4
+    },
+    {
+      "source": "Paid",
+      "target": "StubHub",
+      "value": 5
+    },
+    {
+      "source": "Paid",
+      "target": "eBay",
+      "value": 31
+    },
+    {
+      "source": "Amazon",
+      "target": "Appliance",
+      "value": 1
+    },
+    {
+      "source": "Amazon",
+      "target": "Book",
+      "value": 150
+    },
+    {
+      "source": "Amazon",
+      "target": "CD",
+      "value": 8
+    },
+    {
+      "source": "Amazon",
+      "target": "DVD",
+      "value": 11
+    },
+    {
+      "source": "Amazon",
+      "target": "Electronics",
+      "value": 42
+    },
+    {
+      "source": "Amazon",
+      "target": "Furniture",
+      "value": 1
+    },
+    {
+      "source": "Amazon",
+      "target": "Kitchen",
+      "value": 1
+    },
+    {
+      "source": "Amazon",
+      "target": "Misc",
+      "value": 9
+    },
+    {
+      "source": "Craigslist",
+      "target": "Appliance",
+      "value": 24
+    },
+    {
+      "source": "Craigslist",
+      "target": "Book",
+      "value": 1
+    },
+    {
+      "source": "Craigslist",
+      "target": "CD",
+      "value": 1
+    },
+    {
+      "source": "Craigslist",
+      "target": "Coupon",
+      "value": 4
+    },
+    {
+      "source": "Craigslist",
+      "target": "DVD",
+      "value": 2
+    },
+    {
+      "source": "Craigslist",
+      "target": "Electronics",
+      "value": 41
+    },
+    {
+      "source": "Craigslist",
+      "target": "Furniture",
+      "value": 59
+    },
+    {
+      "source": "Craigslist",
+      "target": "Kitchen",
+      "value": 9
+    },
+    {
+      "source": "Craigslist",
+      "target": "Misc",
+      "value": 48
+    },
+    {
+      "source": "Craigslist",
+      "target": "Patio&Garden",
+      "value": 17
+    },
+    {
+      "source": "Craigslist",
+      "target": "Sports",
+      "value": 10
+    },
+    {
+      "source": "Self",
+      "target": "Book",
+      "value": 1
+    },
+    {
+      "source": "Self",
+      "target": "Electronics",
+      "value": 1
+    },
+    {
+      "source": "Self",
+      "target": "Misc",
+      "value": 3
+    },
+    {
+      "source": "Self",
+      "target": "Patio&Garden",
+      "value": 2
+    },
+    {
+      "source": "Self",
+      "target": "Sports",
+      "value": 1
+    },
+    {
+      "source": "StubHub",
+      "target": "Misc",
+      "value": 5
+    },
+    {
+      "source": "eBay",
+      "target": "Appliance",
+      "value": 1
+    },
+    {
+      "source": "eBay",
+      "target": "Book",
+      "value": 5
+    },
+    {
+      "source": "eBay",
+      "target": "Clothing",
+      "value": 14
+    },
+    {
+      "source": "eBay",
+      "target": "Coupon",
+      "value": 4
+    },
+    {
+      "source": "eBay",
+      "target": "DVD",
+      "value": 2
+    },
+    {
+      "source": "eBay",
+      "target": "Electronics",
+      "value": 14
+    },
+    {
+      "source": "eBay",
+      "target": "Kitchen",
+      "value": 1
+    },
+    {
+      "source": "eBay",
+      "target": "Misc",
+      "value": 18
+    },
+    {
+      "source": "eBay",
+      "target": "Sports",
+      "value": 5
+    },
+    {
+      "source": "Appliance",
+      "target": "Delivery",
+      "value": 3
+    },
+    {
+      "source": "Appliance",
+      "target": "Expedited",
+      "value": 2
+    },
+    {
+      "source": "Appliance",
+      "target": "In Person",
+      "value": 18
+    },
+    {
+      "source": "Appliance",
+      "target": "Tele-exchange",
+      "value": 3
+    },
+    {
+      "source": "Book",
+      "target": "1st Class",
+      "value": 33
+    },
+    {
+      "source": "Book",
+      "target": "Delivery",
+      "value": 1
+    },
+    {
+      "source": "Book",
+      "target": "Expedited",
+      "value": 26
+    },
+    {
+      "source": "Book",
+      "target": "In Person",
+      "value": 1
+    },
+    {
+      "source": "Book",
+      "target": "Media",
+      "value": 96
+    },
+    {
+      "source": "CD",
+      "target": "1st Class",
+      "value": 6
+    },
+    {
+      "source": "CD",
+      "target": "Expedited",
+      "value": 1
+    },
+    {
+      "source": "CD",
+      "target": "Media",
+      "value": 2
+    },
+    {
+      "source": "Clothing",
+      "target": "1st Class",
+      "value": 8
+    },
+    {
+      "source": "Clothing",
+      "target": "Expedited",
+      "value": 6
+    },
+    {
+      "source": "Coupon",
+      "target": "1st Class",
+      "value": 4
+    },
+    {
+      "source": "Coupon",
+      "target": "Email",
+      "value": 2
+    },
+    {
+      "source": "Coupon",
+      "target": "Neutral Site",
+      "value": 1
+    },
+    {
+      "source": "Coupon",
+      "target": "School",
+      "value": 1
+    },
+    {
+      "source": "DVD",
+      "target": "1st Class",
+      "value": 9
+    },
+    {
+      "source": "DVD",
+      "target": "Expedited",
+      "value": 2
+    },
+    {
+      "source": "DVD",
+      "target": "In Person",
+      "value": 1
+    },
+    {
+      "source": "DVD",
+      "target": "Media",
+      "value": 2
+    },
+    {
+      "source": "DVD",
+      "target": "Out & About",
+      "value": 1
+    },
+    {
+      "source": "Electronics",
+      "target": "1st Class",
+      "value": 18
+    },
+    {
+      "source": "Electronics",
+      "target": "Delivery",
+      "value": 5
+    },
+    {
+      "source": "Electronics",
+      "target": "Expedited",
+      "value": 18
+    },
+    {
+      "source": "Electronics",
+      "target": "In Person",
+      "value": 28
+    },
+    {
+      "source": "Electronics",
+      "target": "Neutral Site",
+      "value": 6
+    },
+    {
+      "source": "Electronics",
+      "target": "Parcel Post",
+      "value": 18
+    },
+    {
+      "source": "Electronics",
+      "target": "School",
+      "value": 3
+    },
+    {
+      "source": "Electronics",
+      "target": "Tele-exchange",
+      "value": 1
+    },
+    {
+      "source": "Electronics",
+      "target": "UPS Ground",
+      "value": 1
+    },
+    {
+      "source": "Furniture",
+      "target": "Delivery",
+      "value": 7
+    },
+    {
+      "source": "Furniture",
+      "target": "In Person",
+      "value": 49
+    },
+    {
+      "source": "Furniture",
+      "target": "Neutral Site",
+      "value": 2
+    },
+    {
+      "source": "Furniture",
+      "target": "Parcel Post",
+      "value": 1
+    },
+    {
+      "source": "Furniture",
+      "target": "School",
+      "value": 1
+    },
+    {
+      "source": "Kitchen",
+      "target": "1st Class",
+      "value": 1
+    },
+    {
+      "source": "Kitchen",
+      "target": "Delivery",
+      "value": 2
+    },
+    {
+      "source": "Kitchen",
+      "target": "Expedited",
+      "value": 1
+    },
+    {
+      "source": "Kitchen",
+      "target": "In Person",
+      "value": 5
+    },
+    {
+      "source": "Kitchen",
+      "target": "Neutral Site",
+      "value": 2
+    },
+    {
+      "source": "Misc",
+      "target": "1st Class",
+      "value": 14
+    },
+    {
+      "source": "Misc",
+      "target": "Delivery",
+      "value": 3
+    },
+    {
+      "source": "Misc",
+      "target": "Expedited",
+      "value": 11
+    },
+    {
+      "source": "Misc",
+      "target": "In Person",
+      "value": 48
+    },
+    {
+      "source": "Misc",
+      "target": "Neutral Site",
+      "value": 1
+    },
+    {
+      "source": "Misc",
+      "target": "Parcel Post",
+      "value": 2
+    },
+    {
+      "source": "Misc",
+      "target": "School",
+      "value": 1
+    },
+    {
+      "source": "Misc",
+      "target": "Tele-exchange",
+      "value": 3
+    },
+    {
+      "source": "Patio&Garden",
+      "target": "In Person",
+      "value": 18
+    },
+    {
+      "source": "Patio&Garden",
+      "target": "Tele-exchange",
+      "value": 1
+    },
+    {
+      "source": "Sports",
+      "target": "1st Class",
+      "value": 1
+    },
+    {
+      "source": "Sports",
+      "target": "Expedited",
+      "value": 4
+    },
+    {
+      "source": "Sports",
+      "target": "In Person",
+      "value": 10
+    },
+    {
+      "source": "Sports",
+      "target": "Tele-exchange",
+      "value": 1
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="//d3js.org/d3.v5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter2/1.4.7/crossfilter.min.js"></script>
+</head>
+<body>
+  <script>
+    // Reference: https://animateddata.co.uk/articles/crossfilter/
+    async function make_table(filename) {
+      const data = await d3.csv(filename, type);
+      // set up crossfilter
+      cf = crossfilter(data);
+      // number of records independent of any filters
+      cf.size()
+
+      // DIMENSION
+      // set up dimension
+      nom = cf.dimension(d => d.Name)
+      // view top 5 (desc) and bottom 5 (asc) of dimension
+      nom.top(5) // reverse alphabetical order
+      nom.bottom(5) // alphabetical order
+      // dimension with a filter applied
+      nom.filter(d => d > 'L');
+      nom.top(5); // same as before
+      nom.bottom(5); // different than before
+      // add another dimension with filter
+      // filter applies to the previously created nom dimension also
+      // term === nom in terms of filter but the sorting is different
+      term = cf.dimension(d => d.Term);
+      term.filter(d => d >= 2); // equiv to nom.filterFunction(d => d >= 2)
+      term.top(5); // sorted by Term DESC
+      term.bottom(5); // sorted by Term ASC
+      nom.top(5); // different than before reverse alphabetical order
+      nom.bottom(5); // different than before alphabetical order
+
+      // count current records in a dimension with all filters except dimension in question
+      term.groupAll().value()
+      // count current records in crossfilter with filters applied
+      cf.groupAll().value()
+      
+      // replaces existing dimension filter with BETWEEN statement
+      nom.filter(['K','T']); // equiv to nom.filterRange([])
+      // remove all filters from nom dimension
+      nom.filterAll();
+      nom.top(5); // same as previous
+      nom.bottom(5); // different than previous
+      // remove all filters from term dimension
+      term.filterAll();
+      term.top(5); // same as previous
+      term.bottom(5); // different than previous
+      // restore dimension to original form by removing all active filters
+
+      // GROUP
+      // set up group
+      termgrp = term.group();
+      // number of groupings
+      termgrp.size();
+      // groupby count
+      termgrp.all(); // equiv to termgrp.reduceCount().all()
+      // groupby sum
+      termgrp.reduceSum(d => d.Term).all()
+      // get top groupings
+      termgrp.top(2);
+    }
+    function type(d) {
+      d.Term = +d.Term; // coerce to number
+      return d;
+    }
+    make_table('Clients.csv');
+  </script>
+</body>
+</html>

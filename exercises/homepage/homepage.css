@@ -1,0 +1,24 @@
+h1, .p {
+  padding-top: 40px;
+  text-align: center;
+  font-family: 'Aleo', serif;
+}
+
+.p a {
+  text-decoration: underline;
+  color: blue;
+}
+
+.col{
+  text-align: center;
+  font-family: 'Aleo', serif;
+}
+
+.col-md-4{
+  padding-top: 20px;
+  text-align: center;
+}
+
+#ED {
+  background: #fee;
+}

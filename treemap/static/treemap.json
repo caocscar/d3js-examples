@@ -1,0 +1,166 @@
+{
+  "name": "fa",
+  "children": [
+    {
+      "name": "Amazon",
+      "children": [
+        {
+          "name": "Book",
+          "size": 4002.8600000000097
+        },
+        {
+          "name": "DVD",
+          "size": 102.18999999999997
+        },
+        {
+          "name": "Electronics",
+          "size": 1518.8799999999997
+        },
+        {
+          "name": "CD",
+          "size": 79.63999999999999
+        },
+        {
+          "name": "Furniture",
+          "size": 30.01
+        },
+        {
+          "name": "Misc",
+          "size": 226.30999999999997
+        },
+        {
+          "name": "Kitchen",
+          "size": 6.01
+        },
+        {
+          "name": "Appliance",
+          "size": 28.51
+        }
+      ]
+    },
+    {
+      "name": "Craigslist",
+      "children": [
+        {
+          "name": "Patio&Garden",
+          "size": 730.0
+        },
+        {
+          "name": "Electronics",
+          "size": 967.95
+        },
+        {
+          "name": "Appliance",
+          "size": 606.0
+        },
+        {
+          "name": "Furniture",
+          "size": 1933.0
+        },
+        {
+          "name": "Misc",
+          "size": 817.0
+        },
+        {
+          "name": "Sports",
+          "size": 445.0
+        },
+        {
+          "name": "CD",
+          "size": 25.0
+        },
+        {
+          "name": "Book",
+          "size": 20.0
+        },
+        {
+          "name": "Coupon",
+          "size": 110.0
+        },
+        {
+          "name": "Kitchen",
+          "size": 177.0
+        },
+        {
+          "name": "DVD",
+          "size": 15.0
+        }
+      ]
+    },
+    {
+      "name": "Self",
+      "children": [
+        {
+          "name": "Electronics",
+          "size": 200.0
+        },
+        {
+          "name": "Book",
+          "size": 10.0
+        },
+        {
+          "name": "Patio&Garden",
+          "size": 90.0
+        },
+        {
+          "name": "Misc",
+          "size": 39.0
+        },
+        {
+          "name": "Sports",
+          "size": 6.0
+        }
+      ]
+    },
+    {
+      "name": "StubHub",
+      "children": [
+        {
+          "name": "Misc",
+          "size": 1515.0
+        }
+      ]
+    },
+    {
+      "name": "eBay",
+      "children": [
+        {
+          "name": "Sports",
+          "size": 236.76
+        },
+        {
+          "name": "Electronics",
+          "size": 977.1700000000001
+        },
+        {
+          "name": "Misc",
+          "size": 423.08000000000004
+        },
+        {
+          "name": "Coupon",
+          "size": 19.099999999999994
+        },
+        {
+          "name": "DVD",
+          "size": 53.0
+        },
+        {
+          "name": "Clothing",
+          "size": 198.48000000000002
+        },
+        {
+          "name": "Appliance",
+          "size": 14.0
+        },
+        {
+          "name": "Kitchen",
+          "size": 40.0
+        },
+        {
+          "name": "Book",
+          "size": 39.49
+        }
+      ]
+    }
+  ]
+}

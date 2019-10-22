@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="css/michigan.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="//d3js.org/topojson.v3.min.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-sm fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">SOS Michigan Opioid Epidemic Dashboard</a>
+      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item active">
+          <a  class="nav-link" href="#">EMS</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">ED</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">ME</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container-fluid container-top-buffer">
+    <div class="row content">
+
+      <div class="col-sm-1 sidebuff"></div>
+
+      <div class="col-sm-10 text-center top-buffer">
+        <h2> Hover and click to select city/county</h2>
+          <div class="map"></div>
+
+        <div class="searchbar">
+          <input type="text" placeholder="Search..">
+        </div>
+      </div>
+
+      <div class="col-sm-1 sidebuff"></div>
+      
+    </div>
+  </div>
+  <script>
+
+  //Width and height of map
+  let width = 500;
+  let height = width;
+
+  //Create SVG element and append map to the SVG
+  let svg = d3.select(".map")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+  // Append Div for tooltip to SVG
+  let tooltipDiv = d3.select(".map")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("display", "none");
+
+  // Load topojson data
+  async function make_map(filename) {
+    const MItopo = await d3.json(filename)
+    const cities = await d3.csv('cities.csv',type)
+    // convert to geojson
+    const MIgeo = topojson.feature(MItopo, MItopo.objects.collection)
+
+    // D3 Projection
+    let projection = d3.geoMercator()
+        .fitSize([width, height], MIgeo)
+
+    // Define path generator
+    let path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+        .projection(projection);
+
+    // Bind the data to the SVG and create one path per GeoJSON feature
+    // svg.selectAll("path")
+    //     .data(MIgeo.features)
+    //   .enter().append("path")
+    //     .attr('class', 'county')
+    //     .attr("d", path)
+    //     .on("mouseover", d => {
+    //         tooltipDiv.transition().duration(200)
+    //             .style("display", null);
+    //         tooltipDiv.html(`<p>${d.properties.name}</p>`)
+    //             .style("left", (d3.event.pageX+10 ) + "px")
+    //             .style("top", (d3.event.pageY-20) + "px");
+    //     })
+    //     .on("mouseout", () => {
+    //         tooltipDiv.transition().duration(500)
+    //             .style("display", "none");
+    //     });
+
+      svg.selectAll("path")
+            .data(MIgeo.features)
+          .enter().append("path")
+            .attr('class', 'county')
+            .attr("d", path)
+            .attr("id", "tooltips")
+            .attr("data-toggle", "tooltip")
+            .attr("title", d => d.properties.name )
+            $(function () {
+              $('[data-toggle="tooltip"]').tooltip()
+            })
+
+    // Add points to map
+    svg.selectAll('circle')
+        .data(cities)
+      .enter().append('circle')
+        .attr('class', 'city')
+        .attr('r', '4')
+        .attr("id", "tooltips")
+        .attr("data-toggle", "tooltip")
+        .attr('cx', d => projection([d.lng,d.lat])[0])
+        .attr('cy', d => projection([d.lng,d.lat])[1])
+        .attr("title", d => d.name )
+
+        $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+        })
+
+        // .on('mouseover', function(d) {
+        //   d3.select(this).attr('r', '5')
+        //   tooltipDiv.transition().duration(200)
+        //       .style("display", null);
+        //   tooltipDiv.html(`<p>${d.name}</p>`)
+        //       .style("left", (d3.event.pageX+10 ) + "px")
+        //       .style("top", (d3.event.pageY-20) + "px");
+        // })
+        // .on('mouseout', function(d) {
+        //   d3.select(this).attr('r', '4')
+        //   tooltipDiv.transition().duration(500)
+        //       .style("display", "none");
+        // })
+  };
+
+  function type(d) {
+    d.lat = +d.lat;
+    d.lng = +d.lng;
+    return d
+  }
+  make_map("gz_2010_us_050_00_5m_MI_counties.topojson");
+
+
+  </script>
+  <footer class="footer">
+      <div class="footstyle container-fluid text-center">
+        <div class="row">
+            <div class="col-sm-4">
+              <h4> Label</h4>
+              <p> thing</p>
+              <p> thing </p>
+            </div>
+            <div class="col-sm-4">
+              <h4> Label</h4>
+              <p> thing</p>
+              <p> thing </p>
+            </div>
+            <div class="col-sm-4">
+              <h4> Label</h4>
+              <p> thing</p>
+              <p> thing </p>
+            </div>
+          </div>
+        </div>
+  </footer>
+</body>
+</html>

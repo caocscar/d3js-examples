@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bar Line Combo Chart in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <link rel="stylesheet" href="bar_line.css">
+</head>
+<body>
+<div class="chart"></div>
+<!-- <div class="legend"></div> -->
+
+<script>
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 40, bottom: 30+40+50, left: 50+20},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom + 40;
+
+// parse the date / time
+var parseTime = d3.timeParse("%Y-%m-%d");
+
+// append the svg object to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select(".chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+async function make_bar_line_combo(filename) {
+  const origdata = await d3.csv(filename)
+  // assign new key names to array while preserving the rest
+  const data = origdata.map(({year:x, ...rest}) => ({x, ...rest}) );
+
+  console.table(data);
+
+  // set the domain and range
+  var xBar = d3.scaleBand()
+                .domain(data.map(d => d.x))
+                .range([0, width])
+                .paddingInner(0.5)
+                .paddingOuter(0.25);
+  var xLine = d3.scalePoint()
+                .domain(data.map(d => d.x))
+                .range([0, width])
+                .padding(0.5);
+  var yBar = d3.scaleLinear()
+                .domain([0, 5] )
+                .range([height, 0]).nice();        
+  var yAxis = d3.axisLeft(yBar)
+                .tickValues(d3.range(6))
+                .tickFormat(d3.format("d"));
+
+  // add the y-axis gridlines
+  svg.append("g")			
+      .attr("class", "grid")
+      .call(d3.axisLeft(yBar)
+              .ticks(5)
+              .tickSize(-width)
+              .tickFormat("")
+      )
+      
+  // define the line
+  var valueline = d3.line()
+      .x(d => xLine(d.x))
+      .y(d => yBar(d.line));
+
+  var rect = svg.selectAll("rect")
+      .data(data)
+  		
+  rect.enter().append("rect")
+  	.merge(rect)
+      .attr("class", "bar")
+      .style("stroke", "none")
+      .attr("x", d => xBar(d.x))
+      .attr("width", d => xBar.bandwidth())
+      .attr("y", d => yBar(d.bar))
+      .attr("height", d => height - yBar(d.bar))  
+      .attr("data-legend", "bar");
+
+  // Add the valueline path.
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .style("stroke", "green")
+      .attr("d", valueline)
+      .attr("data-legend", "line");      
+
+  // Add the X Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(xLine));
+
+  // text label for the x-axis
+  svg.append("text")             
+    .attr("transform",
+          "translate(" + (width/2) + " ," + 
+                          (height + 40) + ")")
+    .style("text-anchor", "middle")
+    .text("Week Ending On");
+
+  // Add the Y Axis
+  svg.append('g')
+      .style('font-size', 14)
+      .call(yAxis);
+
+  // text label for the y-axis
+  svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "2em")
+      .style("text-anchor", "middle")
+      .text("Frequency");
+
+  // Legend
+  var L = svg.selectAll('.legend')
+      .data(['Daily','Moving Average'])
+      .enter().append('g')
+      .attr("transform", (d,i) => i===0 ? "translate(300,470)" : "translate(450,470)")
+
+  L.append('rect')
+      .attr('x', 0)
+      .attr('y', (d,i) => i===0 ? 0 : 6)
+      .attr("width", (d,i) => i===0 ? 20 : 30)
+      .attr("height", (d,i) => i===0 ? 20 : 4)
+      .style("fill", (d,i) => i===0 ? 'rgb(112, 143, 233)' : 'red' )      
+  
+  L.append('text')             
+      .attr('x' ,40)
+      .attr("y", 15)
+      .style("text-anchor", "start")
+      .style("font-size", 20)
+      .text(d => d)
+
+};
+make_bar_line_combo('data.csv');
+
+</script>
+</body>

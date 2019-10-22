@@ -1,0 +1,37 @@
+/*Style for Custom Tooltip */
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  min-width: 100px;
+  height: auto;
+  padding: 12px;
+  font-size: 14px;
+  background: rgba(43,43,43, 0.8);
+  color: #fff;
+  border-radius: 5px;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.tooltip p {
+  margin: 5px;
+}
+
+.actived {
+  fill: lightskyblue;
+}
+
+path.county {
+  fill: #00274c;
+  stroke: #fff;
+}
+
+/* path.county:hover, circle.city:hover {
+  fill: #ffcb05;
+} */
+
+circle.city {
+  fill: #587abc; 
+  stroke: none;
+}
+

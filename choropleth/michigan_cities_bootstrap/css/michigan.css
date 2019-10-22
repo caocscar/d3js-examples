@@ -1,0 +1,21 @@
+.counties {
+  fill: #00274c;
+  stroke: #fff;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.county:hover, .city:hover {
+  fill: #ffcb05;
+  cursor: pointer;
+}
+
+.counties .active {
+  display: none;
+}
+
+.cities {
+  fill: #587abc;
+  stroke: white;
+}

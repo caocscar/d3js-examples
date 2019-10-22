@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8 />
+    <title>Bar Chart with Mapbox</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter2/1.4.7/crossfilter.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/v3.2.0/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.2.0/mapbox.css' rel='stylesheet' />
+    <link rel="stylesheet" href="barmap.css">
+</head>
+<body>
+<div id='map'></div>
+<div id='barchart'></div>
+<script>
+// Mapbox section
+L.mapbox.accessToken = 'pk.eyJ1IjoiY2FvYSIsImEiOiJjaWdqbTNqeHowMDVtdXJrcm9vNHJyZ3FnIn0.vylxVPML0OKfGi2SpjN9NA';
+const layers = {
+    'Streets': L.mapbox.styleLayer('mapbox://styles/mapbox/streets-v11'),
+    'Light': L.mapbox.styleLayer('mapbox://styles/mapbox/light-v10'),
+    'Dark': L.mapbox.styleLayer('mapbox://styles/mapbox/dark-v10')
+};
+let map = L.mapbox.map('map')
+    .setView([44.5, -85], 6)
+    .addLayer(layers.Light) // default layer
+    .addControl(L.mapbox.geocoderControl('mapbox.places', {autocomplete: true}))
+    .setMaxBounds([[36,-100],[52,-70]])
+    .setMinZoom(5)
+
+L.control.layers(layers).addTo(map); // add basemap control
+let featureLayer = L.mapbox.featureLayer().addTo(map);
+let boxLayer = L.mapbox.featureLayer().addTo(map);
+
+marker_style = {
+  'marker-symbol': 'tennis',
+  'marker-color': '#f49',
+}
+
+// D3 section
+// set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 110, left: 40},
+    width = 860 - margin.left - margin.right,
+    height = 250 - margin.top - margin.bottom;
+    margin2 = {top: 180, right: 20, bottom: 30, left: 40},
+    height2 = 250 - margin2.top - margin2.bottom;
+
+var svg = d3.select("#barchart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+
+// parse the date / time
+const parseDate = d3.timeParse("%Y-%m-%d");
+const formatDate = d3.timeFormat("%b %d");
+
+// set the ranges
+let x = d3.scaleTime().range([0, width]),
+    y = d3.scaleLinear().range([height, 0]),
+    x2 = d3.scaleTime().range([0, width]),
+    y2 = d3.scaleLinear().range([height2, 0]);
+
+var xAxis = d3.axisBottom(x),
+    yAxis = d3.axisRight(y),
+    xAxis2 = d3.axisBottom(x2);
+
+// Add brush in x-dimension
+var brush = d3.brushX()
+    .extent([[0, 0], [width, height2]])
+    .on("brush", brushed)
+    .on("end", brushended) // add brush snapping
+
+// focus is the micro level view
+var focus = svg.append("g")
+    .attr("class", "focus")
+    .attr("transform", `translate(${margin.left},${margin.top})`)
+
+// context is the macro level view
+var context = svg.append("g")
+    .attr("class", "context")
+    .attr("transform", `translate(${margin2.left},${margin2.top})`);
+
+// clipping rectangle
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+    .append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    
+async function makeBarChart(filename) {
+  const DATA = await d3.csv(filename, type)
+
+  var CF = crossfilter(DATA)
+  date = CF.dimension(d => d.date)
+  lat = CF.dimension(d => d.lat)
+  lng = CF.dimension(d => d.lng)
+  dategrp = date.group()
+  data = dategrp.all()
+
+  // scale the range of the data
+  endDate = d3.timeDay.offset(d3.max(data, d => d.key),1)
+  x.domain([d3.min(data, d => d.key), endDate]);
+  y.domain([0, d3.max(data, d => d.value)]);
+  x2.domain(x.domain());
+  y2.domain(y.domain());
+
+  // add the focus bar chart
+  let bars = focus.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", d => x(d3.timeHour.offset(d.key,1)))
+      .attr("y", d => y(d.value))
+      .attr("width", width / data.length * 22/24)
+      .attr("height", d => height - y(d.value))
+     
+  // add the focus x-axis
+  focus.append("g")
+      .attr("class", "axis--x")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+  // add the focus y-axis
+  focus.append("g")
+      .attr("class", "axis--y")
+      .attr('transform', `translate(${width},0)`)
+      .call(yAxis);
+
+  // add the context bar chart
+  let bars2 = context.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", d => x2(d3.timeHour.offset(d.key,1)))
+      .attr("y", d => y2(d.value))
+      .attr("width", width / data.length * 22/24)
+      .attr("height", d => height2 - y2(d.value))
+      
+  // add the context x-axis
+  context.append("g")
+      .attr("class", "axis--x")
+      .attr("transform", `translate(0,${height2})`)
+      .call(xAxis2);
+
+  // add the context brush
+  beginDate = d3.timeDay.offset(endDate, -7)
+  context.append("g")
+      .attr("class", "brush")
+      .call(brush)
+      .call(brush.move, [x(beginDate), x(endDate)]) // initialize brush selection  
+
+  // draw markers on Mapbox
+  date.filter([beginDate, endDate])
+  for (pt of date.top(Infinity)) {
+    featureLayer.addLayer(L.marker([pt.lat, pt.lng], {
+        icon: L.mapbox.marker.icon(marker_style)
+      })
+      .bindPopup('<p>'+formatDate(pt.date)+'</p>')
+    );
+  };
+  // spatial filtering on map event
+  map.on('moveend zoomend', function() { updateBarChart(this.getBounds()) })
+
+  function updateBarChart(bounds) {
+    let easeFunc = d3.easeQuad
+    let T = 500
+    lat.filter([bounds.getSouth(), bounds.getNorth()])
+    lng.filter([bounds.getWest(), bounds.getEast()])
+    // bar transition
+    bars.data(data) // bind new data  
+      .transition().ease(easeFunc).duration(T)
+        .attr("y", d => y(d.value))
+        .attr("height", d => height - y(d.value))
+    bars2.data(data) // bind new data  
+      .transition().ease(easeFunc).duration(T)
+       .attr("y", d => y2(d.value))
+        .attr("height", d => height2 - y2(d.value))
+    const x0 = d3.select('.handle--w').attr('x')
+    const x1 = d3.select('.handle--e').attr('x')
+    const dayRange = [x0, x1].map(x2.invert)
+    featureLayer.clearLayers()
+    for (pt of date.top(Infinity)) {
+      days = (dayRange[1] - dayRange[0]) / 86400000
+      offset = (dayRange[1] - pt.date) / 86400000
+      featureLayer.addLayer(L.marker([pt.lat, pt.lng], {
+          icon: L.mapbox.marker.icon(marker_style),
+          opacity: d3.max([1 - (offset-1)/days, 0]),
+        })
+        .bindPopup('<p>'+formatDate(pt.date)+' '+pt.lat.toString()+' '+pt.lng.toString()+'</p>')
+      );
+    }; 
+  }
+
+};
+
+// brush function
+function brushed() {
+  const selection = d3.event.selection || x2.range(); // default brush selection
+  x.domain(selection.map(x2.invert, x2)); // new focus x-domain
+  ms = x.domain()[1] - x.domain()[0]
+  days = ms / 1000 / 60 / 60 / 24
+  focus.selectAll(".bar")
+      .attr("x", d => x(d3.timeHour.offset(d.key,1)))
+      .attr("width", width / days * 22/24)
+  focus.select(".axis--x")
+      .call(xAxis)
+}
+
+// brush snapping function
+function brushended() {
+  if (!d3.event.sourceEvent) return; // Only transition after input.
+  if (!d3.event.selection) brushed(); // Empty selection returns default brush
+  let dateRange = d3.event.selection.map(x2.invert),
+      dayRange = dateRange.map(d3.timeDay.round);
+
+  // If empty when rounded, use floor & ceil instead.
+  if (dayRange[0] >= dayRange[1]) {
+      dayRange[0] = d3.timeDay.floor(dateRange[0]);
+      dayRange[1] = d3.timeDay.offset(dayRange[0]);
+  }
+
+  d3.select(this)
+    .transition()
+    .call(d3.event.target.move, dayRange.map(x2));
+
+  // clear layer and redraw markers on Mapbox
+  featureLayer.clearLayers()
+  date.filter(dayRange)
+  for (pt of date.top(Infinity)) {
+    days = (dayRange[1] - dayRange[0]) / 86400000
+    offset = (dayRange[1] - pt.date) / 86400000
+    featureLayer.addLayer(L.marker([pt.lat, pt.lng], {
+        icon: L.mapbox.marker.icon(marker_style),
+        opacity: d3.max([1 - (offset-1)/days, 0]),
+      })
+      .bindPopup('<p>'+formatDate(pt.date)+' '+pt.lat.toString()+' '+pt.lng.toString()+'</p>')
+    );
+  }; 
+}
+
+function type(d) {
+  d.date = parseDate(d.date);
+  d.lat = +d.lat;
+  d.lng = +d.lng;
+  return d;
+}
+
+makeBarChart('fake.csv');
+</script>
+</body>
+</html>

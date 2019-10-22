@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v5.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Roboto Slab', serif;
+        font-size: 24px;
+    }
+</style>
+<body>
+    <script>
+        var data = ['H','E']
+        svg = d3.select('body').append('svg')
+            .attr('width', 300)
+            .attr('height', 300)
+        
+        svg.append('text')
+            .data(data)
+        .enter().append('h1')
+            .text((d,i) => i)
+            .attr('x', 100)
+            .attr('y', 100)
+    </script>
+</body>
+</html>

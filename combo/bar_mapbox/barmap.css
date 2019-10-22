@@ -1,0 +1,30 @@
+body {
+  margin:0;
+  padding:0;
+}
+
+#map {
+  /* position: relative; */
+  top: 0;
+  bottom: 0;
+  left: 40px;
+  width: 620px;
+  height: 400px;
+}
+
+.bar {
+  fill: #ffcb05; /* #499bdd */;
+  clip-path: url(#clip); /* clip bar with rectangle */
+}
+
+#barchart {
+  background:#f8f8f8;
+  /* position:absolute; */
+  bottom:0;right:0;left:0;
+}
+
+.brush .extent {
+  stroke:#fff;
+  fill-opacity:0.125;
+  shape-rendering:crispEdges;
+}

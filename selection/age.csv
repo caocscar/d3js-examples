@@ -1,0 +1,6 @@
+group,index,value,week
+value,<25,0,1
+value,25-34,4,6
+value,35-44,3,1
+value,45-54,3,0
+value,55+,2,1

@@ -1,0 +1,15 @@
+.bar, .obar {
+  fill: #499bdd;
+  clip-path: url(#clip); /* clip bar with rectangle */
+}
+
+.avgLine, .oavgLine {
+  fill: none;
+  stroke: #73000A;
+  stroke-width: 2px;
+  clip-path: url(#clip); /* clip line with rectangle */
+}
+
+.obar, .oavgLine {
+  opacity: 0.2;
+}

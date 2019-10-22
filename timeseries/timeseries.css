@@ -1,0 +1,36 @@
+.line {
+  fill: none;
+  stroke: #ddbc2b;
+  stroke-width: 2px;
+  clip-path: url(#clip);  /* clip line with rectangle */
+}
+
+.avgLine {
+  fill: none;
+  stroke: #352f24;
+  stroke-width: 2px;
+  clip-path: url(#clip); /* clip line with rectangle */
+}
+
+.grid line {
+  stroke: black;
+  stroke-opacity: 0.1;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.tooltip {	
+  position: absolute;			
+  text-align: center;			
+  width: 80px;					
+  height: 28px;					
+  padding: 2px;				
+  font: 12px sans-serif;		
+  background: lightsteelblue;	
+  border: 0px;		
+  border-radius: 8px;			
+  pointer-events: none;			
+}

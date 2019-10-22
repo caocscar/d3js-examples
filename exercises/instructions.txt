@@ -1,0 +1,20 @@
+Here are instructions for the four folders. Try to get as much done as possible. They do not have to be done in order. Please use d3 version 5.
+
+A. barline folder
+Here is a D3 bar line combo chart. I would like you to add the following:
+i) Brush window to the barline chart 
+Example: https://bl.ocks.org/mbostock/34f08d5e11952a80609169b7917d4172
+The x-axis should only show days and no smaller time unit than that.
+ii) Make the default window the last 7 days
+iii) Implement brush snapping so only day boundaries are displayed: 
+Example: https://bl.ocks.org/mbostock/6232620
+
+B. michigan folder
+Here is a county map of Michigan. I would like you to format the text in the tooltip so it only shows the county name. I would also like you to add a click event so that it redirects to another webpage when you click on a county (you can have redirect to the wikipedia page for the county or something).
+
+C. homepage folder
+Here is a html file with some bootstrap layout. I would like you to add the county map of Michigan above the list of county names. See png for desired output. The results from task (B) should also be working.
+
+D. donut folder
+Here is a D3 donut chart with transition effects. The text transition goes in a straight line which doesn't look good. I would like the text to follow the arc of the circle.
+

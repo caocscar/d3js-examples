@@ -1,0 +1,2091 @@
+{
+  "key": "Foster Abe",
+  "value": [
+    {
+      "key": "Amazon",
+      "value": [
+        {
+          "key": "Appliance",
+          "value": [
+            {
+              "key": "Nevada",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 28
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Book",
+          "value": [
+            {
+              "key": "Alabama",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 9
+                },
+                {
+                  "key": "Media",
+                  "value": 61
+                }
+              ]
+            },
+            {
+              "key": "Alberta",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 12
+                }
+              ]
+            },
+            {
+              "key": "Arizona",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 65
+                }
+              ]
+            },
+            {
+              "key": "Arkansas",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 25
+                }
+              ]
+            },
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 21
+                },
+                {
+                  "key": "Expedited",
+                  "value": 71
+                },
+                {
+                  "key": "Media",
+                  "value": 410
+                }
+              ]
+            },
+            {
+              "key": "Colorado",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 157
+                }
+              ]
+            },
+            {
+              "key": "Connecticut",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 9
+                },
+                {
+                  "key": "Media",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "District of Columbia",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 15
+                },
+                {
+                  "key": "Media",
+                  "value": 60
+                }
+              ]
+            },
+            {
+              "key": "Florida",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 7
+                },
+                {
+                  "key": "Expedited",
+                  "value": 82
+                },
+                {
+                  "key": "Media",
+                  "value": 56
+                }
+              ]
+            },
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 81
+                }
+              ]
+            },
+            {
+              "key": "Illinois",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 19
+                },
+                {
+                  "key": "Expedited",
+                  "value": 75
+                },
+                {
+                  "key": "Media",
+                  "value": 55
+                }
+              ]
+            },
+            {
+              "key": "Indiana",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 33
+                },
+                {
+                  "key": "Media",
+                  "value": 30
+                }
+              ]
+            },
+            {
+              "key": "Kansas",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 35
+                }
+              ]
+            },
+            {
+              "key": "Louisiana",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 56
+                }
+              ]
+            },
+            {
+              "key": "Maine",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 20
+                },
+                {
+                  "key": "Media",
+                  "value": 7
+                }
+              ]
+            },
+            {
+              "key": "Maryland",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 5
+                },
+                {
+                  "key": "Expedited",
+                  "value": 247
+                },
+                {
+                  "key": "Media",
+                  "value": 72
+                }
+              ]
+            },
+            {
+              "key": "Massachusetts",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 8
+                },
+                {
+                  "key": "Media",
+                  "value": 41
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 9
+                },
+                {
+                  "key": "Media",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "Minnesota",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 6
+                }
+              ]
+            },
+            {
+              "key": "Missouri",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 4
+                },
+                {
+                  "key": "Media",
+                  "value": 66
+                }
+              ]
+            },
+            {
+              "key": "Nebraska",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 3
+                }
+              ]
+            },
+            {
+              "key": "New Jersey",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 14
+                },
+                {
+                  "key": "Media",
+                  "value": 34
+                }
+              ]
+            },
+            {
+              "key": "New Mexico",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 4
+                }
+              ]
+            },
+            {
+              "key": "New York",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 10
+                },
+                {
+                  "key": "Expedited",
+                  "value": 330
+                },
+                {
+                  "key": "Media",
+                  "value": 439
+                }
+              ]
+            },
+            {
+              "key": "North Carolina",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 17
+                },
+                {
+                  "key": "Media",
+                  "value": 17
+                }
+              ]
+            },
+            {
+              "key": "Ohio",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 6
+                },
+                {
+                  "key": "Media",
+                  "value": 114
+                }
+              ]
+            },
+            {
+              "key": "Oklahoma",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 25
+                }
+              ]
+            },
+            {
+              "key": "Ontario",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 97
+                }
+              ]
+            },
+            {
+              "key": "Oregon",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 76
+                }
+              ]
+            },
+            {
+              "key": "Other",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 257
+                }
+              ]
+            },
+            {
+              "key": "Pennsylvania",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 20
+                },
+                {
+                  "key": "Expedited",
+                  "value": 29
+                },
+                {
+                  "key": "Media",
+                  "value": 27
+                }
+              ]
+            },
+            {
+              "key": "Quebec",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 92
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 9
+                }
+              ]
+            },
+            {
+              "key": "Tennessee",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 17
+                }
+              ]
+            },
+            {
+              "key": "Texas",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 11
+                },
+                {
+                  "key": "Media",
+                  "value": 96
+                }
+              ]
+            },
+            {
+              "key": "Utah",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 79
+                }
+              ]
+            },
+            {
+              "key": "Vermont",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 66
+                }
+              ]
+            },
+            {
+              "key": "Virginia",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 41
+                }
+              ]
+            },
+            {
+              "key": "Washington",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 25
+                }
+              ]
+            },
+            {
+              "key": "West Virginia",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 81
+                }
+              ]
+            },
+            {
+              "key": "Wisconsin",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 16
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "CD",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 24
+                },
+                {
+                  "key": "Expedited",
+                  "value": 15
+                }
+              ]
+            },
+            {
+              "key": "Nevada",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 9
+                }
+              ]
+            },
+            {
+              "key": "Ohio",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "key": "Ontario",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 7
+                }
+              ]
+            },
+            {
+              "key": "Other",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 14
+                }
+              ]
+            },
+            {
+              "key": "Pennsylvania",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 4
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "DVD",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 19
+                }
+              ]
+            },
+            {
+              "key": "Colorado",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 4
+                }
+              ]
+            },
+            {
+              "key": "Connecticut",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 19
+                }
+              ]
+            },
+            {
+              "key": "Florida",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 8
+                },
+                {
+                  "key": "Expedited",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "key": "Missouri",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 11
+                }
+              ]
+            },
+            {
+              "key": "Oregon",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 12
+                }
+              ]
+            },
+            {
+              "key": "Pennsylvania",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 6
+                }
+              ]
+            },
+            {
+              "key": "Tennessee",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 4
+                }
+              ]
+            },
+            {
+              "key": "Utah",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 6
+                }
+              ]
+            },
+            {
+              "key": "Washington",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Electronics",
+          "value": [
+            {
+              "key": "Alabama",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 60
+                }
+              ]
+            },
+            {
+              "key": "Arizona",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 43
+                }
+              ]
+            },
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 45
+                },
+                {
+                  "key": "Expedited",
+                  "value": 8
+                },
+                {
+                  "key": "Parcel Post",
+                  "value": 42
+                }
+              ]
+            },
+            {
+              "key": "Colorado",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 6
+                },
+                {
+                  "key": "Parcel Post",
+                  "value": 27
+                }
+              ]
+            },
+            {
+              "key": "Florida",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 105
+                }
+              ]
+            },
+            {
+              "key": "Illinois",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 15
+                },
+                {
+                  "key": "Parcel Post",
+                  "value": 30
+                }
+              ]
+            },
+            {
+              "key": "Kansas",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 8
+                }
+              ]
+            },
+            {
+              "key": "Massachusetts",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 64
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 11
+                },
+                {
+                  "key": "Parcel Post",
+                  "value": 16
+                }
+              ]
+            },
+            {
+              "key": "Minnesota",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 29
+                },
+                {
+                  "key": "Parcel Post",
+                  "value": 47
+                }
+              ]
+            },
+            {
+              "key": "New Hampshire",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 54
+                }
+              ]
+            },
+            {
+              "key": "New Jersey",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 327
+                }
+              ]
+            },
+            {
+              "key": "New Mexico",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 18
+                }
+              ]
+            },
+            {
+              "key": "New York",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "key": "North Carolina",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 11
+                },
+                {
+                  "key": "Expedited",
+                  "value": 39
+                }
+              ]
+            },
+            {
+              "key": "Ohio",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 86
+                },
+                {
+                  "key": "Parcel Post",
+                  "value": 29
+                }
+              ]
+            },
+            {
+              "key": "Pennsylvania",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 13
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 30
+                }
+              ]
+            },
+            {
+              "key": "Tennessee",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 7
+                }
+              ]
+            },
+            {
+              "key": "Texas",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 30
+                },
+                {
+                  "key": "Parcel Post",
+                  "value": 33
+                },
+                {
+                  "key": "UPS Ground",
+                  "value": 185
+                }
+              ]
+            },
+            {
+              "key": "Utah",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 30
+                }
+              ]
+            },
+            {
+              "key": "Virginia",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 29
+                },
+                {
+                  "key": "Parcel Post",
+                  "value": 24
+                }
+              ]
+            },
+            {
+              "key": "Washington",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Furniture",
+          "value": [
+            {
+              "key": "North Carolina",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 30
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Kitchen",
+          "value": [
+            {
+              "key": "New York",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 6
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Misc",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "Colorado",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 34
+                }
+              ]
+            },
+            {
+              "key": "Minnesota",
+              "value": [
+                {
+                  "key": "Parcel Post",
+                  "value": 11
+                }
+              ]
+            },
+            {
+              "key": "Montana",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 25
+                }
+              ]
+            },
+            {
+              "key": "New York",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 79
+                }
+              ]
+            },
+            {
+              "key": "Ohio",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 14
+                }
+              ]
+            },
+            {
+              "key": "Oklahoma",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 16
+                }
+              ]
+            },
+            {
+              "key": "Pennsylvania",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 33
+                }
+              ]
+            },
+            {
+              "key": "Texas",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "Craigslist",
+      "value": [
+        {
+          "key": "Appliance",
+          "value": [
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "Delivery",
+                  "value": 40
+                },
+                {
+                  "key": "Tele-exchange",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 405
+                },
+                {
+                  "key": "Delivery",
+                  "value": 71
+                },
+                {
+                  "key": "Tele-exchange",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 70
+                },
+                {
+                  "key": "Tele-exchange",
+                  "value": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Book",
+          "value": [
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 20
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "CD",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 25
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Coupon",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "Email",
+                  "value": 10
+                },
+                {
+                  "key": "Neutral Site",
+                  "value": 40
+                },
+                {
+                  "key": "School",
+                  "value": 40
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "DVD",
+          "value": [
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 11
+                },
+                {
+                  "key": "Out & About",
+                  "value": 4
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Electronics",
+          "value": [
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 402
+                },
+                {
+                  "key": "Delivery",
+                  "value": 55
+                },
+                {
+                  "key": "Neutral Site",
+                  "value": 75
+                },
+                {
+                  "key": "School",
+                  "value": 60
+                },
+                {
+                  "key": "Tele-exchange",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 295
+                },
+                {
+                  "key": "Delivery",
+                  "value": 20
+                },
+                {
+                  "key": "Neutral Site",
+                  "value": 25
+                },
+                {
+                  "key": "School",
+                  "value": 30
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Furniture",
+          "value": [
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "",
+                  "value": 20
+                },
+                {
+                  "key": "Delivery",
+                  "value": 30
+                },
+                {
+                  "key": "Neutral Site",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 1208
+                },
+                {
+                  "key": "Delivery",
+                  "value": 215
+                },
+                {
+                  "key": "Neutral Site",
+                  "value": 20
+                },
+                {
+                  "key": "School",
+                  "value": 40
+                }
+              ]
+            },
+            {
+              "key": "North Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 30
+                }
+              ]
+            },
+            {
+              "key": "Ohio",
+              "value": [
+                {
+                  "key": "",
+                  "value": 160
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 200
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Kitchen",
+          "value": [
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "",
+                  "value": 25
+                },
+                {
+                  "key": "Delivery",
+                  "value": 40
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 75
+                },
+                {
+                  "key": "Delivery",
+                  "value": 10
+                },
+                {
+                  "key": "Neutral Site",
+                  "value": 27
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Misc",
+          "value": [
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "",
+                  "value": 10
+                },
+                {
+                  "key": "Tele-exchange",
+                  "value": 15
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 405
+                },
+                {
+                  "key": "Delivery",
+                  "value": 20
+                },
+                {
+                  "key": "Neutral Site",
+                  "value": 40
+                },
+                {
+                  "key": "School",
+                  "value": 20
+                },
+                {
+                  "key": "Tele-exchange",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 292
+                },
+                {
+                  "key": "Delivery",
+                  "value": 10
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Patio&Garden",
+          "value": [
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 265
+                },
+                {
+                  "key": "Tele-exchange",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 445
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Sports",
+          "value": [
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "",
+                  "value": 90
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 345
+                },
+                {
+                  "key": "Tele-exchange",
+                  "value": 10
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "Self",
+      "value": [
+        {
+          "key": "Book",
+          "value": [
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "Delivery",
+                  "value": 10
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Electronics",
+          "value": [
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "Delivery",
+                  "value": 200
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Misc",
+          "value": [
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 29
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 10
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Patio&Garden",
+          "value": [
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 70
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 20
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Sports",
+          "value": [
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "",
+                  "value": 6
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "StubHub",
+      "value": [
+        {
+          "key": "Misc",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "",
+                  "value": 1515
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "eBay",
+      "value": [
+        {
+          "key": "Appliance",
+          "value": [
+            {
+              "key": "Virginia",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 14
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Book",
+          "value": [
+            {
+              "key": "Idaho",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 7
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 8
+                }
+              ]
+            },
+            {
+              "key": "Minnesota",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 7
+                }
+              ]
+            },
+            {
+              "key": "Missouri",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 9
+                }
+              ]
+            },
+            {
+              "key": "Ohio",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 7
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Clothing",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 11
+                }
+              ]
+            },
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "Illinois",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 11
+                }
+              ]
+            },
+            {
+              "key": "Maryland",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 19
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "Minnesota",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "key": "Nebraska",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "key": "New York",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 35
+                }
+              ]
+            },
+            {
+              "key": "North Carolina",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 8
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 6
+                }
+              ]
+            },
+            {
+              "key": "Virginia",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 15
+                }
+              ]
+            },
+            {
+              "key": "Washington",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "Wisconsin",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 40
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Coupon",
+          "value": [
+            {
+              "key": "Massachusetts",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 8
+                }
+              ]
+            },
+            {
+              "key": "Texas",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 9
+                }
+              ]
+            },
+            {
+              "key": "Wisconsin",
+              "value": [
+                {
+                  "key": "Email",
+                  "value": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "DVD",
+          "value": [
+            {
+              "key": "Indiana",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 41
+                }
+              ]
+            },
+            {
+              "key": "Maryland",
+              "value": [
+                {
+                  "key": "Media",
+                  "value": 12
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Electronics",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 126
+                }
+              ]
+            },
+            {
+              "key": "Florida",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 314
+                }
+              ]
+            },
+            {
+              "key": "Louisiana",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 140
+                }
+              ]
+            },
+            {
+              "key": "Michigan",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 43
+                },
+                {
+                  "key": "Expedited",
+                  "value": 15
+                }
+              ]
+            },
+            {
+              "key": "New Jersey",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 94
+                }
+              ]
+            },
+            {
+              "key": "New York",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "North Carolina",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "Ohio",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 190
+                }
+              ]
+            },
+            {
+              "key": "Pennsylvania",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 6
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "",
+                  "value": 4
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Kitchen",
+          "value": [
+            {
+              "key": "Minnesota",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 40
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Misc",
+          "value": [
+            {
+              "key": "California",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 10
+                },
+                {
+                  "key": "Expedited",
+                  "value": 44
+                }
+              ]
+            },
+            {
+              "key": "Georgia",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 30
+                }
+              ]
+            },
+            {
+              "key": "Illinois",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 7
+                }
+              ]
+            },
+            {
+              "key": "Indiana",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 23
+                }
+              ]
+            },
+            {
+              "key": "Kansas",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 4
+                }
+              ]
+            },
+            {
+              "key": "Maryland",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "Massachusetts",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 76
+                }
+              ]
+            },
+            {
+              "key": "Nebraska",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 29
+                }
+              ]
+            },
+            {
+              "key": "New Hampshire",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "key": "New York",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 20
+                },
+                {
+                  "key": "Expedited",
+                  "value": 12
+                }
+              ]
+            },
+            {
+              "key": "South Carolina",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 75
+                }
+              ]
+            },
+            {
+              "key": "Tennessee",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 35
+                }
+              ]
+            },
+            {
+              "key": "Washington",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 18
+                }
+              ]
+            },
+            {
+              "key": "Wisconsin",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 14
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "Sports",
+          "value": [
+            {
+              "key": "Illinois",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 85
+                }
+              ]
+            },
+            {
+              "key": "Maine",
+              "value": [
+                {
+                  "key": "1st Class",
+                  "value": 11
+                }
+              ]
+            },
+            {
+              "key": "New Jersey",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 90
+                }
+              ]
+            },
+            {
+              "key": "Ohio",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "key": "Other",
+              "value": [
+                {
+                  "key": "Expedited",
+                  "value": 30
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

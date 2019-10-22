@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="css/michigan.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="//d3js.org/topojson.v3.min.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-sm fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">SOS Michigan Opioid Epidemic Dashboard</a>
+      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item active">
+          <a  class="nav-link" href="#">EMS</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">ME</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container-fluid container-top-buffer">
+    <div class="row content">
+      <div class="col-sm-1 sidebuff"></div>
+      <div class="col-sm-10 text-center top-buffer">
+        <h2>Right click to zoom in&out.</h2>
+        <div class="map"></div>
+        <div class="searchbar">
+          <input type="text" placeholder="Search..">
+        </div>
+      </div>
+      <div class="col-sm-1 sidebuff"></div>
+    </div>
+  </div>
+  <script>
+
+  // Width and height of map
+  let width = 500;
+  let height = width;
+  let centered;
+  const zoomLevel = 8;
+
+  // Create SVG element and append map to the SVG
+  let svg = d3.select(".map")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height)
+  let g = svg.append("g");
+
+  // Load topojson data
+  async function make_map(filename, filename2) {
+    const miTopo = await d3.json(filename)
+    const cityTopo = await d3.json(filename2) 
+    // convert to geojson
+    const miGeo = topojson.feature(miTopo, miTopo.objects.counties)
+    const cityGeo = topojson.feature(cityTopo, cityTopo.objects.cities)
+
+    // D3 Projection
+    let projection = d3.geoMercator()
+        .fitSize([width, height], miGeo)
+    path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+        .projection(projection);
+
+    // Define path generator
+    // city layer (bottom layer)
+    g.append('g')
+        .attr('class', 'cities')
+      .selectAll('path')
+      .data(cityGeo.features)
+      .enter().append('path')
+        .attr('d', path)
+        .attr('class', 'city')
+        .attr('data-toggle', 'popover')
+        .attr('data-placement', 'top')
+        .attr('data-trigger', 'hover')
+        .attr('data-html', true)
+        .attr('title', d => `<a href="#">${d.properties.display}</a>`)
+        .on('click', cityClick)
+        .on('dblclick contextmenu', resetMap)
+
+    // county layer (top layer)
+    g.append('g')
+        .attr('class', 'counties')
+      .selectAll('path')
+      .data(miGeo.features)
+      .enter().append('path')
+        .attr('d', path)
+        .attr('class', 'county')
+        .attr('id', d => d.properties.NAME)
+        .attr('data-toggle', 'popover')
+        .attr('data-placement', 'top')
+        .attr('data-trigger', 'hover')
+        .attr('data-html', true)
+        .attr('title', d => `<a href="#">${d.properties.NAME}</a>`)
+        .on('click contextmenu', d => countyClick(d))
+    // Popover
+    $(function () {
+      $('[data-toggle="popover"]').popover({delay: {show: 250, hide: 750}})
+    })
+  };
+
+  function type(d) {
+    d.lat = +d.lat || 2;
+    d.lng = +d.lng || 1;
+    return d
+  }
+
+  function countyClick(d) {
+    d3.event.preventDefault() // contextmenu click
+    d3.selectAll('.popover').remove()
+    const centroid = path.centroid(d)
+    // hide county - add active class
+    g.select(`[id="${d.properties.NAME}"]`) // handle two word counties
+        .classed('active', true) 
+    panZoom(centroid, zoomLevel)
+  }
+
+  function cityClick(d) {
+    d3.selectAll('.popover').remove()
+    const centroid = path.centroid(d)
+    centered = d
+    panZoom(centroid, zoomLevel)
+  }
+
+  function resetMap() {
+    d3.event.preventDefault() // contextmenu click
+    d3.selectAll('.popover').remove()
+    // show county - remove active class
+    g.selectAll("path")
+        .classed("active", false)
+    panZoom([width/2, height/2], 1)
+  }
+
+  function panZoom(xy,k) {
+    g.transition().duration(750)
+        .attr("transform", `translate(${width/2},${height/2}) scale(${k}) translate(${-xy[0]},${-xy[1]})`)
+        .style("stroke-width", `${1.5/k}px`);
+  }
+
+  make_map("counties_v17a.topojson", "MI_cities_county_column.topojson");
+
+  </script>
+</body>
+</html>
