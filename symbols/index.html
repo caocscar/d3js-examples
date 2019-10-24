@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<div id="chart"></div>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script type="text/javascript">
+//  https://bl.ocks.org/feyderm/4d143591b66725aed0f1855444752fd9
+  const margin = {top: 20, right: 20, bottom: 20, left: 40},
+      width = 800 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom;
+
+  let shapes = [d3.symbolCircle,
+                d3.symbolCross,
+                d3.symbolDiamond,
+                d3.symbolSquare,
+                d3.symbolStar,
+                d3.symbolWye,
+                d3.symbolTriangle,
+                d3.symbolTriangle,
+                d3.symbolTriangle,
+                d3.symbolTriangle,
+                d3.symbolCross,
+                ];
+
+  let x = d3.scalePoint()
+            .domain(d3.range(shapes.length))
+            .range([0, width-margin.right]);
+
+  let svg = d3.select("#chart").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+
+  let symbol = d3.symbol().size([2000]),
+      color = d3.schemeCategory10;
+  
+  let drag_behavior = d3.drag()
+                          .on("start", dragstarted)
+                          .on("drag", dragged);
+
+  svg.append("g")
+    .selectAll("path")
+    .data(shapes)
+    .enter().append("path")
+      .attr("d", symbol.type(d => d))
+      .attr("transform", (d,i) => `translate(${x(i)},-40)`)
+      .style("fill", (d,i) => color[i])
+      .call(drag_behavior)
+    .transition().duration((d,i) => 500 + i*500)
+      .delay((d,i) => i*250)
+      .attr("transform", (d,i) => {
+        let tfm = `translate(${x(i)+margin.left},${height/2})`
+        return  i > 9 ? tfm += ` rotate(225)`
+              : i > 6 ? tfm += ` rotate(${(i-6)*90})`
+              : tfm
+      });
+
+  function dragstarted() {
+    d3.select(this).raise(); // bring current node to top
+  }
+
+  function dragged() {
+    const dx = d3.event.sourceEvent.offsetX,
+          dy = d3.event.sourceEvent.offsetY;
+    tfm_current = d3.select(this).attr('transform')
+    let tfm = `translate(${dx},${dy})`
+    if (tfm_current.includes('rotate')) {
+      tfm += ` ${tfm_current.split(' ').slice(-1)[0]}`
+    }
+    d3.select(this).attr("transform", tfm)
+}
+
+</script>
+
+</body>

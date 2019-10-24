@@ -1,0 +1,17 @@
+body {
+  font: 14px sans-serif;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.label {
+  text-anchor: middle;
+}
+
+g.hidden {
+  opacity: 0.2;
+}
