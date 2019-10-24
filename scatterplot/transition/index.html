@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
+<svg id='scatter'></svg>
+<button onclick="changePlot(true)" class="button">Push My Button</button>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <link rel="stylesheet" href="scatter.css">
 <script>
@@ -20,7 +22,7 @@ let color = d3.scaleOrdinal(d3.schemePaired);
 let xAxis = d3.axisBottom(x);
 let yAxis = d3.axisRight(y);
 
-let svg = d3.select("body").append("svg")
+let svg = d3.select("#scatter")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
@@ -34,13 +36,11 @@ const markersize = 50
 let symbol = d3.symbol().size([markersize])
 
 async function makeScatterPlot() {
-  const data = await d3.csv("workshop.csv") 
+  data = await d3.csv("workshop.csv") 
 
   data.map(d => {
     d.attend = +d.attend;
     d.register = +d.register;
-    d.x2 = d3.randomUniform(1,100);
-    d.y2 = d3.randomUniform(1,100);
   });
 
   x.domain([0, d3.max(data, d => d.attend)]).nice();
@@ -75,7 +75,7 @@ async function makeScatterPlot() {
   svg.selectAll(".pt")
     .data(data)
     .enter().append("path")
-      .attr("class", d => d.workshop)
+      .attr("class", d => `pt ${d.workshop}`)
       .attr("d", symbol.type(d => shapes[d.workshop]))
       .attr("transform", d => `translate(${x(d.attend)},${y(d.register)}) rotate(0)`)
       .style("fill", d => color(d.workshop))
@@ -106,5 +106,30 @@ async function makeScatterPlot() {
       .text(d => d);
 
 };
+
+function changePlot() {
+  let rdm1 = d3.randomUniform(50,150)
+  let rdm2 = d3.randomUniform(10,rdm1())
+  data.map(d => {
+    d.x2 = rdm2();
+    d.y2 = rdm2();
+  })
+  x.domain([0, d3.max(data, d => d.x2)]).nice();
+  y.domain([0, d3.max(data, d => d.y2)]).nice();
+  const T1 = 750
+  d3.select('.x.axis')
+    .transition().duration(T1)
+    .call(xAxis)
+  d3.select('.y.axis')
+    .transition().duration(T1)
+    .call(yAxis)
+    .on('end', function() {
+      d3.selectAll('path.pt')
+        .data(data)
+        .transition().duration(T1*2)
+          .attr("transform", d => `translate(${x(d.x2)},${y(d.y2)}) rotate(0)`)
+  })
+}
 makeScatterPlot()
+
 </script>
