@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Linked Line Charts in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="line.css">
+</head>
+<body>
+<div><svg id='first'></svg></div>
+<div><svg id='second'></svg></div>
+
+<script>
+// set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 500 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+// set the ranges
+let x = d3.scaleLinear().range([0, width]);
+let y = d3.scaleLinear().range([height, 0]);
+
+let xAxis = d3.axisBottom(x)
+let yAxis = d3.axisLeft(y).ticks(6)
+
+let ygridlines = d3.axisLeft(y).ticks(6)
+    .tickSize(-width)
+    .tickFormat("")
+
+const brush = d3.brushX()
+    .extent([[0, 0], [width, height]])
+    .on("start", brushstarted)
+    .on("brush", brushed)
+    .on("end", brushended);
+
+// Read data
+async function make_line_chart(filename, id, column='HvSpeed') {
+  const data = await d3.csv(filename, type)
+  const event = data.filter((d,i) => d.ColorFlag === 2)
+  const mintime = event[0]['Time']
+  data.map(d => {
+    d['Time'] -= mintime
+    return d
+  })
+
+  let svg = d3.select(`#${id}`)
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+  
+  // Scale the domain of the data
+  x.domain(d3.extent(data, d => d.Time)).nice();
+  y.domain([-1, d3.max(data, d => d[column])]).nice();
+
+  // define the line
+  let valueline = d3.line()
+      .defined(d => !isNaN(d[column]))
+      .x(d => x(d.Time))
+      .y(d => y(d[column]));
+
+  // Add the valueline path
+  line1 = svg.append("path")
+      .datum(data)
+      .attr("class", "prepost")
+      .attr("d", valueline);
+
+  // Add the valueline path
+  line1s = svg.append("path")
+      .datum(data)
+      .attr("class", "prepost highlight")
+      .attr("d", valueline);
+
+  // clipping rectangle
+  svg.append("defs").append("clipPath")
+      .attr("id", "clip")
+    .append("rect")
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr("width", 100)
+      .attr("height", height);
+
+  // Add the valueline path
+  line2 = svg.append("path")
+      .datum(event)
+      .attr("class", "event")
+      .attr("d", valueline);
+
+  // Add the valueline path
+  line2s = svg.append("path")
+      .datum(event)
+      .attr("class", "event")
+      .attr("d", valueline);
+
+  // Add the X Axis
+  svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+  // Add the Y Axis
+  svg.append("g")
+      .call(yAxis);
+
+  // Add the Y Gridlines
+  svg.append("g")
+      .attr('class', 'grid')
+      .call(ygridlines);
+
+  svg.append("g")
+      .attr("class", "brush")
+      .call(brush)
+
+};
+
+let brushSVG
+
+// Clear the previously-active brush, if any.
+function brushstarted() {
+  if (brushSVG !== this) {
+    d3.select(brushSVG).call(brush.move, null);
+    brushSVG = this;
+  }
+}
+
+// Highlight the selected.
+function brushed() {
+  if (d3.event.selection === null) return;
+  x12 = d3.event.selection
+  line1.classed("hidden", true)
+  d3.select('#clip rect')
+      .attr('x', x12[0])
+      .attr('width', x12[1]-x12[0])
+}
+
+// If the brush is empty, select all.
+function brushended() {
+  if (d3.event.selection !== null) return;
+  line1.classed("hidden", false);
+}
+
+function type(d) {
+  for (let prop in d) {
+    d[prop] = d[prop] != "" ? +d[prop] : NaN;
+    if (prop == 'Time') {
+      d[prop] /= 100
+    }
+  }
+  return d;
+}
+
+make_line_chart('trip1400.csv', 'first');
+make_line_chart('trip1400.csv', 'second', 'RvSpeed');
+
+</script>
+</body>
