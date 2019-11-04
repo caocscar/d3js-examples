@@ -29,7 +29,7 @@ var chart = d3.select(".chart")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
 async function make_bar(filename) {
   const data = await d3.csv(filename, type)
@@ -39,7 +39,7 @@ async function make_bar(filename) {
 
   chart.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", `translate(0,${height})`)
       .call(xAxis);
 
   chart.append("g")
@@ -81,9 +81,9 @@ async function make_bar(filename) {
   var barlabels = chart.append('g')
       .attr('class', 'barlabel')
     .selectAll('text')
-      .data(data)
+    .data(data)
     .enter().append('text')
-      .attr("transform", d => "translate(" + x(d.name) + ",0)")
+      .attr("transform", d => `translate(${x(d.name)},0)`)
       .attr('x', x.bandwidth()/2)
       .attr('y', d => y(d.value) + 15)
       .text(d => d.value)

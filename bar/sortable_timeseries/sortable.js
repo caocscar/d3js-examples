@@ -124,7 +124,7 @@ async function readData() {
 
     chartDate = d3.timeDay.offset(chartDate,1)
     dateLabel.transition().duration(T)
-        .text(formatDate(chartDate))
+        .text(`${formatDate(chartDate)}   MLB 2018 Season`)
     data = filterData(chartDate)
 
     // update x-axis
