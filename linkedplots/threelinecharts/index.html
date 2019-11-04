@@ -10,7 +10,6 @@
 <div><svg id='first'></svg></div>
 <div><svg id='second'></svg></div>
 <div><svg id='third'></svg></div>
-
 <script>
 // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -28,12 +27,6 @@ let ygridlines = d3.axisLeft(y).ticks(6)
     .tickSize(-width)
     .tickFormat("")
 
-const brush = d3.brushX()
-    .extent([[0, 0], [width, height]])
-    .on("start", brushstarted)
-    .on("brush", brushed)
-    .on("end", brushended);
-
 // Read data
 async function make_line_chart(filename, id, column='HvSpeed') {
   const data = await d3.csv(filename, type)
@@ -44,7 +37,7 @@ async function make_line_chart(filename, id, column='HvSpeed') {
     return d
   })
 
-  let svg = d3.select(`#${id}`)
+  const svg = d3.select(`#${id}`)
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -60,35 +53,26 @@ async function make_line_chart(filename, id, column='HvSpeed') {
       .x(d => x(d.Time))
       .y(d => y(d[column]));
 
-  // Add the valueline path
-  line1 = svg.append("path")
+  // Add the trip path
+  let line1 = svg.append("path")
       .datum(data)
-      .attr("class", `prepost ${id}`)
+      .attr("class", `prepost`)
       .attr("d", valueline);
 
-  // Add the valueline path
-  line1s = svg.append("path")
+  // Add the trip path selectable
+  let line1s = svg.append("path")
       .datum(data)
       .attr("class", "prepost selected")
       .attr("d", valueline);
 
-  // clipping rectangle
-  svg.append("defs").append("clipPath")
-      .attr("id", "clip")
-    .append("rect")
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr("width", 100)
-      .attr("height", height);
-
-  // Add the valueline path
-  line2 = svg.append("path")
+  // Add the event path
+  let line2 = svg.append("path")
       .datum(event)
       .attr("class", "event")
       .attr("d", valueline);
 
-  // Add the valueline path
-  line2s = svg.append("path")
+  // Add the event path selectable
+  let line2s = svg.append("path")
       .datum(event)
       .attr("class", "event selected")
       .attr("d", valueline);
@@ -107,50 +91,74 @@ async function make_line_chart(filename, id, column='HvSpeed') {
       .attr('class', 'grid')
       .call(ygridlines);
 
+  // clipping rectangle
+  svg.append("defs").append("clipPath")
+      .attr("id", "clip")
+    .append("rect")
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr("width", 100)
+      .attr("height", height);
+      
   // Add the xbrush
   svg.append("g")
       .attr("class", "brush")
       .call(brush)
 
-};
+  function brush() {
 
-  let brushSVG
+    const brush = d3.brushX()
+        .extent([[0, 0], [width, height]])
+        .on("start", brushstarted)
+        .on("brush", brushed)
+        .on("end", brushended);
 
-  // Clear the previously-active brush, if any.
-  function brushstarted() {
-    if (brushSVG !== this) {
-      d3.select(brushSVG).call(brush.move, null);
-      brushSVG = this;
-    }
-  }
+    let brushSVG
 
-  // Highlight the selected.
-  function brushed() {
-    if (d3.event.selection === null) return;
-    const X = d3.event.selection
-    line1.classed('hidden', true)
-    line2.classed('hidden', true)
-    d3.selectAll('#clip rect')
-        .attr('x', X[0])
-        .attr('width', X[1]-X[0])
-  }
+    // Add the xbrush
+    svg.append("g")
+        .attr("class", "brush")
+        .call(brush)
 
-  // If the brush is empty, select all.
-  function brushended() {
-    if (d3.event.selection !== null) return;
-    line1.classed('hidden', false)
-    line2.classed('hidden', false)
-  }
-
-  function type(d) {
-    for (let prop in d) {
-      d[prop] = d[prop] != "" ? +d[prop] : NaN;
-      if (prop == 'Time') {
-        d[prop] /= 100
+    // Clear the previously-active brush, if any.
+    function brushstarted() {
+      if (brushSVG !== this) {
+        d3.select(brushSVG).call(brush.move, null);
+        brushSVG = this;
       }
     }
-    return d;
+
+    // Highlight the selected.
+    function brushed() {
+      if (d3.event.selection === null) return;
+      const X = d3.event.selection
+      line1.classed('hidden', true)
+      line2.classed('hidden', true)
+      d3.selectAll('#clip rect')
+          .attr('x', X[0])
+          .attr('width', X[1]-X[0])
+    }
+
+    // If the brush is empty, select all.
+    function brushended() {
+      if (d3.event.selection !== null) return;
+      line1.classed('hidden', false)
+      line2.classed('hidden', false)
+    }
+
   }
+};
+
+function type(d) {
+  for (let prop in d) {
+    d[prop] = d[prop] != "" ? +d[prop] : NaN;
+    if (prop == 'Time') {
+      d[prop] /= 100
+    }
+  }
+  return d;
+}
+
 
 make_line_chart('trip1400.csv', 'first');
 make_line_chart('trip1400.csv', 'second', 'RvSpeed');
