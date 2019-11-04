@@ -63,8 +63,9 @@ async function makeScatterPlot() {
 
   // x label
   labels.append('text')
-      .attr('transform', `translate(${width/2},${height+margin.bottom})`)
-      .text("Attended");
+      .attr('transform', `translate(${width/2},${height+margin.bottom-5})`)
+      .attr('id', 'xlabel')
+      .text('Attended (Linear Scale)');
 
   // y label
   labels.append('text')
@@ -72,12 +73,12 @@ async function makeScatterPlot() {
       .text("Registered");
 
   // add points
-  svg.selectAll(".pt")
+  let pts = svg.selectAll(".pt")
     .data(data)
     .enter().append("path")
       .attr("class", d => `pt ${d.workshop}`)
       .attr("d", symbol.type(d => shapes[d.workshop]))
-      .attr("transform", d => `translate(${x(d.attend)},${y(d.register)}) rotate(0)`)
+      .attr("transform", d => `translate(${x(d.attend)},${y(d.register)})`)
       .style("fill", d => color(d.workshop))
 
   // legend
@@ -95,7 +96,6 @@ async function makeScatterPlot() {
   legend.append('path')
       .attr('class', 'lpt')
       .attr("d", symbol.type(d => shapes[d]))
-      .attr('transform', 'rotate(0)')
       .style('fill', color);
 
   legend.append("text")
@@ -107,27 +107,45 @@ async function makeScatterPlot() {
 
 };
 
+let categorical = false;
 function changePlot() {
   let rdm1 = d3.randomUniform(50,150)
   let rdm2 = d3.randomUniform(10,rdm1())
   data.map(d => {
-    d.x2 = rdm2();
-    d.y2 = rdm2();
+    d.x2 = Math.round(rdm2());
+    d.y2 = Math.round(rdm2()); 
   })
-  x.domain([0, d3.max(data, d => d.x2)]).nice();
+  if (categorical = !categorical) { // categorical scale
+    x = d3.scaleBand()
+        .domain(data.map(d => d.x3).sort(d3.ascending)) // natural order
+        .padding(0.3)
+  } else { // linear scale
+    x = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.x2)]).nice()  }
+  x.range([0, width])
   y.domain([0, d3.max(data, d => d.y2)]).nice();
+  xAxis = d3.axisBottom(x).ticks();
   const T1 = 750
   d3.select('.x.axis')
+    .transition().duration(T1*0.5)
+      .call(xAxis)
+  d3.select('#xlabel')
+    .transition().duration(T1*0.1)
+      .attr('opacity', 0)
     .transition().duration(T1)
-    .call(xAxis)
+      .attr('opacity', 1)    
+      .text(categorical ? 'Attended (Categorical Scale)' : 'Attended (Linear Scale)')
   d3.select('.y.axis')
-    .transition().duration(T1)
-    .call(yAxis)
-    .on('end', function() {
-      d3.selectAll('path.pt')
-        .data(data)
-        .transition().duration(T1*2)
-          .attr("transform", d => `translate(${x(d.x2)},${y(d.y2)}) rotate(0)`)
+    .transition().duration(T1*0.5)
+      .call(yAxis)
+      .on('end', function() {
+        d3.selectAll('.pt')
+          .data(data)
+          .transition().duration(T1*2)
+            .attr("transform", d => {
+              const w = categorical ? x(d.x3) + x.bandwidth()/2 : x(d.x2)
+              return `translate(${w},${y(d.y2)})`
+            })
   })
 }
 makeScatterPlot()
