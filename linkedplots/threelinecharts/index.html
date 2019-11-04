@@ -9,12 +9,13 @@
 <body>
 <div><svg id='first'></svg></div>
 <div><svg id='second'></svg></div>
+<div><svg id='third'></svg></div>
 
 <script>
 // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 500 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+    width = 400 - margin.left - margin.right,
+    height = 200 - margin.top - margin.bottom;
 
 // set the ranges
 let x = d3.scaleLinear().range([0, width]);
@@ -62,13 +63,13 @@ async function make_line_chart(filename, id, column='HvSpeed') {
   // Add the valueline path
   line1 = svg.append("path")
       .datum(data)
-      .attr("class", "prepost")
+      .attr("class", `prepost ${id}`)
       .attr("d", valueline);
 
   // Add the valueline path
   line1s = svg.append("path")
       .datum(data)
-      .attr("class", "prepost highlight")
+      .attr("class", "prepost selected")
       .attr("d", valueline);
 
   // clipping rectangle
@@ -89,7 +90,7 @@ async function make_line_chart(filename, id, column='HvSpeed') {
   // Add the valueline path
   line2s = svg.append("path")
       .datum(event)
-      .attr("class", "event")
+      .attr("class", "event selected")
       .attr("d", valueline);
 
   // Add the X Axis
@@ -106,50 +107,54 @@ async function make_line_chart(filename, id, column='HvSpeed') {
       .attr('class', 'grid')
       .call(ygridlines);
 
+  // Add the xbrush
   svg.append("g")
       .attr("class", "brush")
       .call(brush)
 
 };
 
-let brushSVG
+  let brushSVG
 
-// Clear the previously-active brush, if any.
-function brushstarted() {
-  if (brushSVG !== this) {
-    d3.select(brushSVG).call(brush.move, null);
-    brushSVG = this;
-  }
-}
-
-// Highlight the selected.
-function brushed() {
-  if (d3.event.selection === null) return;
-  x12 = d3.event.selection
-  line1.classed("hidden", true)
-  d3.select('#clip rect')
-      .attr('x', x12[0])
-      .attr('width', x12[1]-x12[0])
-}
-
-// If the brush is empty, select all.
-function brushended() {
-  if (d3.event.selection !== null) return;
-  line1.classed("hidden", false);
-}
-
-function type(d) {
-  for (let prop in d) {
-    d[prop] = d[prop] != "" ? +d[prop] : NaN;
-    if (prop == 'Time') {
-      d[prop] /= 100
+  // Clear the previously-active brush, if any.
+  function brushstarted() {
+    if (brushSVG !== this) {
+      d3.select(brushSVG).call(brush.move, null);
+      brushSVG = this;
     }
   }
-  return d;
-}
+
+  // Highlight the selected.
+  function brushed() {
+    if (d3.event.selection === null) return;
+    const X = d3.event.selection
+    line1.classed('hidden', true)
+    line2.classed('hidden', true)
+    d3.selectAll('#clip rect')
+        .attr('x', X[0])
+        .attr('width', X[1]-X[0])
+  }
+
+  // If the brush is empty, select all.
+  function brushended() {
+    if (d3.event.selection !== null) return;
+    line1.classed('hidden', false)
+    line2.classed('hidden', false)
+  }
+
+  function type(d) {
+    for (let prop in d) {
+      d[prop] = d[prop] != "" ? +d[prop] : NaN;
+      if (prop == 'Time') {
+        d[prop] /= 100
+      }
+    }
+    return d;
+  }
 
 make_line_chart('trip1400.csv', 'first');
 make_line_chart('trip1400.csv', 'second', 'RvSpeed');
+make_line_chart('trip1400.csv', 'third', 'RvRange');
 
 </script>
 </body>

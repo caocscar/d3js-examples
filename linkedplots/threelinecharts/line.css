@@ -1,0 +1,33 @@
+.prepost {
+  fill: none;
+  stroke: rgb(187, 243, 57);
+  stroke-width: 2px;
+}
+
+.highlight {
+  clip-path: url(#clip);  /* clip line with rectangle */
+}
+
+.event {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.selected {
+  clip-path: url(#clip);  /* clip line with rectangle */
+}
+
+.grid line {
+  stroke: black;
+  stroke-opacity: 0.1;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.hidden {
+  opacity: 0.2
+}
