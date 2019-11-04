@@ -15,7 +15,9 @@ let margin = {top: 20, right: 20, bottom: 30, left: 50},
     padding = 40;
 
 // set the ranges
-const charts = 2
+const columns = ['RvSpeed','HvSpeed']
+const column = columns[0]
+const charts = columns.length
 const size = (height - (charts+1)* padding) / charts + padding
 let x = d3.scaleLinear().range([0, width]);
 let y = d3.scaleLinear().range([size-padding, 0]);
@@ -53,8 +55,6 @@ async function make_line_chart(filename) {
       .attr('y', 0)
       .attr("width", 100)
       .attr("height", size-padding);
-
-  const column = 'HvSpeed'
 
   // Scale the domain of the data
   x.domain(d3.extent(data, d => d.Time)).nice();
@@ -105,14 +105,12 @@ async function make_line_chart(filename) {
       .call(ygridlines);
      
   // Add the xbrush
-  svg.append("g")
-      .attr("class", "brush")
-      .call(brush)
+  svg.call(brush)
 
   function brush() {
 
     const brush = d3.brushX()
-        .extent([[0, 0], [width, height]])
+        .extent([[0, 0], [width, size-padding]])
         .on("start", brushstarted)
         .on("brush", brushed)
         .on("end", brushended);
