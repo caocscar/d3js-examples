@@ -11,23 +11,25 @@
 // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 400 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom,
+    height = 700 - margin.top - margin.bottom,
     padding = 40;
 
 // set the ranges
-const columns = ['RvSpeed','HvSpeed']
-const column = columns[0]
+const columns = ['HvSpeed','RvSpeed','RvRange']
+//const column = columns[0]
 const charts = columns.length
 const size = (height - (charts+1)* padding) / charts + padding
 let x = d3.scaleLinear().range([0, width]);
+
 let y = d3.scaleLinear().range([size-padding, 0]);
+
 
 let xAxis = d3.axisBottom(x)
 let yAxis = d3.axisLeft(y).ticks(6)
 
-let ygridlines = d3.axisLeft(y).ticks(6)
-    .tickSize(-width)
-    .tickFormat("")
+//let ygridlines = d3.axisLeft(y).ticks(6)
+  //  .tickSize(-width)
+    //.tickFormat("")
 
 // Read data
 async function make_line_chart(filename) {
@@ -58,37 +60,46 @@ async function make_line_chart(filename) {
 
   // Scale the domain of the data
   x.domain(d3.extent(data, d => d.Time)).nice();
-  y.domain([-1, d3.max(data, d => d[column])]).nice();
+  //y.domain([-1, d3.max(data, d => d[column])]).nice();
+
+  let yy = columns.map((column,k) => {
+    return d3.scaleLinear()
+                .range([size-padding, 0])
+                .domain([-1, d3.max(data, d => d[column])]).nice();
+  })
+  let yyAxis = yy.map(y => d3.axisLeft(y).ticks(6))
 
   // define the line
-  let valueline = d3.line()
-      .defined(d => !isNaN(d[column]))
-      .x(d => x(d.Time))
-      .y(d => y(d[column]));
+  let vline = columns.map((column,k) => {
+    return d3.line()
+                .defined(d => !isNaN(d[column]))
+                .x(d => x(d.Time))
+                .y(d => yy[k](d[column]));
+  })
 
   // Add the trip path
   let line1 = svg.append("path")
       .datum(data)
       .attr("class", `prepost`)
-      .attr("d", valueline);
-
+      .attr("d", vline[0]);
+  
   // Add the trip path selectable
   let line1s = svg.append("path")
       .datum(data)
       .attr("class", "prepost selected")
-      .attr("d", valueline);
+      .attr("d", vline[1]);
 
   // Add the event path
   let line2 = svg.append("path")
       .datum(event)
       .attr("class", "event")
-      .attr("d", valueline);
+      .attr("d", vline[0]);
 
   // Add the event path selectable
   let line2s = svg.append("path")
       .datum(event)
       .attr("class", "event selected")
-      .attr("d", valueline);
+      .attr("d", vline[1]);
 
   // Add the X Axis
   svg.append("g")
@@ -102,7 +113,7 @@ async function make_line_chart(filename) {
   // Add the Y Gridlines
   svg.append("g")
       .attr('class', 'grid')
-      .call(ygridlines);
+      //.call(ygridlines);
      
   // Add the xbrush
   svg.call(brush)
