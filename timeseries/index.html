@@ -88,7 +88,7 @@ var context = svg.append("g")
     .attr("transform", `translate(${margin2.left},${margin2.top})`);
 
 // clipping rectangle
-svg.append("defs").append("clipPath")
+focus.append("defs").append("clipPath")
     .attr("id", "clip")
   .append("rect")
     .attr("width", width)

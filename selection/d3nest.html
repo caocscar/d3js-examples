@@ -6,6 +6,7 @@
 </head>
 <body>
   <script>
+    // d3.nest is DEPRECATED, use group and rollup instead
     async function make_table(filename) {
       var data = await d3.csv(filename);
       // two level nested map (groupby) count
