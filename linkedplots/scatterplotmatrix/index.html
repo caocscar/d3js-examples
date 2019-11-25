@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Linked Line Charts in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="matrix.css">
+</head>
+<body>
+<script>
+
+const width = 960,
+    padding = 20;
+
+let xAxis = d3.axisBottom()
+    .ticks(6);
+let yAxis = d3.axisLeft()
+    .ticks(6);
+
+const color = d3.scaleOrdinal(d3.schemeDark2);
+
+async function make_matrix() {
+  const data = await d3.csv("iris.csv", d3.autoType)
+
+  let domains = {},
+      columns = data.columns.filter(d => d !== "species"),
+      n = columns.length,
+      size = (width - (n+1) * padding) / n + padding;
+
+  let x = d3.scaleLinear()
+      .range([padding/2, size - padding/2]);
+  let y = d3.scaleLinear()
+      .range([size - padding/2, padding/2]);
+  xAxis.scale(x)
+  yAxis.scale(y)
+
+  columns.map(column => {
+    domains[column] = d3.extent(data, d => d[column]);
+  });
+
+  xAxis.tickSize(size * n);
+  yAxis.tickSize(-size * n);
+
+  let svg = d3.select("body").append("svg")
+      .attr("width", size * n + padding)
+      .attr("height", size * n + padding)
+    .append("g")
+      .attr("transform", `translate(${padding},${padding/2})`);
+
+  svg.selectAll(".x.axis")
+    .data(columns)
+    .join("g")
+      .attr("class", "x axis")
+      .attr("transform", (c,i) => `translate(${(n-i-1)*size},0)`)
+      .each(function(c) { 
+        x.domain(domains[c]);
+        d3.select(this).call(xAxis);
+      });
+
+  svg.selectAll(".y.axis")
+    .data(columns)
+    .join("g")
+      .attr("class", "y axis")
+      .attr("transform", (c,i) => `translate(0,${i*size})`)
+      .each(function(c) {
+        y.domain(domains[c]);
+        d3.select(this).call(yAxis);
+      });
+
+  let cell = svg.selectAll(".cell")
+    .data(cross(columns, columns))
+    .join('g')
+      .attr("class", "cell")
+      .attr("transform", d => `translate(${d.i*size},${d.j*size})`)
+      .each(plot);
+
+  function plot(p) {
+    let cell = d3.select(this);
+
+    x.domain(domains[p.x]);
+    y.domain(domains[p.y]);
+
+    cell.append("rect")
+        .attr("class", "frame")
+        .attr("x", padding/2)
+        .attr("y", padding/2)
+        .attr("width", size - padding)
+        .attr("height", size - padding);
+
+    cell.selectAll('circle')
+      .data(data)
+      .join('circle')
+        .attr("cx", d => x(d[p.x]))
+        .attr("cy", d => y(d[p.y]))
+        .attr("r", 4)
+        .style("fill", d => color(d.species));
+  }
+
+  // brushing section
+  let brush = d3.brush()
+      .on("start", brushstart)
+      .on("brush", brushmove)
+      .on("end", brushend)
+      .extent([[0,0],[size,size]]);
+
+  cell.call(brush);
+
+  let brushCell;
+
+  // Clear the previously-active brush, if any.
+  function brushstart(p) {
+    if (brushCell !== this) {
+      d3.select(brushCell).call(brush.move, null);
+      brushCell = this;
+    x.domain(domains[p.x]);
+    y.domain(domains[p.y]);
+    }
+  }
+
+  // Highlight the selected circles.
+  function brushmove(p) {
+    var e = d3.brushSelection(this);
+    svg.selectAll("circle").classed("hidden", function(d) {
+      return !e
+        ? false
+        : (
+          e[0][0] > x(+d[p.x]) || x(+d[p.x]) > e[1][0]
+          || e[0][1] > y(+d[p.y]) || y(+d[p.y]) > e[1][1]
+        );
+    });
+  }
+
+  // If the brush is empty, select all circles.
+  function brushend() {
+    var e = d3.brushSelection(this);
+    if (e === null) svg.selectAll(".hidden").classed("hidden", false);
+  }
+};
+
+function cross(a, b) {
+  var c = [], i, j,
+      n = a.length,
+      m = b.length;
+  for (i = -1; ++i < n;) 
+    for (j = -1; ++j < m;) 
+      c.push({x: a[i], i: i, y: b[j], j: j});
+  return c;
+}
+
+make_matrix();
+
+</script>
