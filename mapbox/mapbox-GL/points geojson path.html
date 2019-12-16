@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <title>Mapbox GL JS + D3v5</title>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />  <style>
+    #map, svg { 
+      position:absolute; 
+      width: 100%;
+      height: 100%;
+    }
+    svg {
+      pointer-events: none;
+    }
+    .dot {
+      fill: orange;
+      stroke: lightblue;
+      stroke-width: 3;
+      pointer-events: all;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script>  
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2FvYSIsImEiOiJjazFncHJqZzYwMXkyM2hxcWp6d2hucTk1In0.5Z7Nmggo79voVuNvU2i7sQ';   
+    let map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v10',
+      center: [-113.5,53.54],
+      zoom: 10.5,      
+    })
+    map.addControl(new mapboxgl.NavigationControl({showCompass:true}), 'top-right');
+
+    // Setup our svg layer that we can manipulate with d3
+    let container = map.getCanvasContainer()
+    let svg = d3.select(container).append("svg")
+
+    // Project any point to map's current state
+		function projectPoint(lon, lat) {
+		  	let point = map.project(new mapboxgl.LngLat(lon, lat));
+			  this.stream.point(point.x, point.y);
+    }
+    // Projection function
+    let transform = d3.geoTransform({point: projectPoint});
+    let path = d3.geoPath().projection(transform);   
+
+    d3.json('features.geojson').then(data => {
+        // Add points
+        let circles = svg.selectAll(".dot")
+          .data(data.features.filter(d => d.geometry.type == 'Point'))
+          .join('path')
+            .attr('class','dot')
+            .attr('r', 10)
+            .attr('d', path)
+
+        const update = function() {
+            circles.attr('d', path)
+        }
+
+        map.on("move", update)
+    })
+</script>
+</body>
