@@ -101,14 +101,13 @@ async function make_matrix() {
           .attr('class', 'prepost')
           .attr('d', vline);
           
-      cell.selectAll('.circle')
+      cell.selectAll('.pts')
         .data(data.filter(validData))
         .join('circle')
-          .attr('class', 'circle')
+          .attr('class', 'pts')
           .attr('cx', d => x(d[xcol]))
           .attr('cy', d => y(d[ycol]))
           .attr('r', 2)
-          .style('fill', d => color(d.species));
   }
 
   // brushing section
@@ -135,7 +134,7 @@ async function make_matrix() {
   // Highlight the selected circles.
   function brushmove([i,j]) {
     let e = d3.event.selection;
-    svg.selectAll("circle").classed("hidden", d => {
+    svg.selectAll(".pts").classed("hidden", d => {
       return !e ? false : (
           e[0][0] > x(d[xcolumn[i]]) || e[1][0] < x(d[xcolumn[i]])
 //          || e[0][1] > y(d[ycolumns[j]]) || e[1][1] < y(d[ycolumns[j]])

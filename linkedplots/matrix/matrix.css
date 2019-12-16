@@ -26,16 +26,16 @@ svg {
   stroke: #aaa;
 }
 
-circle.hidden {
-  fill: #ddd !important;
-}
-
 .prepost {
   fill: none;
   stroke: rgb(187, 243, 57);
   stroke-width: 3px;
 }
 
-.circle {
+.pts {
   fill: black;
+}
+
+.pts.hidden {
+  fill-opacity: 0;
 }
