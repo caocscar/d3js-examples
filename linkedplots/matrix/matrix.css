@@ -29,3 +29,13 @@ svg {
 circle.hidden {
   fill: #ddd !important;
 }
+
+.prepost {
+  fill: none;
+  stroke: rgb(187, 243, 57);
+  stroke-width: 3px;
+}
+
+.circle {
+  fill: black;
+}

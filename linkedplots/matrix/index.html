@@ -8,21 +8,26 @@
 <body>
 <script>
 
-  let margin = {top: 20, right: 20, bottom: 30, left: 50},
-      width = 400 - margin.left - margin.right,
-      height = 900 - margin.top - margin.bottom,
-      padding = 20;
+let margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 400 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom,
+    padding = 20;
 
 const color = d3.scaleOrdinal(d3.schemeDark2);
 
 async function make_matrix() {
-  const data = await d3.csv("trip1400.csv", d3.autoType)
+  let data = await d3.csv("trip1400.csv", d3.autoType)
 
+  const event = data.filter(d => d.ColorFlag == 2)
+  const eventTime = d3.min(event, d => d.Time)
+  data.map(d => {
+    d.Time -= eventTime
+    d.Time /= 100 
+  });
   let domains = {},
-      //columns = data.columns.filter(d => d !== "species"),
-      columns = ['HvSpeed','RvSpeed','RvRangeRate','Time'],
-      n = columns.length - 1,
-      size = (height - (n+1) * padding) / n + padding;
+      columns = ['HvSpeed','RvRange','RvRangeRate','Time'],
+      n = columns.length,
+      size = (height - n*padding) / (n-1) + padding;
 
   let x = d3.scaleLinear().range([padding/2, width - padding/2]);
   let y = d3.scaleLinear().range([size - padding/2, padding/2]);
@@ -48,8 +53,8 @@ async function make_matrix() {
     .data(xcolumn)
     .join("g")
       .attr("class", "x axis")
-      .each(function(c) { 
-        x.domain(domains[c]);
+      .each(function(col) { 
+        x.domain(domains[col]);
         d3.select(this).call(xAxis);
       });
 
@@ -58,40 +63,52 @@ async function make_matrix() {
     .join("g")
       .attr("class", "y axis")
       .attr("transform", (c,i) => `translate(0,${i*size})`)
-      .each(function(c) {
-        y.domain(domains[c]);
+      .each(function(col) {
+        y.domain(domains[col]);
         d3.select(this).call(yAxis);
       });
 
   let cell = svg.selectAll(".cell")
-    .data(d3.cross(d3.range(1), d3.range(n)))
+    .data(d3.cross(d3.range(1), d3.range(n-1)))
     .join('g')
       .attr("class", "cell")
       .attr("transform", ([i,j]) => `translate(${i*size},${j*size})`)
       .each(plot);
 
   function plot([i,j]) {
-    let cell = d3.select(this);
+      let cell = d3.select(this);
+      let xcol = xcolumn[i]
+      let ycol = ycolumns[j]
+      
+      const validData = d => d[ycol] != null
+      let vline = d3.line()
+          .defined(validData)
+          .x(d => x(d[xcol]))
+          .y(d => y(d[ycol]));
 
-    let xcol = xcolumn[i]
-    let ycol = ycolumns[j]
-    x.domain(domains[xcol]);
-    y.domain(domains[ycol]);
+      x.domain(domains[xcol]);
+      y.domain(domains[ycol]);
 
-    cell.append("rect")
-        .attr("class", "frame")
-        .attr("x", 0)
-        .attr("y", padding/2)
-        .attr("width", width - padding*1.0)
-        .attr("height", size - padding);
+      cell.append('rect')
+          .attr('class', 'frame')
+          .attr('x', 0)
+          .attr('y', padding/2)
+          .attr('width', width - padding*1.0)
+          .attr('height', size - padding);
 
-    cell.selectAll('circle')
-      .data(data)
-      .join('circle')
-        .attr("cx", d => x(d[xcol]))
-        .attr("cy", d => y(d[ycol]))
-        .attr("r", 4)
-        .style("fill", d => color(d.species));
+      cell.append('path')
+          .datum(data)
+          .attr('class', 'prepost')
+          .attr('d', vline);
+          
+      cell.selectAll('.circle')
+        .data(data.filter(validData))
+        .join('circle')
+          .attr('class', 'circle')
+          .attr('cx', d => x(d[xcol]))
+          .attr('cy', d => y(d[ycol]))
+          .attr('r', 2)
+          .style('fill', d => color(d.species));
   }
 
   // brushing section
@@ -110,18 +127,18 @@ async function make_matrix() {
     if (brushCell !== this) {
       d3.select(brushCell).call(brush.move, null);
       brushCell = this;
-//      x.domain(domains[xcolumn[i]]);
-      y.domain(domains[ycolumns[j]]);
+      x.domain(domains[xcolumn[i]]);
+//      y.domain(domains[ycolumns[j]]);
     }
   }
 
   // Highlight the selected circles.
   function brushmove([i,j]) {
-    let e = d3.brushSelection(this);
+    let e = d3.event.selection;
     svg.selectAll("circle").classed("hidden", d => {
       return !e ? false : (
           e[0][0] > x(d[xcolumn[i]]) || e[1][0] < x(d[xcolumn[i]])
-          || e[0][1] > y(d[ycolumns[j]]) || e[1][1] < y(d[ycolumns[j]])
+//          || e[0][1] > y(d[ycolumns[j]]) || e[1][1] < y(d[ycolumns[j]])
         );
     });
   }
@@ -136,3 +153,4 @@ async function make_matrix() {
 make_matrix();
 
 </script>
+</body>
