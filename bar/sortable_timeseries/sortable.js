@@ -1,11 +1,11 @@
-async function readData() {
+async function createChart() {
     
   // read data
   const fileLocation = 'https://gist.githubusercontent.com/caocscar/8cdb75721ea4f6c8a032a00ebc73516c/raw/854bbee2faffb4f6947b6b6c2424b18ca5a8970e/mlb2018.csv'
   DATA = await d3.csv(fileLocation, type)
   chartDate = new Date(2018,3,3)
   data = filterData(chartDate)
-  
+
   // margins
   let margin = {top: 80, right: 90, bottom: 30+50, left: 120},
     width = 900 - margin.left - margin.right,
@@ -133,8 +133,7 @@ async function readData() {
   let dailyUpdate = setInterval(function() {
 
     chartDate = d3.timeDay.offset(chartDate,1)
-    dateLabel.transition().duration(T)
-        .text(formatDate(chartDate))
+    dateLabel.text(formatDate(chartDate))
     data = filterData(chartDate)
 
     // update x-axis

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="bar.css">
+</head>
+<body>
+<button class="button" onclick=update()>Forrest</button>
+<svg class="chart"></svg>
+<script>
+
+const margin = {top: 20, right: 30, bottom: 30+50, left: 40},
+    width = 660 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+const ymax = 20
+let fwdFlag = true
+let xdata = d3.range(10)
+let rand = d3.randomUniform(1,ymax)
+let ydata = xdata.map(d => rand())
+
+let x = d3.scaleBand()
+    .domain(xdata)
+    .range([0, width])
+    .padding(0.2)
+
+let y = d3.scaleLinear()
+    .domain([0, ymax])
+    .range([height, 0]);
+
+let xAxis = d3.axisBottom(x)
+let yAxis = d3.axisLeft(y).ticks(8)
+
+let svg = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", `translate(0,${height})`)
+    .call(xAxis);
+
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+// set up bar groups
+let bars = svg.selectAll(".bar")
+  .data(ydata)
+  .join("g")
+    .attr("class", "bar")
+    .attr("transform", (d,i) => `translate(${x(i)},0)`)
+bars.append('rect')
+    .attr('y', d => y(d))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d))
+    .style('fill', d => d3.interpolatePiYG(d/20))
+bars.append('text')
+    .attr('class', 'barlabel')
+    .attr('x', x.bandwidth()/2)
+    .attr('y', d => y(d) - 5)
+    .text(d => d3.format('.1f')(d))
+
+// A function that create / update the plot for a given variable:
+function update() {
+  if (fwdFlag) {
+      xdata.push(xdata.length)
+      ydata.push(rand())
+  } else {
+      xdata.pop()
+      ydata.pop()
+  }
+  fwdFlag = xdata.length > 13 ? false
+          : xdata.length < 10 ? true
+          : fwdFlag
+
+  // bar transition
+  const T = 750
+  const t = svg.transition().duration(T)
+  x.domain(xdata)
+  svg.select('.x.axis').transition(t)
+      .call(xAxis)
+  svg.selectAll(".bar")
+    .data(ydata)
+    .join(
+      enter => enter.append('g')
+          .attr("class", "bar")
+          .attr("transform", `translate(${width+50},0)`)
+        .call(enter => enter.transition(t)
+          .attr("transform", (d,i) => `translate(${x(i)},0)`))
+        .call(enter => // only one chain allowed per call
+          enter.append('rect')
+              .attr('y', d => y(d))
+              .attr("width", x.bandwidth())
+              .attr("height", d => height - y(d))
+              .style('fill', d => d3.interpolatePlasma(d/20)))
+        .call(enter => // chain together call fcts to access elements at same level
+          enter.append('text')
+            .attr('class', 'barlabel')
+            .attr('x', x.bandwidth()/2)
+            .attr('y', d => y(d) - 5)
+            .text(d => d3.format('.1f')(d))
+        ),
+      update => update
+        .call(update => update.transition(t)
+          .attr("transform", (d,i) => `translate(${x(i)},0)`))
+        .call(update => // single .bar node
+          update.select('rect').transition(t)
+              .attr("width", x.bandwidth()))
+        .call(update => // single .bar node
+          update.select('text').transition(t)
+              .attr('x', x.bandwidth()/2)
+        ),
+      exit => exit
+        .call(exit => exit.transition(t)
+          .attr("transform", `translate(${width+50},0)`)
+          .remove()
+        ),
+    )
+} 
+
+</script>
+</body>
+</html>
