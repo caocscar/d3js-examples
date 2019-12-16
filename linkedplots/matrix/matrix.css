@@ -33,9 +33,20 @@ svg {
 }
 
 .pts {
-  fill: black;
+  fill:  red;
+  fill-opacity: 1;
 }
 
 .pts.hidden {
   fill-opacity: 0;
+}
+
+.event {
+  fill: none;
+  stroke: royalblue;
+  stroke-width: 3px;
+}
+
+path.hidden {
+  stroke: lightgray;
 }

@@ -100,7 +100,7 @@ async function make_matrix() {
           .datum(data)
           .attr('class', 'prepost')
           .attr('d', vline);
-          
+         
       cell.selectAll('.pts')
         .data(data.filter(validData))
         .join('circle')
@@ -108,7 +108,12 @@ async function make_matrix() {
           .attr('cx', d => x(d[xcol]))
           .attr('cy', d => y(d[ycol]))
           .attr('r', 2)
-  }
+/*
+      cell.append('path')
+          .datum(data.filter(d => d.ColorFlag == 2))
+          .attr('class', 'event')
+          .attr('d', vline);
+*/  }
 
   // brushing section
   let brush = d3.brush()
@@ -140,6 +145,7 @@ async function make_matrix() {
 //          || e[0][1] > y(d[ycolumns[j]]) || e[1][1] < y(d[ycolumns[j]])
         );
     });
+    svg.selectAll('path').classed('hidden', true)
   }
 
   // If the brush is empty, select all circles.
