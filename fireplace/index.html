@@ -66,7 +66,8 @@ let fireplace = svg.append('g')
 
 const alpha = 0.7
 const Overhang = 3
-const mantleH = 57.5
+const moffset = 0
+const mantleH = 57.5+moffset
 let mantle = svg.append('g')
     .attr("transform", `translate(0,${height-yR(mantleH)})`)
   .append('rect')
@@ -76,7 +77,7 @@ let mantle = svg.append('g')
     .style('opacity', alpha)
 
 const angle = 45
-const h2 = (31-Overhang)/Math.tan(angle*Math.PI/180)
+const h2 = (31-Overhang)/Math.tan(angle*Math.PI/180) - moffset
 console.log(h2)
 const wR2 = 34
 let upperRight = svg.append('g')
@@ -87,17 +88,17 @@ let upperRight = svg.append('g')
     .style('fill', '#B22222')
     .style('opacity', alpha)
 
-const h1 = 14
-const offset = h1*(31-Overhang)/h2
+const h1 = 14 - moffset
+const offset = 12.875//h1*Math.tan(Math.PI/180*45)
 let midRight = svg.append('g')
-    .attr("transform", `translate(${width-x(wR2)-x(31-Overhang-offset)},${height-yR(mantleH+h1)})`)
+    .attr("transform", `translate(${width-x(wR2)-x(offset)},${height-yR(mantleH+h1)})`)
   .append('rect')
     .attr('width', x(wR2))
     .attr('height', yR(1.5))
     .style('fill', '#B22222')
     .style('opacity', alpha)
 
-const hL = h1
+const hL = h1 - moffset
 const single = true
 let wL2 = single ? 34+offset/2 : wR2
 const fudge = single ? 1.5 : 2
