@@ -1,0 +1,47 @@
+svg {
+  font: 10px sans-serif;
+  padding: 10px;
+}
+
+.axis, .frame {
+  shape-rendering: crispEdges;
+}
+
+.axis line {
+  stroke: #ddd;
+}
+
+.axis path {
+  display: none;
+}
+
+.cell text {
+  font-weight: bold;
+  text-transform: capitalize;
+  fill: black;
+}
+
+.frame {
+  fill: none;
+  stroke: #aaa;
+}
+
+.prepost {
+  fill: none;
+  stroke: rgb(187, 243, 57);
+  stroke-width: 3px;
+  clip-path: url(#clip);
+}
+
+.event {
+  fill: none;
+  stroke: royalblue;
+  stroke-width: 3px;
+  clip-path: url(#clip);
+}
+
+.ylabel {
+  text-anchor: middle;
+}
+
+

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Linked Line Charts in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="ts.css">
+</head>
+<body>
+<script>
+
+const H = 600
+let margin = {top: 20, right: 0, bottom: 50, left: 50},
+    width = 400 - margin.left - margin.right,
+    height = H - margin.top - margin.bottom,
+    margin2 = {top: H-margin.bottom+10, right: 20, bottom: 10, left: 50},
+    height2 = margin.bottom - margin2.bottom
+    padding = 20;
+
+const color = d3.scaleOrdinal(d3.schemeDark2);
+let domains = {}
+const ids = ['first','second','third','fourth','fifth']
+
+async function make_matrix() {
+  let data = await d3.csv("trip1400.csv", d3.autoType)
+
+  const event = data.filter(d => d.ColorFlag == 2)
+  const eventTime = d3.min(event, d => d.Time)
+  data.map(d => {
+    d.Time -= eventTime
+    d.Time /= 100 
+  });
+  let columns = ['HvSpeed','RvRange','RvRangeRate','Time'],
+      n = columns.length,
+      size = height / (n-1) - padding;
+
+  x = d3.scaleLinear().range([0, width]);
+  y = d3.scaleLinear().range([size - padding/2, padding/2]);
+  x2 = d3.scaleLinear().range([0, width]);
+
+  xAxis = d3.axisBottom(x)
+      .ticks(6)
+      .tickSize(size * (n-1));
+  let yAxis = d3.axisLeft(y)
+      .ticks(6)
+      .tickSize(-width);
+  let xAxis2 = d3.axisBottom(x2)
+      .ticks(6)
+
+  columns.map(column => {
+    domains[column] = d3.extent(data, d => d[column]);
+  });
+  ycolumns = columns.slice(0,columns.length-1)
+  xcolumn = columns.slice(-1)
+
+  let svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+
+  let focus = svg.append("g")
+      .attr("class", "focus")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  let context = svg.append("g")
+      .attr("class", "context")
+      .attr("transform", `translate(${margin.left},${margin2.top - padding - margin2.bottom})`);
+
+  focus.selectAll(".x.axis")
+    .data(xcolumn)
+    .join("g")
+      .attr("class", "x axis")
+      .each(function(col) { 
+        x.domain(domains[col]);
+        d3.select(this).call(xAxis);
+      });
+
+  focus.selectAll(".y.axis")
+    .data(ycolumns)
+    .join("g")
+      .attr("class", "y axis")
+      .attr("transform", (c,i) => `translate(0,${i*size})`)
+      .each(function(col) {
+        y.domain(domains[col]);
+        d3.select(this).call(yAxis);
+      });
+  
+  // Add brush in x-dimension
+  var xbrush = d3.brushX()
+      .extent([[0, 0], [width, height2-15]])
+      .on("brush", brushed)
+
+  // add the context x-axis
+  x2.domain(x.domain())
+  context.append("g")
+      .attr("class", "axis--x")
+      .attr("transform", `translate(0,${height2-15})`)
+      .call(xAxis2);
+
+  // add the context brush window
+  context.append("g")
+      .attr("class", "brush")
+      .call(xbrush)
+      .call(xbrush.move, [0, width]); // initialize brush    
+
+  let cell = focus.selectAll(".cell")
+    .data(d3.cross(d3.range(n-1), d3.range(1)))
+    .join('g')
+      .attr("class", "cell")
+      .attr("transform", ([i,j]) => `translate(${j*size},${i*size})`)
+      .each(plot);
+
+  function plot([i,j]) {
+      let cell = d3.select(this);
+      let xcol = xcolumn[j]
+      let ycol = ycolumns[i]
+
+      y.domain(domains[ycol]);
+
+      const validData = d => d[ycol] != null
+      let vline = d3.line()
+          .defined(validData)
+          .x(d => x(d[xcol]))
+          .y(d => y(d[ycol]));
+
+      cell.append('rect')
+          .attr('class', 'frame')
+          .attr('x', 0)
+          .attr('y', padding/2)
+          .attr('width', width)
+          .attr('height', size - padding);
+
+      cell.append('path')
+          .datum(data)
+          .attr('class', `prepost ${ids[i]}`)
+          .attr('d', vline);
+         
+      cell.append('path')
+          .datum(data.filter(d => d.ColorFlag == 2))
+          .attr('class', `event ${ids[i]}`)
+          .attr('d', vline);
+
+      cell.append('text')
+          .attr('class', 'ylabel')
+          .attr('transform', `translate(-25,0) rotate(-90,0,${size/2})`)
+          .attr('x', 0)
+          .attr('y', size/2)
+          .text(ycolumns[i])
+
+      if (i == ycolumns.length-1) {
+        cell.append('text')
+          .attr('class', 'xlabel')
+          .attr('transform', `translate(0,0)`)
+          .attr('x', width/2)
+          .attr('y', size + padding)
+          .text(xcolumn[j])
+      }
+  }
+
+  // clipping rectangle
+  focus.append("defs").append("clipPath")
+      .attr("id", "clip")
+    .append("rect")
+      .attr("width", width)
+      .attr("height", size * ycolumns.length)
+
+};
+
+// brush function
+function brushed() {
+  const selection = d3.event.selection || x2.range(); // default brush
+  x.domain(selection.map(x2.invert, x2)); // new focus x-domain
+  d3.selectAll('.x.axis')
+      .call(xAxis);
+
+  // update each cell viewport
+  const xcol = xcolumn[0]
+  for (let i of d3.range(ycolumns.length)) {
+      let ycol = ycolumns[i]
+      let validData = d => d[ycol] != null
+      y.domain(domains[ycol]);
+      let vline = d3.line()
+          .defined(validData)
+          .x(d => x(d[xcol]))
+          .y(d => y(d[ycol]));
+      d3.selectAll(`.${ids[i]}`)
+          .attr('d', vline)
+  }
+}
+
+make_matrix();
+
+</script>
+</body>
