@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Linked Line Charts in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+    <link rel="stylesheet" href="tsmap.css">
+</head>
+<body>
+<div id='charts'></div>
+<div id='map'></div>
+<script>
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiY2FvYSIsImEiOiJjazFncHJqZzYwMXkyM2hxcWp6d2hucTk1In0.5Z7Nmggo79voVuNvU2i7sQ';   
+let map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v10',
+    center: [-83.53,40.27],
+    zoom: 9,    
+})
+let nav = new mapboxgl.NavigationControl({
+    visualizePitch: true,
+})
+map.addControl(nav, 'top-right');
+
+// Setup our svg layer that we can manipulate with d3
+let container = map.getCanvasContainer()
+let svgMap = d3.select(container).append("svg")
+    .attr('id','mapbox')
+
+// Project any point to map's current state
+function projectPoint(lon, lat) {
+    let point = map.project(new mapboxgl.LngLat(lon, lat));
+    this.stream.point(point.x, point.y);
+}
+
+// Projection function
+let transform = d3.geoTransform({point: projectPoint});
+let path = d3.geoPath().projection(transform);   
+
+const H = 600
+let margin = {top: 20, right: 0, bottom: 50, left: 50},
+    width = 400 - margin.left - margin.right,
+    height = H - margin.top - margin.bottom,
+    margin2 = {top: H-margin.bottom+10, right: 20, bottom: 10, left: 50},
+    height2 = margin.bottom - margin2.bottom
+    padding = 20;
+
+const color = d3.scaleOrdinal(d3.schemeDark2);
+let domains = {}
+const ids = ['first','second','third','fourth','fifth']
+
+async function make_matrix() {
+  data = await d3.csv("trip2089.csv", d3.autoType)
+
+  const event = data.filter(d => d.ColorFlag == 2)
+  const eventTime = d3.min(event, d => d.Time)
+  data.map(d => {
+    d.Time -= eventTime
+    d.Time /= 100 
+  });
+  let columns = ['HvSpeed','RvRange','RvRangeRate','Time'],
+      n = columns.length,
+      size = height / (n-1) - padding;
+
+  x = d3.scaleLinear().range([0, width]);
+  y = d3.scaleLinear().range([size - padding/2, padding/2]);
+  x2 = d3.scaleLinear().range([0, width]);
+
+  xAxis = d3.axisBottom(x)
+      .ticks(6)
+      .tickSize(size * (n-1) - padding);
+  let yAxis = d3.axisLeft(y)
+      .ticks(6)
+      .tickSize(-width);
+  let xAxis2 = d3.axisBottom(x2)
+      .ticks(6)
+
+  columns.map(column => {
+    domains[column] = d3.extent(data, d => d[column]);
+  });
+  ycolumns = columns.slice(0,columns.length-1)
+  xcolumn = columns.slice(-1)
+
+  let svg = d3.select("#charts").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+
+  let focus = svg.append("g")
+      .attr("class", "focus")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  let context = svg.append("g")
+      .attr("class", "context")
+      .attr("transform", `translate(${margin.left},${margin2.top - padding - margin2.bottom})`);
+
+  focus.selectAll(".x.axis")
+    .data(xcolumn)
+    .join("g")
+      .attr("class", "x axis")
+      .attr('transform', `translate(0,${padding/2})`)
+      .each(function(col) { 
+        x.domain(domains[col]);
+        d3.select(this).call(xAxis);
+      });
+
+  focus.selectAll(".y.axis")
+    .data(ycolumns)
+    .join("g")
+      .attr("class", "y axis")
+      .attr("transform", (c,i) => `translate(0,${i*size})`)
+      .each(function(col) {
+        y.domain(domains[col]);
+        d3.select(this).call(yAxis);
+      });
+  
+  // Add brush in x-dimension
+  var xbrush = d3.brushX()
+      .extent([[0, 0], [width, height2]])
+      .on("brush", brushed)
+
+  // add the context x-axis
+  x2.domain(x.domain())
+  context.append("g")
+      .attr("class", "axis--x")
+      .attr("transform", `translate(0,${height2/2})`)
+      .call(xAxis2);
+
+  // add the context brush window
+  context.append("g")
+      .attr("class", "brush")
+      .call(xbrush)
+      .call(xbrush.move, [0, width]); // initialize brush    
+
+  let cell = focus.selectAll(".cell")
+    .data(d3.cross(d3.range(n-1), d3.range(1)))
+    .join('g')
+      .attr("class", "cell")
+      .attr("transform", ([i,j]) => `translate(${j*size},${i*size})`)
+      .each(plot);
+
+  function plot([i,j]) {
+      let cell = d3.select(this);
+      let xcol = xcolumn[j]
+      let ycol = ycolumns[i]
+
+      y.domain(domains[ycol]);
+
+      const validData = d => d[ycol] != null
+      let vline = d3.line()
+          .defined(validData)
+          .x(d => x(d[xcol]))
+          .y(d => y(d[ycol]));
+
+      cell.append('rect')
+          .attr('class', 'frame')
+          .attr('x', 0)
+          .attr('y', padding/2)
+          .attr('width', width)
+          .attr('height', size - padding);
+
+      cell.append('path')
+          .datum(data)
+          .attr('class', `prepost ${ids[i]}`)
+          .attr('d', vline);
+         
+      cell.append('path')
+          .datum(data.filter(d => d.ColorFlag == 2))
+          .attr('class', `event ${ids[i]}`)
+          .attr('d', vline);
+
+      cell.append('text')
+          .attr('class', 'ylabel')
+          .attr('transform', `translate(-25,0) rotate(-90,0,${size/2})`)
+          .attr('x', 0)
+          .attr('y', size/2)
+          .text(ycolumns[i])
+
+      if (i == ycolumns.length-1) {
+        cell.append('text')
+          .attr('class', 'xlabel')
+          .attr('x', width/2)
+          .attr('y', size + padding)
+          .text(xcolumn[j])
+      }
+  }
+
+  // clipping rectangle
+  focus.append("defs").append("clipPath")
+      .attr("id", "clip")
+    .append("rect")
+      .attr("width", width)
+      .attr("height", size * ycolumns.length)
+
+  // mapbox section
+  let geojson = makeGeojson(data)
+  let bbox = turf.bbox(geojson)
+  map.fitBounds(bbox, {padding: 50})
+
+  let features = svgMap.append("path")
+      .datum(geojson)
+      .attr('class', 'line')
+      .attr('d', path)
+
+  let geojson2 = makeGeojson(event)
+  let features2 = svgMap.append("path")
+      .datum(geojson2)
+      .attr('class', 'eventline')
+      .attr('d', path)
+
+  const updatePath = function() {
+    features.attr('d', path)
+    features2.attr('d', path)
+  }
+  map.on('move', updatePath)
+
+};
+
+function makeGeojson(data) {
+  let pts = data.map(d => [d.HvLongitude, d.HvLatitude])
+  return {"type": "LineString", "coordinates": pts}
+}
+
+// brush function
+function brushed() {
+  const selection = d3.event.selection || x2.range(); // default brush
+  x.domain(selection.map(x2.invert, x2)); // new focus x-domain
+  d3.selectAll('.x.axis')
+      .call(xAxis);
+
+  // update each cell viewport
+  const xcol = xcolumn[0]
+  for (let i of d3.range(ycolumns.length)) {
+      let ycol = ycolumns[i]
+      let validData = d => d[ycol] != null
+      y.domain(domains[ycol]);
+      let vline = d3.line()
+          .defined(validData)
+          .x(d => x(d[xcol]))
+          .y(d => y(d[ycol]));
+      d3.selectAll(`.${ids[i]}`)
+          .attr('d', vline)
+  }
+
+  // update map
+  let timeFilter = data.filter(d => d.Time >= x.domain()[0] & d.Time <= x.domain()[1])
+  let event = timeFilter.filter(d => d.ColorFlag == 2)
+
+  let geojson = makeGeojson(timeFilter)
+  d3.select('.line')
+      .datum(geojson)
+      .attr('d', path)
+  
+  let geojson2 = makeGeojson(event)
+  d3.select('.eventline')
+      .datum(geojson2)
+      .attr('d', path)     
+
+}
+
+make_matrix();
+</script>
+<!-- <script src="tsmap.js"></script> -->
+</body>
