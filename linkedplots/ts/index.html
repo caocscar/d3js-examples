@@ -39,7 +39,7 @@ async function make_matrix() {
 
   xAxis = d3.axisBottom(x)
       .ticks(6)
-      .tickSize(size * (n-1));
+      .tickSize(size * (n-1) - padding);
   let yAxis = d3.axisLeft(y)
       .ticks(6)
       .tickSize(-width);
@@ -68,6 +68,7 @@ async function make_matrix() {
     .data(xcolumn)
     .join("g")
       .attr("class", "x axis")
+      .attr('transform', `translate(0,${padding/2})`)
       .each(function(col) { 
         x.domain(domains[col]);
         d3.select(this).call(xAxis);
@@ -187,6 +188,5 @@ function brushed() {
 }
 
 make_matrix();
-
 </script>
 </body>
