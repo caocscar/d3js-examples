@@ -85,14 +85,14 @@ async function make_matrix() {
   
   // Add brush in x-dimension
   var xbrush = d3.brushX()
-      .extent([[0, 0], [width, height2-15]])
+      .extent([[0, 0], [width, height2]])
       .on("brush", brushed)
 
   // add the context x-axis
   x2.domain(x.domain())
   context.append("g")
       .attr("class", "axis--x")
-      .attr("transform", `translate(0,${height2-15})`)
+      .attr("transform", `translate(0,${height2/2})`)
       .call(xAxis2);
 
   // add the context brush window
