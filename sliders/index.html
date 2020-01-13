@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+  <title>d3-simple-slider</title>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://unpkg.com/d3-simple-slider"></script>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+<div class="container">
+  <h2>NO Matches</h2>
+  <div class="row align-items-center"></div>
+</div>
+<script>
+
+// https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+let margin = {top: 20, right: 50, bottom: 20, left: 130},
+    width = 500 - margin.left - margin.right,
+    height = 200 - margin.top - margin.bottom;
+
+const xoffset = 125,
+    symbolSize = 250,
+    symbol = d3.symbol().type(d3.symbolCircle).size(symbolSize)(),
+    tickValues = [0, 2.5, 5],
+    stepSize = 0.1;
+
+  // rectangle
+  let R = d3.select('.container').append('svg')
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .attr('class', 'back')
+    .append("rect")
+      .attr('class', 'top')
+      .attr("width", 10)
+      .attr("height", 90)
+      .attr('x', xoffset)
+      .attr('y', 15)
+      .attr('opacity', 0)
+
+  const data = d3.range(6)
+  const h = 12 // pixels
+  const numFormat = d3.format('$.2f')
+
+  // Tale of two sliders
+  let X = d3.scaleLinear()
+      .domain(d3.extent(data))
+
+  let slider1 = d3.sliderBottom(X)
+      .width(width)
+      .tickFormat(numFormat)
+      .tickValues(tickValues)
+      .step(stepSize)
+      .handle(symbol) 
+      .default(2)
+      .fill('#a1d99b')
+      .on('onchange', d => d3.select('#value1').text(numFormat(d)));
+      
+  let slider2 = d3.sliderBottom(X)
+      .width(width)
+      .tickFormat(numFormat)
+      .tickValues(tickValues)
+      .step(stepSize)
+      .handle(symbol)
+      .default(4)
+      .fill('#31a354')
+      .on('onchange', d => d3.select('#value2').text(numFormat(d)));
+
+  let P1 = d3.select('.back').append('svg')
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .attr('class', 'bottom')
+    .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`)
+      .attr('id', 's1')
+      .call(slider1);
+  
+  let P2 = d3.select('.back').append('svg')
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .attr('class', 'bottom')
+    .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top+height/2})`)
+      .attr('id', 's2')
+      .call(slider2);
+
+  // team labels
+  P1.append('text')
+      .attr('class', 'player')
+      .attr('x', -80)
+      .attr('y', 0.33*h)
+      .text('Player 1')
+  P1.append('text')
+      .attr('id', 'value1')
+      .attr('x', -80)
+      .attr('y', 3*h)
+      .text(slider1.value())
+
+  P2.append('text')
+      .attr('class', 'player')
+      .attr('x', -80)
+      .attr('y', 0.33*h)
+      .text('Player 2')
+  P2.append('text')
+      .attr('id', 'value2')
+      .attr('x', -80)
+      .attr('y', 3*h)
+      .text(slider2.value())
+
+  d3.selectAll('.track')
+      .attr('stroke-width', h)
+  d3.selectAll('.track-inset')
+      .attr('stroke-width', h-2)          
+  d3.selectAll('.track-fill')
+      .attr('stroke-width', h-2)
+
+  // check for a match
+  let check4Match = setInterval(function() {
+    if (slider1.value() == slider2.value()) {
+      d3.select('h2').text('PEEK-A-BOO')
+      d3.select('.top').attr('opacity', 0.5)
+      x2 = parseInt(d3.select('.track-fill').attr('x2'))
+      d3.select('.top').attr('x', xoffset+x2)
+      d3.selectAll('.parameter-value path').attr('fill', '#2719C7')
+    } else {
+      d3.select('h2').text('NO MATCH')
+      d3.select('.top').attr('opacity', 0)
+      d3.selectAll('.parameter-value path').attr('fill', 'white')
+    }
+  }, 100);
+</script>
+</body>
+</html>

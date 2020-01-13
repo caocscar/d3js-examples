@@ -1,0 +1,9 @@
+.bottom {
+  position: relative;
+}
+
+.top {
+  position: absolute;
+  fill: #2719C7;
+  /* stroke: null; */
+}
