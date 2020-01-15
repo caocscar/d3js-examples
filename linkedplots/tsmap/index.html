@@ -13,6 +13,7 @@
 <div id='map'></div>
 <script>
 
+// map initialization
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2FvYSIsImEiOiJjazFncHJqZzYwMXkyM2hxcWp6d2hucTk1In0.5Z7Nmggo79voVuNvU2i7sQ';   
 let map = new mapboxgl.Map({
     container: 'map',
@@ -26,18 +27,18 @@ let nav = new mapboxgl.NavigationControl({
 })
 map.addControl(nav, 'top-right');
 
-// Setup our svg layer that we can manipulate with d3
+// setup our svg layer that we can manipulate with d3
 let container = map.getCanvasContainer()
 let svgMap = d3.select(container).append("svg")
     .attr('id','mapbox')
 
-// Project any point to map's current state
+// project any point to map's current state
 function projectPoint(lon, lat) {
     let point = map.project(new mapboxgl.LngLat(lon, lat));
     this.stream.point(point.x, point.y);
 }
 
-// Projection function
+// projection function
 let transform = d3.geoTransform({point: projectPoint});
 let path = d3.geoPath().projection(transform);   
 
@@ -46,11 +47,9 @@ let margin = {top: 0, right: 0, bottom: 50, left: 50},
     width = 400 - margin.left - margin.right,
     height = H - margin.top - margin.bottom,
     margin2 = {top: H-margin.bottom+10, right: 20, bottom: 10, left: 50},
-    height2 = margin.bottom - margin2.bottom
-    padding = 20;
-
-let domains = {}
-const ids = ['first','second','third','fourth','fifth']
+    height2 = margin.bottom - margin2.bottom,
+    padding = 20,
+    domains = {};
 
 async function make_matrix(filename) {
   data = await d3.csv(filename, d3.autoType)
@@ -117,7 +116,7 @@ async function make_matrix(filename) {
         d3.select(this).call(yAxis);
       });
   
-  // Add brush in x-dimension
+  // add brush in x-dimension
   var xbrush = d3.brushX()
       .extent([[0, 0], [width, height2]])
       .on("brush", brushed)
@@ -165,12 +164,12 @@ async function make_matrix(filename) {
 
       cell.append('path')
           .datum(data)
-          .attr('class', `prepost ${ids[i]}`)
+          .attr('class', `prepost ${ycol}`)
           .attr('d', vline);
          
       cell.append('path')
           .datum(data.filter(d => d.ColorFlag == 2))
-          .attr('class', `event ${ids[i]}`)
+          .attr('class', `event ${ycol}`)
           .attr('d', vline);
 
       cell.append('text')
@@ -182,10 +181,10 @@ async function make_matrix(filename) {
 
       if (i == ycolumns.length-1) {
         cell.append('text')
-          .attr('class', 'xlabel')
-          .attr('x', width/2)
-          .attr('y', size + padding)
-          .text('Time Relative to Start of Alert (s)')
+            .attr('class', 'xlabel')
+            .attr('x', width/2)
+            .attr('y', size + padding)
+            .text('Time Relative to Start of Alert (s)')
       }
   }
 
@@ -287,15 +286,15 @@ function brushed() {
 
   // update each cell viewport
   const xcol = xcolumn[0]
-  for (let i of d3.range(ycolumns.length)) {
-      let ycol = ycolumns[i]
+  for (let ycol of ycolumns) {
+      //let ycol = ycolumns[i]
       let validData = d => d[ycol] != null
       y.domain(domains[ycol]).nice();
       let vline = d3.line()
           .defined(validData)
           .x(d => x(d[xcol]))
           .y(d => y(d[ycol]));
-      d3.selectAll(`.${ids[i]}`)
+      d3.selectAll(`.${ycol}`)
           .attr('d', vline)
   }
 
