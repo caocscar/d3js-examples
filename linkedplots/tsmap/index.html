@@ -32,6 +32,43 @@ let container = map.getCanvasContainer()
 let svgMap = d3.select(container).append("svg")
     .attr('id','mapbox')
 
+// mapbox legend
+svgMap.append('rect')
+    .attr('class', 'legendBkgd')
+    .attr('width', 70)
+    .attr('height', 40)
+
+let legend = svgMap.selectAll('.legend')
+  .data(['host','remote'])
+  .join('g')
+    .attr("class", "legend")
+    .attr("transform", (d,i) => `translate(0,${i*20})`)
+    .on('click', function(d) {
+      tf = d3.select(this).classed('hidden')
+      d3.select(this).classed('hidden', !tf)
+      d3.selectAll(`.${d}`).attr('opacity', tf ? 1 : 0 )
+    })
+
+const xoffset = 5,
+      yoffset = 10,
+      colorObj = {'host':'yellow', 'remote':'orange'};
+
+legend.append('line')
+    .attr('class', 'lpt')
+    .attr('x1', xoffset)
+    .attr('y1', yoffset)
+    .attr('x2', xoffset+20)
+    .attr('y2', yoffset)
+    .style('stroke', d => colorObj[d])
+    .style('stroke-width', 5);
+
+legend.append("text")
+    .attr("x", xoffset+25)
+    .attr("y", yoffset)
+    .attr("dy", ".2em")
+    .style("text-anchor", "start")
+    .text(d => d);
+
 // project any point to map's current state
 function projectPoint(lon, lat) {
     let point = map.project(new mapboxgl.LngLat(lon, lat));
@@ -42,6 +79,7 @@ function projectPoint(lon, lat) {
 let transform = d3.geoTransform({point: projectPoint});
 let path = d3.geoPath().projection(transform);   
 
+// setup svg
 const H = 600
 let margin = {top: 0, right: 0, bottom: 50, left: 50},
     width = 400 - margin.left - margin.right,
@@ -51,7 +89,50 @@ let margin = {top: 0, right: 0, bottom: 50, left: 50},
     padding = 20,
     domains = {};
 
-async function make_matrix(filename) {
+let svg = d3.select("#charts").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+
+let focus = svg.append("g")
+    .attr("class", "focus")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+let context = svg.append("g")
+    .attr("class", "context")
+    .attr("transform", `translate(${margin.left},${margin2.top - padding - margin2.bottom})`);
+
+let ycolumns = ['HvSpeed','RvRange','RvRangeRate']
+let xcolumn = ['Time']
+let n = ycolumns.length,
+    size = height / n - padding;
+
+// setup axes
+let x = d3.scaleLinear().range([0, width]);
+let y = d3.scaleLinear().range([size - padding/2, padding/2]);
+let x2 = d3.scaleLinear().range([0, width]);
+
+let xAxis = d3.axisBottom(x)
+    .ticks(6)
+    .tickSize(size * n - padding);
+let yAxis = d3.axisLeft(y)
+    .ticks(6)
+    .tickSize(-width);
+let xAxis2 = d3.axisBottom(x2)
+    .ticks(6)
+
+// add brush in x-dimension
+let xbrush = d3.brushX()
+    .extent([[0, 0], [width, height2]])
+    .on("brush", brushed)
+
+// clipping rectangle
+focus.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", size * ycolumns.length)
+
+async function draw_charts(filename) {
   data = await d3.csv(filename, d3.autoType)
 
   const event = data.filter(d => d.ColorFlag == 2)
@@ -60,41 +141,12 @@ async function make_matrix(filename) {
     d.Time -= eventTime
     d.Time /= 100 
   });
-  ycolumns = ['HvSpeed','RvRange','RvRangeRate']
-  xcolumn = ['Time']
-  let n = ycolumns.length,
-      size = height / n - padding;
-
-  x = d3.scaleLinear().range([0, width]);
-  y = d3.scaleLinear().range([size - padding/2, padding/2]);
-  x2 = d3.scaleLinear().range([0, width]);
-
-  xAxis = d3.axisBottom(x)
-      .ticks(6)
-      .tickSize(size * n - padding);
-  let yAxis = d3.axisLeft(y)
-      .ticks(6)
-      .tickSize(-width);
-  let xAxis2 = d3.axisBottom(x2)
-      .ticks(6)
 
   ycolumns.map(ycolumn => {
     domains[ycolumn] = d3.extent(data, d => d[ycolumn]);
     domains[ycolumn] = [d3.min([0, d3.min(data, d => d[ycolumn])]), d3.max(data, d => d[ycolumn])];
   });
   domains[xcolumn] = d3.extent(data, d => d[xcolumn])
-
-  let svg = d3.select("#charts").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-
-  let focus = svg.append("g")
-      .attr("class", "focus")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-  let context = svg.append("g")
-      .attr("class", "context")
-      .attr("transform", `translate(${margin.left},${margin2.top - padding - margin2.bottom})`);
 
   focus.selectAll(".x.axis")
     .data(xcolumn)
@@ -116,11 +168,6 @@ async function make_matrix(filename) {
         d3.select(this).call(yAxis);
       });
   
-  // add brush in x-dimension
-  var xbrush = d3.brushX()
-      .extent([[0, 0], [width, height2]])
-      .on("brush", brushed)
-
   // add the context x-axis
   x2.domain(x.domain())
   context.append("g")
@@ -143,59 +190,52 @@ async function make_matrix(filename) {
       .each(plot);
 
   function plot([i,j]) {
-      let cell = d3.select(this);
-      let xcol = xcolumn[j]
-      let ycol = ycolumns[i]
+    let cell = d3.select(this);
+    let xcol = xcolumn[j]
+    let ycol = ycolumns[i]
 
-      y.domain(domains[ycol]).nice();
+    y.domain(domains[ycol]).nice();
 
-      const validData = d => d[ycol] != null
-      let vline = d3.line()
-          .defined(validData)
-          .x(d => x(d[xcol]))
-          .y(d => y(d[ycol]));
+    const validData = d => d[ycol] != null
+    let vline = d3.line()
+        .defined(validData)
+        .x(d => x(d[xcol]))
+        .y(d => y(d[ycol]));
 
-      cell.append('rect')
-          .attr('class', 'frame')
-          .attr('x', 0)
-          .attr('y', padding/2)
-          .attr('width', width)
-          .attr('height', size - padding);
+    cell.append('rect')
+        .attr('class', 'frame')
+        .attr('x', 0)
+        .attr('y', padding/2)
+        .attr('width', width)
+        .attr('height', size - padding);
 
-      cell.append('path')
-          .datum(data)
-          .attr('class', `prepost ${ycol}`)
-          .attr('d', vline);
-         
-      cell.append('path')
-          .datum(data.filter(d => d.ColorFlag == 2))
-          .attr('class', `event ${ycol}`)
-          .attr('d', vline);
+    cell.append('path')
+        .datum(data)
+        .attr('class', `prepost ${ycol}`)
+        .attr('d', vline);
+        
+    cell.append('path')
+        .datum(data.filter(d => d.ColorFlag == 2))
+        .attr('class', `event ${ycol}`)
+        .attr('d', vline);
 
+    cell.append('text')
+        .attr('class', 'ylabel')
+        .attr('transform', `translate(-25,0) rotate(-90,0,${size/2})`)
+        .attr('x', 0)
+        .attr('y', size/2)
+        .text(ycol)
+
+    if (i == ycolumns.length-1) {
       cell.append('text')
-          .attr('class', 'ylabel')
-          .attr('transform', `translate(-25,0) rotate(-90,0,${size/2})`)
-          .attr('x', 0)
-          .attr('y', size/2)
-          .text(ycolumns[i])
-
-      if (i == ycolumns.length-1) {
-        cell.append('text')
-            .attr('class', 'xlabel')
-            .attr('x', width/2)
-            .attr('y', size + padding)
-            .text('Time Relative to Start of Alert (s)')
-      }
+          .attr('class', 'xlabel')
+          .attr('x', width/2)
+          .attr('y', size + padding)
+          .text('Time Relative to Start of Alert (s)')
+    }
   }
 
-  // clipping rectangle
-  focus.append("defs").append("clipPath")
-      .attr("id", "clip")
-    .append("rect")
-      .attr("width", width)
-      .attr("height", size * ycolumns.length)
-
-  // mapbox section
+  // mapbox - draw vehicle path
   let geojson = makeGeojson(data)
   let HvFeatures = svgMap.append("path")
       .datum(geojson['Hv'])
@@ -228,43 +268,6 @@ async function make_matrix(filename) {
   let bbox = turf.bbox(geojson['Hv'])
   map.fitBounds(bbox, {padding: 50})
 
-  // mapbox legend
-  svgMap.append('rect')
-      .attr('class', 'legendBkgd')
-      .attr('width', 70)
-      .attr('height', 40)
-
-  let legend = svgMap.selectAll('.legend')
-    .data(['host','remote'])
-    .join('g')
-      .attr("class", "legend")
-      .attr("transform", (d,i) => `translate(0,${i*20})`)
-      .on('click', function(d) {
-        tf = d3.select(this).classed('hidden')
-        d3.select(this).classed('hidden', !tf)
-        d3.selectAll(`.${d}`).attr('opacity', tf ? 1 : 0 )
-      })
-
-  const xoffset = 5,
-        yoffset = 10,
-        colorObj = {'host':'yellow', 'remote':'orange'};
-
-  legend.append('line')
-      .attr('class', 'lpt')
-      .attr('x1', xoffset)
-      .attr('y1', yoffset)
-      .attr('x2', xoffset+20)
-      .attr('y2', yoffset)
-      .style('stroke', d => colorObj[d])
-      .style('stroke-width', 5);
-
-  legend.append("text")
-      .attr("x", xoffset+25)
-      .attr("y", yoffset)
-      .attr("dy", ".2em")
-      .style("text-anchor", "start")
-      .text(d => d);
-
 };
 
 function makeGeojson(data) {
@@ -285,14 +288,12 @@ function brushed() {
       .call(xAxis);
 
   // update each cell viewport
-  const xcol = xcolumn[0]
   for (let ycol of ycolumns) {
-      //let ycol = ycolumns[i]
       let validData = d => d[ycol] != null
       y.domain(domains[ycol]).nice();
       let vline = d3.line()
           .defined(validData)
-          .x(d => x(d[xcol]))
+          .x(d => x(d[xcolumn[0]]))
           .y(d => y(d[ycol]));
       d3.selectAll(`.${ycol}`)
           .attr('d', vline)
@@ -319,6 +320,6 @@ function brushed() {
       .attr('d', path)
 }
 
-make_matrix("trip6748.csv");
+draw_charts("trip6748.csv");
 </script>
 </body>
