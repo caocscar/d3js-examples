@@ -16,9 +16,10 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2FvYSIsImEiOiJjazFncHJqZzYwMXkyM2hxcWp6d2hucTk1In0.5Z7Nmggo79voVuNvU2i7sQ';   
 let map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v10',
+    style: 'mapbox://styles/mapbox/light-v10',
     center: [-83.53,40.27],
     zoom: 9,    
+    doubleClickZoom: false,
 })
 let nav = new mapboxgl.NavigationControl({
     visualizePitch: true,
@@ -41,19 +42,18 @@ let transform = d3.geoTransform({point: projectPoint});
 let path = d3.geoPath().projection(transform);   
 
 const H = 600
-let margin = {top: 20, right: 0, bottom: 50, left: 50},
+let margin = {top: 0, right: 0, bottom: 50, left: 50},
     width = 400 - margin.left - margin.right,
     height = H - margin.top - margin.bottom,
     margin2 = {top: H-margin.bottom+10, right: 20, bottom: 10, left: 50},
     height2 = margin.bottom - margin2.bottom
     padding = 20;
 
-const color = d3.scaleOrdinal(d3.schemeDark2);
 let domains = {}
 const ids = ['first','second','third','fourth','fifth']
 
-async function make_matrix() {
-  data = await d3.csv("trip2089.csv", d3.autoType)
+async function make_matrix(filename) {
+  data = await d3.csv(filename, d3.autoType)
 
   const event = data.filter(d => d.ColorFlag == 2)
   const eventTime = d3.min(event, d => d.Time)
@@ -61,9 +61,10 @@ async function make_matrix() {
     d.Time -= eventTime
     d.Time /= 100 
   });
-  let columns = ['HvSpeed','RvRange','RvRangeRate','Time'],
-      n = columns.length,
-      size = height / (n-1) - padding;
+  ycolumns = ['HvSpeed','RvRange','RvRangeRate']
+  xcolumn = ['Time']
+  let n = ycolumns.length,
+      size = height / n - padding;
 
   x = d3.scaleLinear().range([0, width]);
   y = d3.scaleLinear().range([size - padding/2, padding/2]);
@@ -71,18 +72,18 @@ async function make_matrix() {
 
   xAxis = d3.axisBottom(x)
       .ticks(6)
-      .tickSize(size * (n-1) - padding);
+      .tickSize(size * n - padding);
   let yAxis = d3.axisLeft(y)
       .ticks(6)
       .tickSize(-width);
   let xAxis2 = d3.axisBottom(x2)
       .ticks(6)
 
-  columns.map(column => {
-    domains[column] = d3.extent(data, d => d[column]);
+  ycolumns.map(ycolumn => {
+    domains[ycolumn] = d3.extent(data, d => d[ycolumn]);
+    domains[ycolumn] = [d3.min([0, d3.min(data, d => d[ycolumn])]), d3.max(data, d => d[ycolumn])];
   });
-  ycolumns = columns.slice(0,columns.length-1)
-  xcolumn = columns.slice(-1)
+  domains[xcolumn] = d3.extent(data, d => d[xcolumn])
 
   let svg = d3.select("#charts").append("svg")
       .attr("width", width + margin.left + margin.right)
@@ -134,8 +135,9 @@ async function make_matrix() {
       .call(xbrush)
       .call(xbrush.move, [0, width]); // initialize brush    
 
+  // create and plot each cell
   let cell = focus.selectAll(".cell")
-    .data(d3.cross(d3.range(n-1), d3.range(1)))
+    .data(d3.cross(d3.range(n), d3.range(1)))
     .join('g')
       .attr("class", "cell")
       .attr("transform", ([i,j]) => `translate(${j*size},${i*size})`)
@@ -146,7 +148,7 @@ async function make_matrix() {
       let xcol = xcolumn[j]
       let ycol = ycolumns[i]
 
-      y.domain(domains[ycol]);
+      y.domain(domains[ycol]).nice();
 
       const validData = d => d[ycol] != null
       let vline = d3.line()
@@ -183,7 +185,7 @@ async function make_matrix() {
           .attr('class', 'xlabel')
           .attr('x', width/2)
           .attr('y', size + padding)
-          .text(xcolumn[j])
+          .text('Time Relative to Start of Alert (s)')
       }
   }
 
@@ -196,31 +198,84 @@ async function make_matrix() {
 
   // mapbox section
   let geojson = makeGeojson(data)
-  let bbox = turf.bbox(geojson)
-  map.fitBounds(bbox, {padding: 50})
-
-  let features = svgMap.append("path")
-      .datum(geojson)
-      .attr('class', 'line')
+  let HvFeatures = svgMap.append("path")
+      .datum(geojson['Hv'])
+      .attr('class', 'host')
+      .attr('d', path)
+  let RvFeatures = svgMap.append("path")
+      .datum(geojson['Rv'])
+      .attr('class', 'remote')
       .attr('d', path)
 
   let geojson2 = makeGeojson(event)
-  let features2 = svgMap.append("path")
-      .datum(geojson2)
-      .attr('class', 'eventline')
+  let HvFeatures2 = svgMap.append("path")
+      .datum(geojson2['Hv'])
+      .attr('class', 'host evt')
+      .attr('d', path)
+  let RvFeatures2 = svgMap.append("path")
+      .datum(geojson2['Rv'])
+      .attr('class', 'remote evt')
       .attr('d', path)
 
   const updatePath = function() {
-    features.attr('d', path)
-    features2.attr('d', path)
+    features = [HvFeatures, HvFeatures2, RvFeatures, RvFeatures2]
+    HvFeatures.attr('d', path)
+    HvFeatures2.attr('d', path)
+    RvFeatures.attr('d', path)
+    RvFeatures2.attr('d', path)
   }
   map.on('move', updatePath)
+
+  let bbox = turf.bbox(geojson['Hv'])
+  map.fitBounds(bbox, {padding: 50})
+
+  // mapbox legend
+  svgMap.append('rect')
+      .attr('class', 'legendBkgd')
+      .attr('width', 70)
+      .attr('height', 40)
+
+  let legend = svgMap.selectAll('.legend')
+    .data(['host','remote'])
+    .join('g')
+      .attr("class", "legend")
+      .attr("transform", (d,i) => `translate(0,${i*20})`)
+      .on('click', function(d) {
+        tf = d3.select(this).classed('hidden')
+        d3.select(this).classed('hidden', !tf)
+        d3.selectAll(`.${d}`).attr('opacity', tf ? 1 : 0 )
+      })
+
+  const xoffset = 5,
+        yoffset = 10,
+        colorObj = {'host':'yellow', 'remote':'orange'};
+
+  legend.append('line')
+      .attr('class', 'lpt')
+      .attr('x1', xoffset)
+      .attr('y1', yoffset)
+      .attr('x2', xoffset+20)
+      .attr('y2', yoffset)
+      .style('stroke', d => colorObj[d])
+      .style('stroke-width', 5);
+
+  legend.append("text")
+      .attr("x", xoffset+25)
+      .attr("y", yoffset)
+      .attr("dy", ".2em")
+      .style("text-anchor", "start")
+      .text(d => d);
 
 };
 
 function makeGeojson(data) {
-  let pts = data.map(d => [d.HvLongitude, d.HvLatitude])
-  return {"type": "LineString", "coordinates": pts}
+  let HvPts = data.map(d => [d.HvLongitude, d.HvLatitude])
+  let RvPts = data.map(d => [d.RvLongitude, d.RvLatitude])
+  HvPts = HvPts.filter(d => d[0] != null & d[1] != null)
+  RvPts = RvPts.filter(d => d[0] != null & d[1] != null)
+  return {"Hv": {"type": "LineString", "coordinates": HvPts},
+          "Rv": {"type": "LineString", "coordinates": RvPts},
+          }
 }
 
 // brush function
@@ -235,7 +290,7 @@ function brushed() {
   for (let i of d3.range(ycolumns.length)) {
       let ycol = ycolumns[i]
       let validData = d => d[ycol] != null
-      y.domain(domains[ycol]);
+      y.domain(domains[ycol]).nice();
       let vline = d3.line()
           .defined(validData)
           .x(d => x(d[xcol]))
@@ -249,18 +304,22 @@ function brushed() {
   let event = timeFilter.filter(d => d.ColorFlag == 2)
 
   let geojson = makeGeojson(timeFilter)
-  d3.select('.line')
-      .datum(geojson)
+  d3.select('.host')
+      .datum(geojson['Hv'])
+      .attr('d', path)
+  d3.select('.remote')
+      .datum(geojson['Rv'])
       .attr('d', path)
   
   let geojson2 = makeGeojson(event)
-  d3.select('.eventline')
-      .datum(geojson2)
-      .attr('d', path)     
-
+  d3.select('.host.evt')
+      .datum(geojson2['Hv'])
+      .attr('d', path)
+  d3.select('.remote.evt')
+      .datum(geojson2['Rv'])
+      .attr('d', path)
 }
 
-make_matrix();
+make_matrix("trip6748.csv");
 </script>
-<!-- <script src="tsmap.js"></script> -->
 </body>

@@ -41,7 +41,7 @@ svg {
   clip-path: url(#clip);
 }
 
-.ylabel {
+.xlabel, .ylabel {
   text-anchor: middle;
 }
 
@@ -51,17 +51,33 @@ svg {
   width: 800px;
   height: 300px;
 }
-#mapbox {
-  pointer-events: none;
-}
-.line {
+
+.host, .evt, .remote {
   fill: none;
-  stroke: rgb(187, 243, 57);
-  stroke-width: 3px;
-}
-.eventline {
-  fill: none;
-  stroke: royalblue;
-  stroke-width: 3px;
+  stroke-width: 4px;
 }
 
+.host {
+  stroke: rgb(187, 243, 57);
+}
+
+.host.evt {
+  stroke: royalblue;
+}
+
+.remote {
+  stroke: rgb(243, 169, 57);
+}
+
+.remote.evt {
+  stroke: red;
+}
+
+.legendBkgd {
+  fill: lightblue;
+  fill-opacity: 0.6;
+}
+
+.legend.hidden {
+  opacity: 0.2;
+}
