@@ -8,20 +8,9 @@ ol li {
 li.highlight {
   background: yellow;
 }
-pre {
-  display: inline;
-  background: lightgray;
-}
-#chart {
-  width: 960px;
-  height: 350px;
-}
 path {
   fill: none;
   stroke: #999;
-}
-path.hidden {
-  display: none;
 }
 path.init {
   stroke-width: 2;
