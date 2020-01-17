@@ -35,7 +35,8 @@ function splitPath() {
       total = 0;
   const sampleInterval = .25;
 
-  const pieceSizes = [...Array(numPieces)].map(() => Math.floor(Math.random()*20) + 5)
+  pieceSizes = [...Array(numPieces)].map(() => Math.floor(Math.random()*20) + 5)
+  pieceSizes.sort((a,b) => b-a)
   let size = d3.sum(pieceSizes);
   let pieceSize = pLength / size; // avg pieceSize
 
@@ -68,9 +69,9 @@ function drawSegments(pieces) {
     .join("line")
       .attr("class", "sep")
       .attr("transform", d => `translate(${d.segs[0][0]},${d.segs[0][1]}) rotate(${(d.angle-90)},0,0)`)
-      .attr("x1", -12)
+      .attr("x1", -24)
       .attr("y1", 0)
-      .attr("x2", 12)
+      .attr("x2", 24)
       .attr("y2", 0);                    
 
   highlightStep(4)
@@ -85,20 +86,17 @@ function drawSegments(pieces) {
 }
 
 let margin = {top: 20, right: 20, bottom: 20, left: 20},
-    width = 960 - margin.left - margin.right,
-    height = 350 - margin.top - margin.bottom,
+    width = 500 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom,
     c1 = d3.schemePRGn[11],
-    c2 = d3.schemeYlGnBu[9],
+    c2 = d3.schemeSpectral[9],
     colors = c1.concat(c2),
-    cycles = 7,
-    pts = [];
+    a = 1,
+    b = 9.4,
+    theta = d3.range(0,100,1);
 
-for (let i=0; i<cycles; i++) {
-    pts.push([i*(width/cycles), 50]);
-    pts.push([i*(width/cycles), height-50]);
-    pts.push([i*(width/cycles)+50, height-50]);
-    pts.push([i*(width/cycles)+50, 50]);
-}
+theta = theta.map(d => d/4)
+let pts = theta.map(t => [(a+b*t)*Math.cos(t)+width/2, (a+b*t)*Math.sin(t)+height/2])//A*(2 + Math.sin(0.07*x) + Math.cos(0.05*x))])
 
 let g = d3.select("#chart").append("svg")
     .attr("width", width + margin.left + margin.right)
