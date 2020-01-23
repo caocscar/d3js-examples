@@ -46,10 +46,13 @@ svg {
 }
 
 /* Map */
-#map, #mapbox { 
-  position: absolute; 
+@import url("https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css");
+
+#gmap, #mapbox { 
   width: 800px;
   height: 300px;
+  position: absolute;
+  top: 650;
 }
 
 .host, .evt, .remote {
