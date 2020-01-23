@@ -16,7 +16,7 @@ let margin = {top: 20, right: 20, bottom: 30, left: 50},
 const color = d3.scaleOrdinal(d3.schemeDark2);
 
 async function make_matrix() {
-  let data = await d3.csv("trip1400.csv", d3.autoType)
+  let data = await d3.csv("trip2089.csv", d3.autoType)
 
   const event = data.filter(d => d.ColorFlag == 2)
   const eventTime = d3.min(event, d => d.Time)
