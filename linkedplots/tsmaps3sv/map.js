@@ -19,13 +19,8 @@ function initMapbox() {
 }  
 
 function updateMarker(e) {
-	if (marker) {
-    marker.setLngLat(e.lngLat)
-  } else {
-    addMarker(e)
-    markerButton.text("Remove Marker")
-    svButton.property('disabled', false)
-  }
+  if (e && e.point.x < 80 && e.point.y < 50) return // check if click in legend area 
+	marker ? marker.setLngLat(e.lngLat) : addMarker(e)
   updateCoords();
 }
 
@@ -39,6 +34,8 @@ function addMarker(e) {
   marker.setLngLat(e ? e.lngLat : map.getCenter());
   marker.addTo(map);
   marker.on('dragend', updateCoords);
+  markerButton.text("Remove Marker");
+  svButton.property('disabled', false);
 }
 
 function removeMarker() {
@@ -94,4 +91,67 @@ function initMap() {
   initStreetView();
 }
 
+// project any point to map's current state
+function projectPoint(lon, lat) {
+  let point = map.project(new mapboxgl.LngLat(lon, lat));
+  this.stream.point(point.x, point.y);
+}
 
+function makeGeojson(data) {
+  let HvPts = data.map(d => [d.HvLongitude, d.HvLatitude])
+  let RvPts = data.map(d => [d.RvLongitude, d.RvLatitude])
+  HvPts = HvPts.filter(d => d[0] != null & d[1] != null)
+  RvPts = RvPts.filter(d => d[0] != null & d[1] != null)
+  return {"Hv": {"type": "LineString", "coordinates": HvPts},
+          "Rv": {"type": "LineString", "coordinates": RvPts},
+          }
+}
+
+// map initialization
+initMap()
+
+// setup our svg layer that we can manipulate with d3
+let container = map.getCanvasContainer()
+let svgMap = d3.select(container).append("svg")
+    .attr('id','mapbox')
+
+// mapbox legend
+svgMap.append('rect')
+    .attr('class', 'legendBkgd')
+    .attr('width', 70)
+    .attr('height', 40)
+
+let legend = svgMap.selectAll('.legend')
+  .data(['host','remote'])
+  .join('g')
+    .attr("class", "legend")
+    .attr("transform", (d,i) => `translate(0,${i*20})`)
+    .on('click', function(d) {
+      tf = d3.select(this).classed('hidden')
+      d3.select(this).classed('hidden', !tf)
+      d3.selectAll(`.${d}`).attr('opacity', tf ? 1 : 0 )
+    })
+
+const xoffset = 5,
+      yoffset = 10,
+      colorObj = {'host':'yellow', 'remote':'orange'};
+
+legend.append('line')
+    .attr('class', 'lpt')
+    .attr('x1', xoffset)
+    .attr('y1', yoffset)
+    .attr('x2', xoffset+20)
+    .attr('y2', yoffset)
+    .style('stroke', d => colorObj[d])
+    .style('stroke-width', 5);
+
+legend.append("text")
+    .attr("x", xoffset+25)
+    .attr("y", yoffset)
+    .attr("dy", ".2em")
+    .style("text-anchor", "start")
+    .text(d => d);
+
+// projection function
+let transform = d3.geoTransform({point: projectPoint});
+let path = d3.geoPath().projection(transform);   
