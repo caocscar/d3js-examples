@@ -99,10 +99,10 @@ function update() {
               .style('fill', d => d3.interpolatePlasma(d/20)))
         .call(enter => // chain together call fcts to access elements at same level
           enter.append('text')
-            .attr('class', 'barlabel')
-            .attr('x', x.bandwidth()/2)
-            .attr('y', d => y(d) - 5)
-            .text(d => d3.format('.1f')(d))
+              .attr('class', 'barlabel')
+              .attr('x', x.bandwidth()/2)
+              .attr('y', d => y(d) - 5)
+              .text(d => d3.format('.1f')(d))
         ),
       update => update
         .call(update => update.transition(t)

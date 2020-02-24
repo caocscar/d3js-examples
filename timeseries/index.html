@@ -95,10 +95,9 @@ focus.append("defs").append("clipPath")
     .attr("height", height)
 
 // gridlines
-let gridlines = d3.axisRight()
+let gridlines = d3.axisRight(y)
     .tickFormat("")
     .tickSize(-width)
-    .scale(y)
 
 // tooltip
 var tooltip = d3.select("body").append("div")	
