@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Time Series Chart in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="timeseries.css">
+</head>
+<body>
+<script>
+// set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 110, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+    margin2 = {top: 430, right: 20, bottom: 30, left: 40},
+    height2 = 500 - margin2.top - margin2.bottom;
+
+let svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+
+// parse the date / time
+const parseDate = d3.timeParse("%m/%d/%Y");
+const formatDate = d3.timeFormat("%b %d, %Y");
+
+let formatMillisecond = d3.timeFormat(".%L"),
+    formatSecond = d3.timeFormat(":%S"),
+    formatMinute = d3.timeFormat("%I:%M"),
+    formatHour = d3.timeFormat("%I %p"),
+    formatDay = d3.timeFormat("%a %d"),
+    formatWeek = d3.timeFormat("%b %d"),
+    formatMonth = d3.timeFormat("%b"),
+    formatYear = d3.timeFormat("%Y");
+
+// Define filter conditions
+function multiFormat(date) {
+  return (d3.timeSecond(date) < date ? formatMillisecond
+    : d3.timeMinute(date) < date ? formatSecond
+    : d3.timeHour(date) < date ? formatMinute
+    : d3.timeDay(date) < date ? formatHour
+    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+    : d3.timeYear(date) < date ? formatMonth
+    : formatYear)(date);
+}
+
+// set the ranges
+let x = d3.scaleTime().range([0, width]),
+    y = d3.scaleLinear().range([height, 0]),
+    x2 = d3.scaleTime().range([0, width]),
+    y2 = d3.scaleLinear().range([height2, 0]);
+
+let xAxis = d3.axisBottom(x).tickFormat(multiFormat),
+    yAxis = d3.axisRight(y),
+    xAxis2 = d3.axisBottom(x2);
+
+// Add brush in x-dimension
+let brush = d3.brushX()
+    .extent([[0, 0], [width, height2]])
+    .on("brush", brushed)
+
+// define the focus line
+let line1 = d3.line()
+    .x(d => x(d.date))
+    .y(d => y(d.value))
+    .curve(d3.curveStepAfter)
+
+// define the context line
+let line2 = d3.line()
+    .x(d => x2(d.date))
+    .y(d => y2(d.value))
+    .curve(d3.curveStepAfter)
+    
+// focus is the micro level view
+let focus = svg.append("g")
+    .attr("class", "focus")
+    .attr("transform", `translate(${margin.left},${margin.top})`)
+   
+// context is the macro level view
+let context = svg.append("g")
+    .attr("class", "context")
+    .attr("transform", `translate(${margin2.left},${margin2.top})`);
+
+// clipping rectangle
+focus.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height)
+
+async function make_line_chart(filename) {
+  const data = await d3.csv(filename, type);
+
+  // scale the range of the data
+  x.domain([d3.min(data, d => d.date), d3.timeDay.offset(d3.max(data, d => d.date), 1)]);
+  y.domain([0, d3.max(data, d => d.value)]);
+  x2.domain(x.domain());
+  y2.domain(y.domain());
+
+  // add the focus line path
+  focus.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", line1)
+     
+  // add the focus x-axis
+  focus.append("g")
+      .attr("class", "axis--x")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+  // add the focus y-axis
+  focus.append("g")
+      .attr("class", "axis--y")
+      .attr('transform', `translate(${width},0)`)
+      .call(yAxis);
+
+  // add the context line path
+  context.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", line2);
+    
+  // add the context x-axis
+  context.append("g")
+      .attr("class", "axis--x")
+      .attr("transform", `translate(0,${height2})`)
+      .call(xAxis2);
+
+  // add the context brush window
+  endDate = d3.max(data, d => d.date)
+  beginDate = d3.timeDay.offset(endDate, -30)
+  context.append("g")
+      .attr("class", "brush")
+      .call(brush)
+      .call(brush.move, [x(beginDate), x(endDate)]); // initialize brush    
+
+};
+
+// brush function
+function brushed() {
+  const selection = d3.event.selection || x2.range(); // default brush
+  x.domain(selection.map(x2.invert, x2)); // new focus x-domain
+  focus.select(".line")
+      .attr("d", line1);
+  focus.select(".axis--x")
+      .call(xAxis);
+}
+
+function type(d) {
+  d.date = parseDate(d.date);
+  d.value = +d.value || 0;
+  return d;
+}
+
+make_line_chart('gas.csv');
+
+</script>
+</body>
