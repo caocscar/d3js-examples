@@ -1,7 +1,7 @@
 const config = {
   region: 'us-east-2',
-  accessKeyId: 'AKIA5WKJB44U5L53UEPM',
-  secretAccessKey: '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'
+  accessKeyId: '',
+  secretAccessKey: ''
 };
 const bucket = 'honda-dsrc-de-id';
 const s3 = new AWS.S3(config);   
