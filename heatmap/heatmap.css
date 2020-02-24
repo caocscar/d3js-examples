@@ -1,0 +1,19 @@
+body {
+  font: 14px sans-serif;
+}
+
+.label {
+  stroke: black;
+  /* shape-rendering: crispEdges; */
+}
+
+.tile {
+  shape-rendering: crispEdges;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
