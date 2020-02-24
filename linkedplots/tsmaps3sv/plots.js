@@ -16,14 +16,15 @@ let focus = svg.append("g")
     .attr("class", "focus")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-let context = svg.append("g")
-    .attr("class", "context")
-    .attr("transform", `translate(${margin.left},${margin2.top - padding - margin2.bottom})`);
-
-let ycolumns = ['HvSpeed','RvRange','RvRangeRate']
+let ycolumns = ['HvSpeed','RvSpeed']
 let xcolumn = ['Time']
 let n = ycolumns.length,
     size = height / n - padding;
+
+let context = svg.append("g")
+    .attr("class", "context")
+    //.attr("transform", `translate(${margin.left},${margin2.top - padding - margin2.bottom})`);
+    .attr("transform", `translate(${margin.left},${size*n + padding +10})`);
 
 // setup axes
 let x = d3.scaleLinear().range([0, width]);
