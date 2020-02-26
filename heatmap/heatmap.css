@@ -18,3 +18,16 @@ body {
   stroke: #000;
   shape-rendering: crispEdges;
 }
+
+.tooltip text {
+  font-size: 14px;
+}
+
+.tooltip-rect {
+  fill: white;
+  stroke: #000;
+}
+
+.tooltip-text {
+  font-weight: bold;
+}
