@@ -3,12 +3,13 @@ body {
 }
 
 .label {
-  stroke: black;
-  /* shape-rendering: crispEdges; */
+  font-size: 18px;
 }
 
 .tile {
   shape-rendering: crispEdges;
+  stroke: white;
+  stroke-width: 1px;
 }
 
 .axis path,

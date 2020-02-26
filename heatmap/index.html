@@ -10,21 +10,16 @@
 <div id="heatmap"></div>
 <script>
 //  http://bl.ocks.org/mbostock/3202354
-let margin = {top: 20, right: 90, bottom: 30, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+let margin = {top: 50, right: 90, bottom: 30, left: 100},
+    width = 700 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
 
 let parseDate = d3.timeParse("%Y-%m-%d"),
     formatDate = d3.timeFormat("%b %d");
 
 let x = d3.scaleTime().range([0, width]),
-    y = d3.scaleLinear().range([height, 0]),
-    z = d3.scaleLinear().range(["white", "steelblue"]);
-
-// The size of the buckets in the CSV data file.
-// This could be inferred from the data if it weren't sparse.
-let xStep = 864e5,
-    yStep = 100;
+    y = d3.scaleBand().range([0, height]),
+    z = d3.scaleLinear().range(["white", "orange"]);
 
 let svg = d3.select("#heatmap").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -36,14 +31,11 @@ async function makeHeatmap(filename) {
   const buckets = await d3.csv(filename, type)
 
   // Compute the scale domains.
-  x.domain(d3.extent(buckets, d => d.date));
-  y.domain(d3.extent(buckets, d => d.bucket));
+  const xmin = d3.min(buckets, d => d.date)
+  const xmax = d3.timeDay.offset(d3.max(buckets, d => d.date),1)
+  x.domain([xmin, xmax]);
+  y.domain(buckets.map(d => d.bucket));
   z.domain([0, d3.max(buckets, d => d.count)]);
-
-  // Extend the x- and y-domain to fit the last bucket.
-  // For example, the y-bucket 3200 corresponds to values [3200, 3300].
-  x.domain([x.domain()[0], +x.domain()[1] + xStep]);
-  y.domain([y.domain()[0], y.domain()[1] + yStep]);
 
   // Display the tiles for each non-zero bucket.
   // See http://bl.ocks.org/3074470 for an alternative implementation.
@@ -52,17 +44,46 @@ async function makeHeatmap(filename) {
     .join("rect")
       .attr("class", "tile")
       .attr("x", d => x(d.date))
-      .attr("y", d => y(d.bucket + yStep))
-      .attr("width", x(xStep) - x(0))
-      .attr("height",  y(0) - y(yStep))
+      .attr("y", d => y(d.bucket))
+      .attr("width", x(86400*1000) - x(0)) 
+      .attr("height",  y.bandwidth())
       .style("fill", d => z(d.count));
+
+  // Add an x-axis with label.
+  let xAxis = d3.axisTop(x)
+      .ticks(d3.timeDay)
+      .tickFormat(formatDate)
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .call(xAxis)
+
+  svg.append('text')
+      .attr('class', 'label')
+      .attr('x', width/2)
+      .attr('y', -30)
+      .attr('text-anchor', 'middle')
+      .text('Date')
+
+  // Add a y-axis with label.
+  let yAxis = d3.axisLeft(y)
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+
+  svg.append('text')
+      .attr('class', 'label')
+      .attr("transform", `translate(-50,${height/2}) rotate(-90)`)
+      .attr('text-anchor', 'middle')
+      .text('Device')
 
   // Add a legend for the color values.
   let legend = svg.selectAll(".legend")
     .data(z.ticks(6).slice(1).reverse())
     .join("g")
       .attr("class", "legend")
-      .attr("transform", (d,i) =>  `translate(${width + 20},${20 + i * 20})`);
+      .attr("transform", (d,i) => `translate(${width+20},${20+i*20})`);
 
   legend.append("rect")
       .attr("width", 20)
@@ -77,26 +98,11 @@ async function makeHeatmap(filename) {
 
   svg.append("text")
       .attr("class", "label")
-      .attr("x", width + 20)
+      .attr("x", width+20)
       .attr("y", 10)
       .attr("dy", ".35em")
       .text("Count");
 
-  // Add an x-axis with label.
-  let xAxis = d3.axisBottom(x)
-      .ticks(d3.timeDay)
-      .tickFormat(formatDate)
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", `translate(0,${height})`)
-      .call(xAxis)
-
-  // Add a y-axis with label.
-  let yAxis = d3.axisLeft(y)
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
 }
 
 function type(d) {
