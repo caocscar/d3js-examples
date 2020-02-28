@@ -3,8 +3,15 @@
 <head>
   <meta charset="utf-8">
   <title>Heatmap in D3 v5</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <link rel="stylesheet" href="heatmap.css">
+
 </head>
 <body>
 <div id="heatmap"></div>
@@ -25,10 +32,6 @@ let svg = d3.select("#heatmap").append("svg")
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
-
-let tooltip = svg.append("g")
-    .attr("class", "tooltip")
-    .style("display", "none");
 
 async function makeHeatmap(filename) {
   const buckets = await d3.csv(filename, type)
@@ -55,9 +58,12 @@ async function makeHeatmap(filename) {
       .attr("width", x(86400*1000) - x(0)) 
       .attr("height",  y.bandwidth())
       .style("fill", d => color(d.count))
-      .on("mouseover", () => tooltip.raise().style('display', null))
-      .on("mousemove", mousemove)
-      .on("mouseout", () => tooltip.style("display", "none"))
+      .attr('data-toggle', 'tooltip')
+      .attr('title', d => d.count)
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();   
+  })
 
   // Add an x-axis with label.
   let xAxis = d3.axisTop(x)
@@ -118,41 +124,6 @@ async function makeHeatmap(filename) {
       .attr("y", 10)
       .attr("dy", ".35em")
       .text("Count");
-
-  // add custom tooltip https://bl.ocks.org/Qizly/8f6ba236b79d9bb03a80
-  const h = 70, 
-        w = 9,
-        lineHeight = 20;
-  tooltip.append("rect")
-      .attr("class", "tooltip-rect")
-      .attr("width", 100)
-      .attr("height", h)
-      .attr("x", 0)
-      .attr("y", -h)
-      .attr("rx", 4)
-      .attr("ry", 4);
-
-  tooltip.append("text")
-      .attr("class", "tooltip-text one")
-      .attr("x", w)
-      .attr("y", -h+lineHeight);
-
-  tooltip.append("text")
-      .attr("class", "tooltip-text two")
-      .attr("x", w)
-      .attr("y", -h+lineHeight*2)
-
-  tooltip.append("text")
-      .attr("class", "tooltip-text three")
-      .attr("x", w)
-      .attr("y", -h+lineHeight*3)
-
-  function mousemove(d) {
-    tooltip.attr("transform", `translate(${x(d.date)},${y(d.bucket)})`);
-    tooltip.select(".one").text(`Date: ${formatDate(d.date)}`);
-    tooltip.select(".two").text(`Device: ${d.bucket}`);
-    tooltip.select(".three").text(`Count: ${d.count}`);
-  }
 
 }
 
