@@ -83,35 +83,13 @@
     let path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
         .projection(projection);
 
-    // Bind the data to the SVG and create one path per GeoJSON feature
-    // svg.selectAll("path")
-    //     .data(MIgeo.features)
-    //   .enter().append("path")
-    //     .attr('class', 'county')
-    //     .attr("d", path)
-    //     .on("mouseover", d => {
-    //         tooltipDiv.transition().duration(200)
-    //             .style("display", null);
-    //         tooltipDiv.html(`<p>${d.properties.name}</p>`)
-    //             .style("left", (d3.event.pageX+10 ) + "px")
-    //             .style("top", (d3.event.pageY-20) + "px");
-    //     })
-    //     .on("mouseout", () => {
-    //         tooltipDiv.transition().duration(500)
-    //             .style("display", "none");
-    //     });
-
-      svg.selectAll("path")
-            .data(MIgeo.features)
-          .enter().append("path")
-            .attr('class', 'county')
-            .attr("d", path)
-            .attr("id", "tooltips")
-            .attr("data-toggle", "tooltip")
-            .attr("title", d => d.properties.name )
-            $(function () {
-              $('[data-toggle="tooltip"]').tooltip()
-            })
+    svg.selectAll("path")
+          .data(MIgeo.features)
+        .enter().append("path")
+          .attr('class', 'county')
+          .attr("d", path)
+          .attr("data-toggle", "tooltip")
+          .attr("title", d => d.properties.name )
 
     // Add points to map
     svg.selectAll('circle')
@@ -119,29 +97,16 @@
       .enter().append('circle')
         .attr('class', 'city')
         .attr('r', '4')
-        .attr("id", "tooltips")
-        .attr("data-toggle", "tooltip")
         .attr('cx', d => projection([d.lng,d.lat])[0])
         .attr('cy', d => projection([d.lng,d.lat])[1])
+        .attr("data-toggle", "tooltip")
         .attr("title", d => d.name )
 
-        $(function () {
-          $('[data-toggle="tooltip"]').tooltip()
-        })
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
 
-        // .on('mouseover', function(d) {
-        //   d3.select(this).attr('r', '5')
-        //   tooltipDiv.transition().duration(200)
-        //       .style("display", null);
-        //   tooltipDiv.html(`<p>${d.name}</p>`)
-        //       .style("left", (d3.event.pageX+10 ) + "px")
-        //       .style("top", (d3.event.pageY-20) + "px");
-        // })
-        // .on('mouseout', function(d) {
-        //   d3.select(this).attr('r', '4')
-        //   tooltipDiv.transition().duration(500)
-        //       .style("display", "none");
-        // })
+
   };
 
   function type(d) {
