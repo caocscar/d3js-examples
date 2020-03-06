@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="bar.css">
 </head>
 <body>
-    <button onclick="update()">Press me</button>
+    <button id="toggle" onclick="update()">Grouped Bar Chart</button>
 <svg id="stackedgrouped"></svg>
 <script>
 
@@ -117,7 +117,8 @@ function transitionStacked() {
         .attr("height", d => y(d[0]) - y(d[1]))
       .transition()
         .attr("x", (d,i) => x(i+1))
-        .attr("width", x.bandwidth());
+        .attr("width", x.bandwidth())
+        .on('end', () => d3.select('#toggle').text("I can't make up my mind"));
 
     legend.transition().duration(T)
         .attr("transform", (d,i) => `translate(${width-250+i*100},${20-i*20})`)
@@ -131,7 +132,8 @@ function transitionGrouped() {
         .attr("width", x.bandwidth() / n)
       .transition()
         .attr("y", d => y(d[1] - d[0]))
-        .attr("height", d => y(0) - y(d[1] - d[0])); // y(0)=height
+        .attr("height", d => y(0) - y(d[1] - d[0]))
+        .on('end', () => d3.select('#toggle').text('No, change it back!')); // y(0)=height
 
     legend.transition().duration(T)
         .attr("transform", (d,i) => `translate(${width-250+i*100},${20-i*20})`)
