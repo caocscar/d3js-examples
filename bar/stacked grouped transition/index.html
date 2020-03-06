@@ -32,6 +32,7 @@ let svg = d3.select("#stackedgrouped")
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+// Add normalized stack bar chart in future    
 async function makeStackedBar() {
     url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRUO5O57fmUTxfthnNSIIGdaaQw57AMAhwXhacOJQYTC4qx2aM8E50lPKujgKZSBoIWJO3JN0PS-52u/pub?gid=0&single=true&output=csv'
     const data = await d3.csv(url, d3.autoType)
