@@ -59,10 +59,10 @@ async function makeHeatmap(filename) {
       .attr("height",  y.bandwidth())
       .style("fill", d => color(d.count))
       .attr('data-toggle', 'tooltip')
-      .attr('title', d => d.count)
+      .attr('title', d => `Date: ${formatDate(d.date)}<br>Bucket: ${d.bucket}<br>Ct: ${d.count}`)
 
   $(function () {
-    $('[data-toggle="tooltip"]').tooltip();   
+    $('[data-toggle="tooltip"]').tooltip({html: true});   
   })
 
   // Add an x-axis with label.
