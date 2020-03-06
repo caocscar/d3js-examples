@@ -18,9 +18,11 @@ let margin = {top: 50, right: 50, bottom: 50, left: 100},
     layout = false,
     T = 400;
 let x = d3.scaleBand()
+    .domain(d3.range(1,14))
     .range([0, width])
-    .padding(0.33)
+    .padding(0.33);
 let y = d3.scaleLinear()
+    .domain([0, 5])
     .range([height, 0]);
 let color = d3.schemePaired.slice(0,2)
 let xAxis = d3.axisBottom(x)
@@ -35,7 +37,7 @@ let svg = d3.select("#stackedgrouped")
 // Add normalized stack bar chart in future    
 async function makeStackedBar() {
     url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRUO5O57fmUTxfthnNSIIGdaaQw57AMAhwXhacOJQYTC4qx2aM8E50lPKujgKZSBoIWJO3JN0PS-52u/pub?gid=0&single=true&output=csv'
-    const data = await d3.csv(url, d3.autoType)
+    data = await d3.csv(url, d3.autoType)
 
     data.map(d => {
         d.jam = d.Wait > 0 ? 0 : 1
@@ -53,11 +55,9 @@ async function makeStackedBar() {
         spots[k-1] = jammy
     }
     series = d3.stack()
-        .keys(d3.range(2))(spots)
+        .keys(d3.range(n))(spots)
         .map(arr => arr.map( ([y0,y1]) => [y0,y1,arr.index]))
 
-    x.domain(d3.range(1,14));
-    y.domain([0, 5]);
 
     // start with stacked bars
     rect = svg.selectAll("g")
