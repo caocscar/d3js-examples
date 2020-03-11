@@ -11,7 +11,7 @@
 <script>
 // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 700 - margin.left - margin.right,
+    width = 1000 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
 // parse the date / time
@@ -20,14 +20,6 @@ const parseTime = d3.timeParse("%Y-%m-%d");
 // set the ranges
 let x = d3.scaleTime().range([0, width]);
 let y = d3.scaleLinear().range([height, 0]);
-
-// define the line
-const vacationLine = d3.line()
-    .x(d => x(d.Month))
-    .y(d => y(d.Vacation));
-const sickLine = d3.line()
-    .x(d => x(d.Month))
-    .y(d => y(d.Sick));
 
 let svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -47,28 +39,33 @@ let gridlines = d3.axisLeft(y)
     .tickFormat("")
     .tickValues(tickValues)
 
+// define the line
+let valueline = d3.line()
+    .defined(d => !isNaN(d))
+    .x((d,i) => x(data.date[i]))
+    .y(d => y(d))
+
 // Get the data
 async function makeMultiLineChart() {
   const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSv1DbpJLnX6hJZB5x8IcVNqsK1W0c6TLfBFebiFvwIYewE8WZMz-7apDHQwc_TMFxNQuC41a_awV6F/pub?gid=1740202645&single=true&output=csv'
-  data = await d3.csv(url, function(d) {
-    d.Month = parseTime(d.Month)
-    d.Vacation = +d.Vacation
-    d.Sick = +d.Sick
-    return d
-  });
-
-  x.domain(d3.extent(data, d => d.Month));
+  rawdata = await d3.csv(url)
+  // generalized construction of dataset with n series
+  columns = rawdata.columns.slice(1)
+  data = {
+    date: rawdata.map(d => parseTime(d.Month)),
+    series: columns.map(d => {
+          return {'name': d.toLowerCase(), 'values': rawdata.map(k => +k[d])}
+    }),
+  };
+  x.domain(d3.extent(data.date));
   y.domain([0, 16*24]);
 
-  svg.append("path")
-      .datum(data)
-      .attr("class", "vacation")
-      .attr("d", vacationLine);
-
-  svg.append("path")
-      .datum(data)
-      .attr("class", "sick")
-      .attr("d", sickLine);
+  svg.append("g")
+    .selectAll('path')
+    .data(data.series)
+    .join('path')
+      .attr('class', (d,i) => d.name)
+      .attr('d', d => valueline(d.values));
 
   svg.append("g")
       .attr("transform", `translate(0,${height})`)
