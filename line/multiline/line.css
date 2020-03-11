@@ -1,0 +1,27 @@
+.vacation, .sick {
+  fill: none;
+  stroke-width: 3px;
+}
+
+.vacation {
+  stroke: steelblue;
+}
+
+.sick {
+  stroke: rgb(54, 114, 69);
+}
+
+.grid line {
+  stroke: #e4e4e4;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.rectangle {
+  fill-opacity: 0.1;
+  fill: blue;
+}
+

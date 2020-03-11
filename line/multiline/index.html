@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Line Chart in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="line.css">
+</head>
+<body>
+
+<script>
+// set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 700 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// parse the date / time
+const parseTime = d3.timeParse("%Y-%m-%d");
+
+// set the ranges
+let x = d3.scaleTime().range([0, width]);
+let y = d3.scaleLinear().range([height, 0]);
+
+// define the line
+const vacationLine = d3.line()
+    .x(d => x(d.Month))
+    .y(d => y(d.Vacation));
+const sickLine = d3.line()
+    .x(d => x(d.Month))
+    .y(d => y(d.Sick));
+
+let svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`)
+
+let xAxis = d3.axisBottom(x)
+    .ticks(8)
+
+const tickValues = [0, 120, 192, 384]
+let yAxis = d3.axisLeft(y)
+    .tickValues(tickValues)
+
+let gridlines = d3.axisLeft(y)
+    .tickSize(-width)
+    .tickFormat("")
+    .tickValues(tickValues)
+
+// Get the data
+async function makeMultiLineChart() {
+  const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSv1DbpJLnX6hJZB5x8IcVNqsK1W0c6TLfBFebiFvwIYewE8WZMz-7apDHQwc_TMFxNQuC41a_awV6F/pub?gid=1740202645&single=true&output=csv'
+  data = await d3.csv(url, function(d) {
+    d.Month = parseTime(d.Month)
+    d.Vacation = +d.Vacation
+    d.Sick = +d.Sick
+    return d
+  });
+
+  x.domain(d3.extent(data, d => d.Month));
+  y.domain([0, 16*24]);
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "vacation")
+      .attr("d", vacationLine);
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "sick")
+      .attr("d", sickLine);
+
+  svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+  svg.append("g")
+      .call(yAxis);
+
+  svg.append('g').lower()
+      .attr('class','grid')
+      .call(gridlines)
+
+  svg.append('text')
+      .attr('transform','translate(10,20)')
+      .text('Hours')
+
+  const dates = [
+    [new Date(2019,3,26), new Date(2019,6,7)],
+  ]
+  
+  // generalization for an array of date objects
+  svg.selectAll('rect')
+    .data(dates)
+    .join('rect')
+      .attr('class', 'rectangle')
+      .attr('width', d => x(d[1]) - x(d[0]))
+      .attr('height', height)
+      .attr('x', d => x(d[0]))
+};
+
+makeMultiLineChart();
+
+</script>
+</body>
