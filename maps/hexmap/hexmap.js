@@ -16,7 +16,7 @@ let svg = d3.select("#map")
 const intervals = [10,100,1000,10000,100000]
 let colorScale = d3.scaleThreshold()
     .domain(intervals)
-    .range(d3.schemeGnBu[6])
+    .range(d3.schemeYlGnBu[6])
 
 // Legend
 const xLegend = 20
