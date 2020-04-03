@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <link rel="stylesheet" href="bar.css">
+</head>
+<body>
+<svg id="normalizedstack"></svg>
+<script>
+
+let margin = {top: 110, right: 20, bottom: 0, left: 50},
+    W = 700,
+    H = 200,
+    width = W - margin.left - margin.right,
+    height = H - margin.top - margin.bottom,
+    fmtPct = d3.format('.0%')
+
+let x = d3.scaleLinear()
+    .domain([0, 1])
+    .range([0, width]);
+
+let y = d3.scaleBand()
+    .range([height, 0])
+    .padding(0.1);
+
+let xAxisSpecs = d3.axisTop(x)
+    .ticks(10, "%")
+
+let yAxisSpecs = d3.axisLeft(y)
+    .tickSizeOuter(0)
+    .tickFormat(d3.timeFormat('%b %d'))
+
+let xAxis = g => g
+    .call(xAxisSpecs)
+    .call(g => g.selectAll(".domain").remove())
+
+let yAxis = g => g
+    .call(yAxisSpecs)
+    .call(g => g.selectAll(".domain").remove())
+
+let svg = d3.select("#normalizedstack")
+    .attr('viewBox', `0 0 ${W} ${H}`)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+async function makeNormalizedStackedBar() {
+    let url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTMKsVgVrNMagP-IfMRkAwa96DSHo9zp2jcN_Rf5P4PuIs1necg2N4XCb9ARcdWRSzqTPrH4qFbEuwE/pub?gid=874651455&single=true&output=csv'
+    age = await d3.csv(url, d3.autoType)
+
+    y.domain(age.map(d => d.Date))
+    let stack = d3.stack()
+        .keys(age.columns.slice(1))
+        .order(d3.stackOrderReverse)
+        .offset(d3.stackOffsetExpand) // normalizes stack
+
+    series = stack(age).map(d => (d.forEach(v => v.key = d.key), d)) //  adds key to innermost array
+
+    let colorScale = d3.scaleOrdinal()
+        .domain(series.map(d => d.key))
+        .range(d3.schemeSpectral[series.length])
+        .unknown("#ccc")
+
+    // start with stacked bars
+    svg.selectAll("g")
+      .data(series)
+      .join("g")
+        .attr("fill", d => colorScale(d.key))
+      .selectAll('rect')
+      .data(d => d)
+      .join('rect')
+        .attr("x", d => x(d[0]))
+        .attr("y", d => y(d.data.Date))
+        .attr("width", d => x(d[1]) - x(d[0]))
+        .attr("height", y.bandwidth())
+      .append('title')
+        .text(d => `${d.key}:  ${fmtPct(d.data[d.key])}`)
+
+    // add axes
+    svg.append("g")
+        .attr("class", "x axis")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    // add legend
+    let legend = d3.legendColor()
+        .scale(colorScale)
+        .orient('horizontal')
+        .shapeWidth(40)
+        .title('Age Group')
+
+    svg.append('g')
+        .attr('transform', `translate(0,${-margin.top+20})`)
+        .call(legend)
+}
+
+makeNormalizedStackedBar()
+
+</script>
+</body>
+</html>
