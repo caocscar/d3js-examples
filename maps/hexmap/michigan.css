@@ -1,0 +1,44 @@
+/*Style for Custom Tooltip */
+/* div.tooltip {
+  position: absolute;
+  text-align: center;
+  min-width: 80px;
+  height: auto;
+  padding: 10px;
+  font-size: 14px;
+  font-family: arial;
+  background: rgba(0,0,0, 0.9);
+  color: #fff;
+  border-radius: 5px;
+  pointer-events: none;
+  line-height: 1;
+} */
+
+/* .tooltip p {
+  margin: 2px;
+} */
+
+path.hex {
+  /* fill: #4d84b8; */
+  stroke: none; 
+  /* stroke-width: 1px; */
+}
+
+path.hex:hover{
+  /* fill: #ffcb05; */
+  stroke: black;
+  cursor: pointer;
+}
+
+.svg-container {
+  /* display: inline-block; */
+  /* position: relative; */
+  /* width: 100%; */
+  /* vertical-align: top; */
+  /* overflow: hidden; */
+  border: 2px solid green;
+}
+
+.legendLabel {
+  font-size: 0.8em;
+}
