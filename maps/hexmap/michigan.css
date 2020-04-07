@@ -17,9 +17,13 @@
 /* .tooltip p {
   margin: 2px;
 } */
+.top-buffer{
+  margin-top: 20px;
+}
+
 
 path.hex {
-  /* fill: #4d84b8; */
+  /* fill: #4d84b8; */.
   stroke: none; 
   /* stroke-width: 1px; */
 }
@@ -39,6 +43,6 @@ path.hex:hover{
   border: 2px solid green;
 }
 
-.legendLabel {
+#legendTitle, .legendLabel {
   font-size: 0.8em;
 }
