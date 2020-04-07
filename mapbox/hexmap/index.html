@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <title>Hexmap Mapbox GL JS + D3v5</title>
+  <!-- bootstrap 4 -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <!-- D3.js -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js'></script>
+  <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css' type='text/css' />
+  <!-- project files -->
+  <link rel="stylesheet" href="michigan.css"> 
+  <style>
+    #map, svg { 
+      position: relative;
+      width: 750px;
+      height: 900px;
+    }
+    svg {
+      pointer-events: all;
+    }
+    .hex {
+      pointer-events: all;
+    }
+  </style>
+  
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row top-buffer">
+    <div class="col-sm-10">
+      <!-- inline radio buttons-->
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="custom-control-input" id="pop" name="attributes" value="POP" checked>
+        <label class="custom-control-label" for="pop">Population</label><br>
+      </div>
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="custom-control-input" id="cases" name="attributes" value="Cases">
+        <label class="custom-control-label" for="cases">Cases</label><br>
+      </div>
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="custom-control-input" id="rate" name="attributes" value="RawCsRt">
+        <label class="custom-control-label" for="rate">Case Rate</label><br>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-10">
+        <div id="map"></div>
+    </div>     
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script> 
+<script>  
+  mapboxgl.accessToken = 'pk.eyJ1IjoiY2FvYSIsImEiOiJjazFncHJqZzYwMXkyM2hxcWp6d2hucTk1In0.5Z7Nmggo79voVuNvU2i7sQ';   
+  let map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v10',
+      center: [-86.34,45.01],
+      zoom: 5.83,
+  })
+  map.addControl(new mapboxgl.NavigationControl({
+      visualizePitch: true,
+  }), 'top-right');
+  map.addControl(new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      autocomplete: true,
+      countries: 'us',
+      bbox: [-90.4, 41.7, -82.4, 48.2],
+      marker: false,
+      zoom: 8,
+  }), 'top-left');
+
+  // Setup our svg layer that we can manipulate with d3
+  let container = map.getCanvasContainer()
+  let svg = d3.select(container).append("svg")
+
+  // Project any point to map's current state
+  function projectPoint(lon, lat) {
+      let point = map.project(new mapboxgl.LngLat(lon, lat));
+      this.stream.point(point.x, point.y);
+  }
+  // Projection function
+  let transform = d3.geoTransform({point: projectPoint});
+  let path = d3.geoPath().projection(transform);   
+
+  let intervals = [100,1000,10000,100000]
+  let colorScale = d3.scaleThreshold()
+      .domain(intervals)
+      .range(d3.schemeYlOrBr[5])
+
+  let column = 'POP';
+  const radioButton = d3.selectAll('input')
+
+  d3.json('cases_hexagons_20km_polygons.geojson').then(data => {
+      let features = svg.selectAll(".hex")
+        .data(data.features)
+        .join('path')
+          .attr('class', 'hex')
+          .attr('d', path)
+          .style("fill", d => colorScale(d.properties.POP))
+          .style('stroke', 'none')
+          .attr("data-toggle", "tooltip")
+          .attr("data-html", true)
+          .attr("title", d => {
+            txt = `index: ${d.properties.index}`
+            txt += `<br>Pop: ${d3.format(',')(d.properties.POP)}`
+            txt += `<br>Cases: ${d.properties.Cases}`
+            txt += `<br>Case Rate: ${d3.format('.3f')(10000*d.properties.RawCsRt)}`
+            return txt
+          })
+      const update = () => {
+        features.attr('d', path)
+      }
+      map.on("move", update)
+  })
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
+  radioButton.on('change', function() {
+    if (['POP','Cases','RawCsRt'].includes(this.value)) column = this.value
+    if (column === 'POP') {
+        intervals = [100,1000,10000,100000]
+        colorScale.range(d3.schemeYlOrBr[5])
+        text = 'Population'
+    } else if (column === 'Cases') {
+        intervals = [1,10,100,1000]
+        colorScale.range(d3.schemePuBuGn[5])
+        text = 'Cases'
+    } else {
+        intervals = [1, 2, 5, 10]
+        colorScale.range(d3.schemeRdPu[5])
+        text = 'Case Rate'
+    }
+    colorScale.domain(intervals)
+    svg.selectAll('.hex')
+      .transition().duration(500)
+        .delay((d,i) => i*1)
+        .style('fill', d => column == 'RawCsRt' ? colorScale(10000*d.properties[column]) : colorScale(d.properties[column]))
+  })
+
+  
+
+
+</script>
+</body>
