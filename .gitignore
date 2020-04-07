@@ -1,3 +1,4 @@
 students/
 linkedplots/**/trip*.csv
 linkedplots/**/s3read.js
+.DS_Store
