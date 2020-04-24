@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Continuous Scale Legend in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<style>
+  .y-axis line, y-axis path {
+    stroke: white;
+  }
+</style>
+<body>
+
+<script>
+let margin = {top: 50, right: 50, bottom: 50, left: 50},
+    width = 700 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
+
+let svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// CONTINUOUS SCALE
+let wc = 100
+let colorScale = d3.scaleSequentialLog(d3.interpolateRdYlBu).domain([1, 100000])
+
+let defs = svg.append("defs");
+let linearGradient = defs.append("linearGradient")
+    .attr("id", "linear-gradient")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "0%")
+    .attr("y2", "100%");
+
+linearGradient.selectAll("stop")
+  .data(colorScale.ticks().map((d,i,arr) => ({offset:`${100*i/arr.length}%`, color: colorScale(d)})))
+  .join("stop")
+    .attr("offset", d => d.offset)
+    .attr("stop-color", d => d.color);
+
+svg.append('rect')
+    .attr('width', wc)
+    .attr('height', height)
+    .style('fill', 'url(#linear-gradient)')
+    .style('fill-opacity', 1)
+
+// Axis
+axisScale = d3.scaleLog()
+    .domain(colorScale.domain())
+    .range([0, height])
+
+yAxis = d3.axisRight(axisScale)
+    .ticks(5, ',')
+    .tickSize(-wc)
+
+svg.append('g')
+    .attr("class", `y-axis`)
+    .attr("transform", `translate(${wc},0)`)
+    .call(yAxis)
+
+d3.select('.y-axis path.domain').remove()
+d3.selectAll('g.tick text').style('font-size', '2.5em')
+
+// DISCRETE SCALE
+let xoffset = 10
+let yoffset = 10
+let wd = wc
+let h = wd
+let n = 6
+
+discreteColorScale = d3.scaleThreshold()
+    .domain([10,20,50,75,100])
+    .range(d3.schemePRGn[n])
+
+discreteLegend = svg.append('g')
+  .attr('class', 'discrete')
+  .attr('transform', `translate(${wc+150},0)`)
+  
+let rects = discreteLegend.selectAll(".rect")
+  .data(discreteColorScale.range())
+  .join("rect")
+    .attr('class','swatch')
+    .attr('x', xoffset)
+    .attr('y', (d,i) => i*h+yoffset)
+    .attr('width', wd)
+    .attr('height', h)
+    .style('fill', d => d)
+    .style('fill-opacity', 1)
+
+let labels = discreteLegend.selectAll('text')
+  .data([0].concat(discreteColorScale.domain()))
+  .join('text')
+    .attr('class', 'swatch-label')
+    .attr('x', wd+6+xoffset)
+    .attr('y', (d,i) => i*h+h/2+yoffset)
+    .attr('dy', '.35em')
+    .style('stroke', 'purple')
+    .style('font-size', '1.5em')
+    .text((d,i,arr) => LegendText(d,i,arr));
+
+function LegendText(d,i,arr) {
+    const numFmt = d3.format(',')
+    return i < arr.length-1 ? `${numFmt(d)}-${numFmt(arr[i+1].__data__)}` : `${numFmt(d)}+`
+}
+
+</script>
+</body>
