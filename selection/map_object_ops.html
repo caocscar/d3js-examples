@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://d3js.org/d3-array.v2.min.js"></script>
+</head>
+<body>
+<script>
+    let pop = {'Michigan': 1000000,
+            'Detroit': 675294,
+            'Washtenaw': 345678,
+            'Clare': 56983,
+    }
+    async function make_table(filename) {
+//      rawdata = await d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTMKsVgVrNMagP-IfMRkAwa96DSHo9zp2jcN_Rf5P4PuIs1necg2N4XCb9ARcdWRSzqTPrH4qFbEuwE/pub?gid=0&single=true&output=csv', type)
+        const data = await d3.csv(filename);
+        // single level group selection; returns Map
+        g1 = d3.group(data, d => d.AY)
+        // two level group selection
+        g2 = d3.group(data, d => d.AY, d => d.Term)
+        // single level map count
+        one = d3.rollup(data, v => v.length, d => d.AY)
+        // two level map count
+        two = d3.rollup(data, v => v.length, d => d.AY, d => d.Term)
+        // single level map sum
+        summ = d3.rollup(data, v => d3.sum(v, d => d.Term), d => d.AY)
+        // two level map sum
+        summgen = d3.rollup(data, v => d3.sum(v, d => d.Term), d => d.AY, d => d.G)
+        // convert from Map to Array; Map => Array of Objects
+        arr = Array.from(d3.group(data, d => d.AY), ([key, value]) => ({'k':key, 'v':value}))
+    }
+    make_table('Clients.csv');
+ </script>
+</body>
+</html>

@@ -8,7 +8,7 @@
   <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
   <style>
     #map, svg { 
-      position:absolute; 
+      position: absolute; 
       width: 100%;
       height: 100%;
     }
@@ -22,8 +22,26 @@
     let map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/dark-v10',
-        center: [-113.5,53.54],
-        zoom: 10.5,  
+        center: [-83.5,43.54],
+        zoom: 6.5,  
+    })
+    const countyTileset = 'counties_v17a-3qtxmg'
+    const countyTilesetSrc = {
+        type: 'vector',
+        url: 'mapbox://caoa.1wm38rfu',
+    }
+    map.on('load', () => { // load from tileset directly
+      map.addLayer({
+      "id": "county-border",
+      "type": "line",
+      "source": countyTilesetSrc,
+      "source-layer": countyTileset,
+      "layout": {'visibility' : 'visible'},
+      "paint": {
+          "line-width": 1,
+          "line-color": "#fff",
+        },
+      });
     })
 
     // Setup our svg layer that we can manipulate with d3

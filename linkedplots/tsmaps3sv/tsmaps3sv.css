@@ -45,6 +45,10 @@ svg {
   text-anchor: middle;
 }
 
+#charts {
+  width: 80%;
+}
+
 /* Map */
 @import url("https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css");
 

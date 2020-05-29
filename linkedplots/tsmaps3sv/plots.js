@@ -1,7 +1,7 @@
 // setup svg
-const H = 600
+const H = 600, W = 700;
 let margin = {top: 0, right: 0, bottom: 50, left: 50},
-    width = 400 - margin.left - margin.right,
+    width = W - margin.left - margin.right,
     height = H - margin.top - margin.bottom,
     margin2 = {top: H-margin.bottom+10, right: 20, bottom: 10, left: 50},
     height2 = margin.bottom - margin2.bottom,
@@ -9,8 +9,10 @@ let margin = {top: 0, right: 0, bottom: 50, left: 50},
     domains = {};
 
 let svg = d3.select("#charts").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .attr("preserveAspectRatio", "xMinYMid meet")
+    //.attr("width", width + margin.left + margin.right)
+    //.attr("height", height + margin.top + margin.bottom)
 
 let focus = svg.append("g")
     .attr("class", "focus")
@@ -23,7 +25,6 @@ let n = ycolumns.length,
 
 let context = svg.append("g")
     .attr("class", "context")
-    //.attr("transform", `translate(${margin.left},${margin2.top - padding - margin2.bottom})`);
     .attr("transform", `translate(${margin.left},${size*n + padding +10})`);
 
 // setup axes

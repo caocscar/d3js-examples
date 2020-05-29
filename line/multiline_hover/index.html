@@ -139,7 +139,7 @@ function hover(svg, path) {
     const i0 = i1 - 1;
     const i = xm - data.dates[i0] > data.dates[i1] - xm ? i1 : i0;
     const s = d3.least(data.series, d => Math.abs(d.values[i] - ym));
-    path.attr("stroke", d => d === s ? null : "#ddd").filter(d => d === s).raise();
+    path.attr("stroke", d => d.name === s.name ? null : "#ddd").filter(d => d.name === s.name).raise();
     dot.attr("transform", `translate(${x(data.dates[i])},${y(s.values[i])})`);
     dot.select("text").text(s.name);
   }
