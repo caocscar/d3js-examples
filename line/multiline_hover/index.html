@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Line Chart in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
+    <link rel="stylesheet" href="line.css">
+</head>
+<body>
+
+<script>
+// set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 30, left: 50},
+    W = 1000, H = 500,
+    width = W - margin.left - margin.right,
+    height = H - margin.top - margin.bottom;
+
+// parse the date / time
+const parseTime = d3.timeParse("%Y-%m-%d");
+
+// set the ranges
+let x = d3.scaleTime().range([0, width]);
+let y = d3.scaleLinear().range([height, 0]);
+
+let svg = d3.select("body").append("svg")
+    .attr("viewBox", `-${margin.left} -${margin.top} ${W} ${H}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .style("overflow", "visible")
+
+let xAxis = d3.axisBottom(x)
+    .ticks(8)
+
+const tickValues = [0, 120, 192, 384]
+let yAxis = d3.axisLeft(y)
+    .tickValues(tickValues)
+
+let gridlines = d3.axisLeft(y)
+    .tickSize(-width)
+    .tickFormat("")
+    .tickValues(tickValues)
+
+// define the line
+let valueline = d3.line()
+    .defined(d => !isNaN(d))
+    .x((d,i) => x(data.dates[i]))
+    .y(d => y(d))
+
+// Get the data
+async function makeMultiLineChart() {
+  const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSv1DbpJLnX6hJZB5x8IcVNqsK1W0c6TLfBFebiFvwIYewE8WZMz-7apDHQwc_TMFxNQuC41a_awV6F/pub?gid=1740202645&single=true&output=csv'
+  rawdata = await d3.csv(url)
+  // generalized construction of dataset with n series
+  columns = rawdata.columns.slice(1)
+  data = {
+    dates: rawdata.map(d => parseTime(d.Month)),
+    series: columns.map(d => {
+          return {'name': d.toLowerCase(), 'values': rawdata.map(k => +k[d])}
+    }),
+  };
+  x.domain(d3.extent(data.dates));
+  y.domain([0, 16*24]);
+
+  const dates = [
+    [new Date(2019,3,26), new Date(2019,6,7)],
+    [new Date(2020,2,10), d3.max(data.dates)],
+  ]
+  
+  // generalization for an array of date objects
+  svg.selectAll('rect')
+    .data(dates)
+    .join('rect')
+      .attr('class', 'rectangle')
+      .attr('width', d => x(d[1]) - x(d[0]))
+      .attr('height', height)
+      .attr('x', d => x(d[0]))
+
+  path = svg.append("g")
+      .attr('fill', 'none')
+      .attr('stroke', 'purple')
+      .attr('stroke-width', 3)
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+    .selectAll('path')
+    .data(data.series)
+    .join('path')
+      .style('mix-blend-mode', 'multiply')
+      .attr('d', d => valueline(d.values));
+
+  svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+  svg.append("g")
+      .call(yAxis);
+
+  svg.append('g').lower()
+      .attr('class','grid')
+      .call(gridlines)
+
+  svg.append('text')
+      .attr('transform','translate(10,20)')
+      .text('Hours')
+
+  svg.call(hover, path);
+
+};
+
+function hover(svg, path) {
+  
+  if ("ontouchstart" in document) svg
+      .style("-webkit-tap-highlight-color", "transparent")
+      .on("touchmove", moved)
+      .on("touchstart", entered)
+      .on("touchend", left)
+  else svg
+      .on("mousemove", moved)
+      .on("mouseenter", entered)
+      .on("mouseleave", left);
+
+  const dot = svg.append("g")
+      .attr("display", "none");
+
+  dot.append("circle")
+      .attr("r", 5);
+
+  dot.append("text")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "1em")
+      .attr("text-anchor", "middle")
+      .attr("y", -15);
+
+  function moved() {
+    d3.event.preventDefault();
+    const mouse = d3.mouse(this);
+    const xm = x.invert(mouse[0]);
+    const ym = y.invert(mouse[1]);
+    const i1 = d3.bisectLeft(data.dates, xm, 1);
+    const i0 = i1 - 1;
+    const i = xm - data.dates[i0] > data.dates[i1] - xm ? i1 : i0;
+    const s = d3.least(data.series, d => Math.abs(d.values[i] - ym));
+    path.attr("stroke", d => d === s ? null : "#ddd").filter(d => d === s).raise();
+    dot.attr("transform", `translate(${x(data.dates[i])},${y(s.values[i])})`);
+    dot.select("text").text(s.name);
+  }
+
+  function entered() {
+    path.style("mix-blend-mode", null).attr("stroke", "#ddd");
+    dot.attr("display", null);
+  }
+
+  function left() {
+    path.style("mix-blend-mode", "multiply").attr("stroke", null);
+    dot.attr("display", "none");
+  }
+}
+
+makeMultiLineChart();
+
+</script>
+</body>

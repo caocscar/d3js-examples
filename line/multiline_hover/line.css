@@ -1,0 +1,12 @@
+.grid line {
+  stroke: #e4e4e4;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.rectangle {
+  fill: #e5e4ff;
+}

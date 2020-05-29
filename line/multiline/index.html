@@ -11,8 +11,9 @@
 <script>
 // set the dimensions and margins of the graph
 let margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 1000 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    W = 1000, H = 500,
+    width = W - margin.left - margin.right,
+    height = H - margin.top - margin.bottom;
 
 // parse the date / time
 const parseTime = d3.timeParse("%Y-%m-%d");
@@ -22,8 +23,8 @@ let x = d3.scaleTime().range([0, width]);
 let y = d3.scaleLinear().range([height, 0]);
 
 let svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
 
@@ -84,6 +85,7 @@ async function makeMultiLineChart() {
 
   const dates = [
     [new Date(2019,3,26), new Date(2019,6,7)],
+    [new Date(2020,2,10), d3.max(data.date)],
   ]
   
   // generalization for an array of date objects
