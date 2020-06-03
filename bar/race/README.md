@@ -1,2 +1,2 @@
-# d3-bar-sortable-timeseries
-D3 sortable time series bar chart example for CSCAR workshop
+# d3-bar-chart-race
+D3 bar chart race example for CSCAR workshop
