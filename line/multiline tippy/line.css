@@ -1,0 +1,20 @@
+.tipsy {
+  fill: none;
+  stroke-width: 3px;
+  stroke: orange;
+}
+
+.grid line {
+  stroke: #e4e4e4;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.rectangle {
+  fill-opacity: 0.1;
+  fill: blue;
+}
+

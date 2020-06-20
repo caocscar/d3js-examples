@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Line Chart in D3 v5</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="line.css">
+</head>
+<body>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css"/>
+<script>
+// set the dimensions and margins of the graph
+let margin = {top: 20, right: 20, bottom: 30, left: 50},
+    W = 1000, H = 500,
+    width = W - margin.left - margin.right,
+    height = H - margin.top - margin.bottom;
+
+// parse the date / time
+const parseTime = d3.timeParse("%Y-%m-%d");
+
+// set the ranges
+let x = d3.scaleUtc().range([0, width]);
+let y = d3.scaleLinear().range([height, 0]);
+
+let svg = d3.select("body").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`)
+
+let xAxis = d3.axisBottom(x)
+    .ticks(8)
+
+const tickValues = [0, 120, 192, 384]
+let yAxis = d3.axisLeft(y)
+    .tickValues(tickValues)
+
+let gridlines = d3.axisLeft(y)
+    .tickSize(-width)
+    .tickFormat("")
+    .tickValues(tickValues)
+
+// define the line
+let valueline = d3.line()
+    .defined(d => !isNaN(d))
+    .x((d,i) => x(data.date[i]))
+    .y(d => y(d))
+
+// Get the data
+async function makeMultiLineChart() {
+  const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSv1DbpJLnX6hJZB5x8IcVNqsK1W0c6TLfBFebiFvwIYewE8WZMz-7apDHQwc_TMFxNQuC41a_awV6F/pub?gid=1740202645&single=true&output=csv'
+  rawdata = await d3.csv(url, d3.autoType)
+  // generalized construction of dataset with n series
+  columns = rawdata.columns.slice(1)
+  data = {
+    date: rawdata.map(d => d.Month),
+    series: columns.map(d => {
+      return {'name': d.toLowerCase(), 'values': rawdata.map(k => k[d])}
+    }),
+  };
+  x.domain(d3.extent(data.date));
+  y.domain([0, 16*24]);
+
+  svg.append("g")
+    .selectAll('path')
+    .data(data.series)
+    .join('path')
+      .attr('class', 'tipsy')
+      .attr('d', d => valueline(d.values))
+      .attr('data-tippy-content', (d,i) => d.values[i])
+      .on('mousemove', function(d,i) {
+        const idx = getDateValue(d3.mouse(this)[0])
+        d3.select(this).attr('data-tippy-content', d.values[idx])
+      })
+
+  svg.append("g")
+    .selectAll('circle')
+    .data(data.date)
+    .join('circle')
+      .attr('class', 'alex')
+      .attr('r', 4)
+      .attr('cx', d => x(d))
+      .attr('cy', (d,i) => y(data.series[0].values[i]))
+      .attr('fill', 'magenta')
+      .attr('data-tippy-content', (d,i) => data.series[0].values[i])
+
+  svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+  svg.append("g")
+      .call(yAxis);
+
+  svg.append('g').lower()
+      .attr('class','grid')
+      .call(gridlines)
+
+  svg.append('text')
+      .attr('transform','translate(10,20)')
+      .text('Hours')
+
+  tippy('.alex', { followCursor: true } )
+
+  function getDateValue(mx) {
+    const date = x.invert(mx);
+    const index = d3.bisect(data.date, date);
+    const a = data.date[index - 1];
+    const b = data.date[index];
+    const idx = b && (date - a > b - date) ? index : index-1;
+    return idx
+  }
+  
+};
+
+makeMultiLineChart();
+
+</script>
+</body>
