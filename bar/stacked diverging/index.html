@@ -12,7 +12,7 @@
 <script>
 
 let margin = {top: 110, right: 20, bottom: 0, left: 50},
-    W = 600,
+    W = 500,
     H = 300,
     width = W - margin.left - margin.right,
     height = H - margin.top - margin.bottom,
@@ -22,7 +22,7 @@ let x = d3.scaleLinear()
     .range([0, width]);
 
 let y = d3.scaleBand()
-    .range([height, 0])
+    .range([0, height])
     .padding(0.1);
 
 let fmtValue = x => { 
@@ -60,7 +60,6 @@ async function makeDivergingStackedBar() {
     y.domain(data.map(d => d.age))
     let stack = d3.stack()
         .keys(data.columns.slice(1))
-        .order(d3.stackOrderReverse)
         .offset(d3.stackOffsetDiverging) // diverging stack
 
     series = stack(data).map(d => (d.forEach(v => v.key = d.key), d)) //  adds key to innermost array
@@ -103,7 +102,7 @@ async function makeDivergingStackedBar() {
         .title('Gender')
 
     svg.append('g')
-        .attr('transform', `translate(0,${-margin.top+20})`)
+        .attr('transform', `translate(${width/2-40},${-margin.top+20})`)
         .call(legend)
 }
 
