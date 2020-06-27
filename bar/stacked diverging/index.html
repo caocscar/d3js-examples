@@ -9,6 +9,9 @@
 </head>
 <body>
 <svg id="divergingstack"></svg>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css"/>
 <script>
 
 let margin = {top: 110, right: 20, bottom: 0, left: 50},
@@ -52,7 +55,7 @@ let svg = d3.select("#divergingstack")
 async function makeDivergingStackedBar() {
     data = await d3.csv('age.csv', d3.autoType)
     data.map(d => {
-        d.M = -d.M
+       d.M = -d.M
         return d
     })
 
@@ -63,6 +66,13 @@ async function makeDivergingStackedBar() {
         .offset(d3.stackOffsetDiverging) // diverging stack
 
     series = stack(data).map(d => (d.forEach(v => v.key = d.key), d)) //  adds key to innermost array
+
+    // data2 = d3.rollups(data, v => d3.rollup(v, ([v2]) => v2.count, d => d.sex), d => d.age)
+    // series = d3.stack()
+    //     .keys(['M','F'])
+    //     .value(([, value], sex) => value.get(sex))
+    //     .offset(d3.stackOffsetDiverging)
+    // series = stack(data2)
 
     let colorScale = d3.scaleOrdinal()
         .domain(series.map(d => d.key))
@@ -78,12 +88,12 @@ async function makeDivergingStackedBar() {
       .selectAll('rect')
       .data(d => d)
       .join('rect')
+        .attr('class', 'gender')
         .attr("x", d => x(d[0]))
         .attr("y", d => y(d.data.age))
         .attr("width", d => x(d[1]) - x(d[0]))
         .attr("height", y.bandwidth())
-      .append('title')
-        .text('hello there')
+        .attr("data-tippy-content", d => `${d.key}: ${Math.abs(d.data[d.key])}`)
 
     // add axes
     svg.append("g")
@@ -104,6 +114,8 @@ async function makeDivergingStackedBar() {
     svg.append('g')
         .attr('transform', `translate(${width/2-40},${-margin.top+20})`)
         .call(legend)
+
+    tippy('.gender', {followCursor: true})
 }
 
 makeDivergingStackedBar()
