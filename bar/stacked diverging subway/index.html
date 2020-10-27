@@ -67,63 +67,67 @@ shuttle.append('line')
 
 async function makeDivergingStackedBar() {
     data = await d3.csv('fakedata_wide.csv', d3.autoType)
-    data.map(d => {
-        d.pickup = -d.pickup
-        return d
-    })
 
     maxRider = d3.max([d3.max(data, d => -d.pickup), d3.max(data, d => d.dropoff)])
     x.domain([-maxRider, maxRider])
     y.domain(data.map(d => d.station))
-    stack = d3.stack()
-        .keys(data.columns.slice(1,3))
-        .offset(d3.stackOffsetDiverging) // diverging stack
 
-    series = stack(data).map(d => (d.forEach(v => v.key = d.key), d)) //  adds key to innermost array
-
-    shuttle.selectAll('.station')
-      .data(data)
-      .join('circle')
-        .attr('class', 'station')
-        .attr('cx', xoffset)
-        .attr('cy', d => y(d.station) + y.bandwidth()/2)
-        .attr('r', 3)
-        .text(d => d.headway)
-
-    shuttle.selectAll('.headway')
-      .data(data)
-      .join('text')
-        .attr('class', 'headway')
-        .attr('x', xoffset + 35)
-        .attr('y', d => y(d.station) + y.bandwidth()/2)
-        .attr('dy', '0.35em')
-        .text(d => d.headway)
-
-    let colorScale = d3.scaleOrdinal()
-        .domain(series.map(d => d.key))
-        .range(d3.schemePaired.slice(0,2))
+    colorScale = d3.scaleOrdinal()
+        .domain(['pickup','dropoff','waited'])
+        .range(d3.schemePaired.slice(0,3))
         .unknown("#ccc")
 
     // add the x-axis gridlines
     svg.append("g")			
         .attr("class", "grid")
-        .call(xAxisGrid)
+        .call(xAxisGrid)    
 
-    // add stacked bars
-    svg.append("g")
-      .selectAll("g")
-      .data(series)
-      .join("g")
-        .attr("fill", d => colorScale(d.key))
-      .selectAll('rect')
-      .data(d => d)
-      .join('rect')
-        .attr('class', 'pd')
-        .attr("x", d => x(d[0]))
-        .attr("y", d => y(d.data.station))
-        .attr("width", d => x(d[1]) - x(d[0]))
-        .attr("height", y.bandwidth())
-        .attr("data-tippy-content", d => `${d.data.station}: ${Math.abs(d.data[d.key])} ${d.key}`)
+    // create group for each shuttle stop
+    rects = svg.selectAll('.shuttle-stop')
+      .data(data)
+      .join('g')
+        .attr('class', 'shuttle-stop')
+
+    // add elements for each shuttle stop
+    rects.append('circle')
+        .attr('class', 'station')
+        .attr('cx', xoffset)
+        .attr('cy', d => y(d.station) + y.bandwidth()/2)
+        .attr('r', 3)
+
+    rects.append('text')
+        .attr('class', 'headway')
+        .attr('x', xoffset + 35)
+        .attr('y', d => y(d.station) + y.bandwidth()/2)
+        .attr('dy', '0.35em')
+        .text(d => `${Math.floor(d.headway/60)}:${d.headway%60}`)    
+
+    rects.append('rect')
+        .attr('class', 'pickup pdw')
+        .attr('x', d => x(-d.pickup))
+        .attr('y', d => y(d.station))
+        .attr('width', d => x(d.pickup)-x(0))
+        .attr('height', y.bandwidth())
+        .attr("data-tippy-content", d => `${d.station}: ${d.pickup} pickups`)
+        .attr('fill', colorScale('pickup'))   
+
+    rects.append('rect')
+        .attr('class', 'dropoff pdw')
+        .attr('x', d => x(0))
+        .attr('y', d => y(d.station))
+        .attr('width', d => x(d.dropoff)-x(0))
+        .attr('height', y.bandwidth())
+        .attr("data-tippy-content", d => `${d.station}: ${d.dropoff} dropoffs`)
+        .attr('fill', colorScale('dropoff'))         
+
+    rects.append('rect')
+        .attr('class', 'waited pdw')
+        .attr('x', d => x(-d.waited))
+        .attr('y', d => y(d.station))
+        .attr('width', d => x(d.waited)-x(0))
+        .attr('height', y.bandwidth())
+        .attr("data-tippy-content", d => `${d.station}: ${d.waited} waited`)
+        .attr('fill', colorScale('waited'))        
 
     // add axes
     svg.append("g")
@@ -150,9 +154,8 @@ async function makeDivergingStackedBar() {
         .attr('transform', `translate(${x(30)},${-25})`)
         .text('dropoff')
 
-
     // add tooltip
-    tippy('.pd', {followCursor: true})
+    tippy('.pdw', {followCursor: true})
 }
 
 makeDivergingStackedBar()
