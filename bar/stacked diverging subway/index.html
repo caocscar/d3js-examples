@@ -100,7 +100,7 @@ async function makeDivergingStackedBar() {
         .attr('x', xoffset + 35)
         .attr('y', d => y(d.station) + y.bandwidth()/2)
         .attr('dy', '0.35em')
-        .text(d => `${Math.floor(d.headway/60)}:${d.headway%60}`)    
+        .text(d => `${Math.floor(d.headway/60)}:${d3.format('>02')(d.headway%60)}`)    
 
     rects.append('rect')
         .attr('class', 'pickup pdw')
