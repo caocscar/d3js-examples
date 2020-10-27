@@ -1,8 +1,24 @@
-.label {
+.header {
     text-anchor: middle;
     font-size: 0.8em;
 }
 
-.tick text {
+.grid line, .x-axis line {
+    stroke: black;
+    stroke-opacity: 0.1;
+    shape-rendering: crispEdges;
+}
+  
+.grid path {
+    stroke-width: 0;
+}
 
+.station {
+    stroke: black;
+    fill: white;
+}
+
+.headway {
+    font-size: 0.8em;
+    text-anchor: end;
 }

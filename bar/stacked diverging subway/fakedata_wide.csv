@@ -1,8 +1,4 @@
 station,pickup,dropoff,headway
-YMCA,29,24,3:53
-Seward 9S,27,29,5:42
-Seward 9C,22,40,3:57
-Seward 9N,47,25,4:53
 Fire Station,20,26,4:50
 Printing Co,23,27,6:20
 Mt Vernon,24,23,10:00
@@ -19,3 +15,7 @@ Ionia-Monroe Ctr,25,29,2:35
 Pearl-Ottawa WB,25,21,4:46
 Amway Grand WB,27,52,3:54
 Museum WB,42,10,4:36
+YMCA,29,24,3:53
+Seward 9S,27,29,5:42
+Seward 9C,22,40,3:57
+Seward 9N,47,25,4:53
