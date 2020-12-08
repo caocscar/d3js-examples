@@ -8,13 +8,6 @@
   stroke-width: 1px;
 }
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
 .axis .tick text {
   font-size: 1.5em;
 }

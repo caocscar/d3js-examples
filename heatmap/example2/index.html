@@ -28,7 +28,7 @@ let x = d3.scaleBand()
 let y = d3.scaleBand()
     .domain(dates2)
     .range([margin.top, height - margin.bottom])
-    .round(true)
+    .round(true);
 const formatHour = d => d === 6 ? "6AM" : d === 12 ? "12PM" : (d%12) + "";
 let xAxis = d3.axisTop(x).tickSize(0).tickFormat(formatHour)
 let yAxis = d3.axisLeft(y).tickSize(0)
@@ -58,8 +58,8 @@ async function makeHeatmap(filename) {
       .attr("class", "tile")
       .attr("x", d => x(d.hour))
       .attr("y", d => y(d.weekday))
-      .attr("width", x.bandwidth()-1) 
-      .attr("height",  y.bandwidth()-1)
+      .attr("width", x.bandwidth()) 
+      .attr("height",  y.bandwidth())
       .style("fill", d => colorScale(d.pickup))
       .on("click", function() {
         d3.selectAll(".labels").attr("opacity", 1 - d3.select('.labels').attr('opacity'))
