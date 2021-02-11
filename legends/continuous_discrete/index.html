@@ -91,7 +91,7 @@ let rects = discreteLegend.selectAll(".rect")
     .style('fill-opacity', 1)
 
 let labels = discreteLegend.selectAll('text')
-  .data([0].concat(discreteColorScale.domain()))
+  .data([0, ...colorScale.domain()])
   .join('text')
     .attr('class', 'swatch-label')
     .attr('x', wd+6+xoffset)
@@ -103,7 +103,7 @@ let labels = discreteLegend.selectAll('text')
 
 function LegendText(d,i,arr) {
     const numFmt = d3.format(',')
-    return i < arr.length-1 ? `${numFmt(d)}-${numFmt(arr[i+1].__data__)}` : `${numFmt(d)}+`
+    return i < arr.length-1 ? `${numFmt(d)} - ${numFmt(arr[i+1].__data__)}` : `${numFmt(d)}+`
 }
 
 </script>
