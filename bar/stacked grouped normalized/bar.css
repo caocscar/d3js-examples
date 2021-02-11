@@ -1,4 +1,7 @@
-.label {
+.legend-headway-title, .legend-headway-text {
+    font-size: 0.8em;
+}
+
+.legend-headway-text {
     text-anchor: middle;
-    font-size: 0.9em;
 }

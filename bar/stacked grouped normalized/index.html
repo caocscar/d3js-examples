@@ -4,99 +4,121 @@
     <meta charset="UTF-8">
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/d3-array.v2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
     <link rel="stylesheet" href="bar.css">
 </head>
 <body>
 <svg id="normalizedstack"></svg>
 <script>
 
-let margin = {top: 110, right: 20, bottom: 0, left: 50},
+async function makeNormalizedStackedBar() {
+    // data wrangling
+    const longData = await d3.csv('headway_by_date_hour.txt', d3.autoType);
+    const categories = Array.from(new Set(longData.map(d => d.bin)));
+
+    headwayData = Array.from(d3.rollup(longData, v => d3.sum(v, d => d.count), d => d.period, d => d.bin), ([key,value]) => {
+        let row = {};
+        row['period'] = key;
+        categories.forEach(d => { row[d] = value.has(d) ? value.get(d) : 0 });
+        return row;
+    });
+    // calculate total
+    let row = {};
+    row['period'] = 'overall';
+    for (let col of Object.keys(headwayData[0]).slice(1)) {
+        row[col] = d3.sum(headwayData, d => d[col])
+    }
+    headwayData = headwayData.concat(row);
+    Object.assign(headwayData, {columns: ['period', ...categories]});
+
+    let margin = {top: 110, right: 20, bottom: 0, left: 100},
     W = 700,
-    H = 200,
+    H = 220,
     width = W - margin.left - margin.right,
     height = H - margin.top - margin.bottom,
     fmtPct = d3.format('.0%')
 
-let x = d3.scaleLinear()
-    .domain([0, 1])
-    .range([0, width]);
+    let x = d3.scaleLinear()
+        .domain([0, 1])
+        .range([0, width]);
 
-let y = d3.scaleBand()
-    .range([height, 0])
-    .padding(0.1);
+    let y = d3.scaleBand()
+        .domain(["overall", "morning_commute", "afternoon_commute", "off_peak"])
+        .range([0, height])
+        .padding(0.1);
 
-let xAxisSpecs = d3.axisTop(x)
-    .ticks(10, "%")
+    let xAxis = d3.axisTop(x)
+        .ticks(10, "%");
 
-let yAxisSpecs = d3.axisLeft(y)
-    .tickSizeOuter(0)
-    .tickFormat(d3.timeFormat('%b %d'))
+    let yAxis = d3.axisLeft(y)
+        .tickSizeOuter(0);
 
-let xAxis = g => g
-    .call(xAxisSpecs)
-    .call(g => g.selectAll(".domain").remove())
+    let svg = d3.select("#normalizedstack")
+        .attr('viewBox', `0 0 ${W} ${H}`)
+      .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-let yAxis = g => g
-    .call(yAxisSpecs)
-    .call(g => g.selectAll(".domain").remove())
-
-let svg = d3.select("#normalizedstack")
-    .attr('viewBox', `0 0 ${W} ${H}`)
-  .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
-
-async function makeNormalizedStackedBar() {
-    let url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTMKsVgVrNMagP-IfMRkAwa96DSHo9zp2jcN_Rf5P4PuIs1necg2N4XCb9ARcdWRSzqTPrH4qFbEuwE/pub?gid=874651455&single=true&output=csv'
-    age = await d3.csv(url, d3.autoType)
-
-    y.domain(age.map(d => d.Date))
     let stack = d3.stack()
-        .keys(age.columns.slice(1))
-        .order(d3.stackOrderReverse)
-        .offset(d3.stackOffsetExpand) // normalizes stack
+        .keys(headwayData.columns.slice(1))
+        .offset(d3.stackOffsetExpand); // normalizes stack
 
-    series = stack(age).map(d => (d.forEach(v => v.key = d.key), d)) //  adds key to innermost array
+    series = stack(headwayData).map(d => (d.forEach(v => v.key = d.key), d));
 
-    let colorScale = d3.scaleOrdinal()
+    let colorScaleHeadway = d3.scaleOrdinal()
         .domain(series.map(d => d.key))
-        .range(d3.schemeSpectral[series.length])
+        .range(d3.schemeSpectral[series.length+1].slice(1))
         .unknown("#ccc")
 
     // start with stacked bars
     svg.selectAll("g")
       .data(series)
       .join("g")
-        .attr("fill", d => colorScale(d.key))
+        .attr("fill", d => colorScaleHeadway(d.key))
       .selectAll('rect')
       .data(d => d)
       .join('rect')
         .attr("x", d => x(d[0]))
-        .attr("y", d => y(d.data.Date))
-        .attr("width", d => x(d[1]) - x(d[0]))
-        .attr("height", y.bandwidth())
-      .append('title')
-        .text(d => `${d.key}:  ${fmtPct(d.data[d.key])}`)
+        .attr("y", d => y(d.data.period))
+        .attr("width", d => x(d[1] - d[0]))
+        .attr("height", y.bandwidth());
 
     // add axes
     svg.append("g")
         .attr("class", "x axis")
-        .call(xAxis);
+        .call(xAxis)
+        .call(g => g.selectAll(".domain").remove());
 
     svg.append("g")
         .attr("class", "y axis")
-        .call(yAxis);
+        .call(yAxis)
+        .call(g => g.selectAll(".domain").remove());
 
     // add legend
-    let legend = d3.legendColor()
-        .scale(colorScale)
-        .orient('horizontal')
-        .shapeWidth(40)
-        .title('Age Group')
+    const rectHeight = y.bandwidth()/2;
+    const rectWidth = rectHeight*6;
+    let legend = svg.append("g")
+        .attr("transform", `translate(${0},${-margin.top+40})`)
+      .selectAll(".legend")
+      .data(categories)
+      .join("g")
+        .attr("class", "legend")
+        .attr("transform", (_, i) => `translate(${i*rectWidth},${10})`);
 
-    svg.append('g')
-        .attr('transform', `translate(0,${-margin.top+20})`)
-        .call(legend)
+    legend.append("rect")
+        .attr("width", rectWidth-2)
+        .attr("height", rectHeight)
+        .style("fill", d => colorScaleHeadway(d));
+
+    legend.append("text")
+        .attr("class", "legend-headway-text")
+        .attr("x", rectWidth/2)
+        .attr("y", 2.1*rectHeight)
+        .text((d, i) => i < categories.length ? d : "");
+
+    legend.append("text")
+        .attr("class", "legend-headway-title")
+        .attr("x", 0)
+        .attr("y", -5)
+        .text((_, i) => i === 0 ? "Headway Time (minutes)" : "");
 }
 
 makeNormalizedStackedBar()
