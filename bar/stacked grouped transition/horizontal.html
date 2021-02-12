@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
+    <link rel="stylesheet" href="bar.css">
+</head>
+<body>
+    <button id="toggle" onclick="update()">Grouped Bar Chart</button>
+<svg id="stackedgrouped"></svg>
+<script>
+
+const data = [
+    {takeover: 'unplanned', type: 'girl', count: 18},
+    {takeover: 'unplanned', type: 'boy', count: 11},
+    {takeover: 'planned', type: 'girl', count: 24},
+    {takeover: 'planned', type: 'boy', count: 2},
+]    
+let margin = {top: 50, right: 50, bottom: 50, left: 100},
+    width = 900 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+    n = 2,
+    layout = false,
+    T = 400;
+const category1 = Array.from(new Set(data.map(d => d.takeover))).sort();
+let y = d3.scaleBand()
+    .domain(category1)
+    .range([0, height])
+    .padding(0.33);
+let color = d3.schemePaired.slice(0,2).reverse();
+let yAxis = d3.axisLeft(y);
+const legendYOffset = -40;
+const legendXOffset = 20;
+const labelOffset = 140;
+const swatch = 20;
+
+let svg = d3.select("#stackedgrouped")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Add normalized stack bar chart in future    
+async function makeHorizontalStackedBar() {
+    // data wrangling
+    const category2 = Array.from(new Set(data.map(d => d.type))).sort();
+    const group = d3.rollup(data, v => d3.sum(v, d => d.count), d => d.takeover, d => d.type);
+    const stackInput = Array.from(group, ([key,value]) => {
+        let row = {};
+        row['takeover'] = key;
+        category2.forEach(d => { row[d] = value.has(d) ? value.get(d) : 0 });
+        return row;
+    })
+
+    series = d3.stack()
+        .keys(category2)(stackInput)
+        .map((d,i) => (d.forEach((v, j) => v.idx = i), d));
+
+    x = d3.scaleLinear()
+        .domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
+        .range([0, width]);
+    let xAxis = d3.axisBottom(x).ticks(5);
+
+    // start with stacked bars
+    rect = svg.selectAll("g")
+      .data(series)
+      .join("g")
+        .attr("fill", (d, i) => color[i])
+      .selectAll('rect')
+      .data(d => d)
+      .join('rect')
+        .attr("class", "lily")
+        .attr("y", d => y(d.data.takeover))
+        .attr("x", d => x(d[0]))
+        .attr("height", y.bandwidth())
+        .attr("width", d => x(d[1] - d[0]));
+
+    // add axes
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    // labels
+    svg.append('text')
+        .attr('transform', `translate(-5, 5)`)
+        .attr('class', 'ylabel')
+        .text('Intervention')
+
+    // Add a legend for the color values.
+    legend = svg.selectAll(".legend")
+      .data(category2)
+      .join("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => `translate(${legendXOffset + i * labelOffset}, ${legendYOffset})`)
+
+    legend.append("rect")
+        .attr("width", swatch)
+        .attr("height", swatch)
+        .style("fill", (d, i) => color[i]);
+
+    legend.append("text")
+        .attr("x", 26)
+        .attr("y", 10)
+        .attr("dy", ".35em")
+        .text(d => d) 
+}
+
+function update() {
+    layout ? transitionStacked() : transitionGrouped();
+    layout = !layout
+}
+
+function transitionStacked() {
+    rect.transition().duration(T)
+        .attr("x", d => x(d[0]))
+      .transition()
+        .attr("y", d => y(d.data.takeover))
+        .attr("height", y.bandwidth())
+        .on('end', () => d3.select('#toggle').text("I can't make up my mind"));
+    transitionLegend(stacked=true)
+}
+
+function transitionGrouped() {    
+    rect.transition().duration(T)
+        .attr("y", (d, i) => y(d.data.takeover) + y.bandwidth() / n * d.idx)
+        .attr("height", y.bandwidth() / n)
+      .transition()
+        .attr("x", 0)
+        .on('end', () => d3.select('#toggle').text('No, change it back!'));
+    transitionLegend(stacked=false)
+}
+
+function transitionLegend(stacked) {
+    legend.transition().duration(T)
+        .attr("transform", (d, i) => `translate(${legendXOffset + i * labelOffset}, ${legendYOffset + i * swatch})`)
+      .transition()
+        .attr("transform", (d, i) => {
+          return stacked ? `translate(${legendXOffset + i * labelOffset}, ${legendYOffset})`
+              : `translate(${legendXOffset}, ${legendYOffset + i * swatch})`
+        })
+}
+
+makeHorizontalStackedBar()
+
+
+</script>
+</body>
+</html>

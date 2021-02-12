@@ -1,3 +1,7 @@
 .label {
     text-anchor: middle;
 }
+
+.ylabel {
+    text-anchor: end;
+}
