@@ -2,6 +2,6 @@
     text-anchor: middle;
 }
 
-.ylabel {
-    text-anchor: end;
+#stacked-grouped-bar-chart {
+    border: 2px solid black
 }

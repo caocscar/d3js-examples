@@ -7,42 +7,39 @@
     <link rel="stylesheet" href="bar.css">
 </head>
 <body>
-    <button id="toggle" onclick="update()">Grouped Bar Chart</button>
-<svg id="stackedgrouped"></svg>
+<div id="stacked-grouped-bar-chart"></div>
+<button id="toggle" onclick="update()">Grouped Bar Chart</button>
 <script>
-
-const data = [
-    {takeover: 'unplanned', type: 'girl', count: 18},
-    {takeover: 'unplanned', type: 'boy', count: 11},
-    {takeover: 'planned', type: 'girl', count: 24},
-    {takeover: 'planned', type: 'boy', count: 2},
-]    
-let margin = {top: 50, right: 50, bottom: 50, left: 100},
-    width = 900 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
-    n = 2,
-    layout = false,
-    T = 400;
-const category1 = Array.from(new Set(data.map(d => d.takeover))).sort();
-let y = d3.scaleBand()
-    .domain(category1)
-    .range([0, height])
-    .padding(0.33);
-let color = d3.schemePaired.slice(0,2).reverse();
-let yAxis = d3.axisLeft(y);
-const legendYOffset = -40;
-const legendXOffset = 20;
-const labelOffset = 140;
-const swatch = 20;
-
-let svg = d3.select("#stackedgrouped")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
 
 // Add normalized stack bar chart in future    
 async function makeHorizontalStackedBar() {
+
+    const data = [
+        {takeover: 'unplanned pregnancy', type: 'girl', count: 18},
+        {takeover: 'unplanned pregnancy', type: 'boy', count: 11},
+        {takeover: 'planned pregnancy', type: 'girl', count: 24},
+        {takeover: 'planned pregnancy', type: 'boy', count: 2},
+        {takeover: 'unplanned pregnancy', type: 'baby', count: 3},
+        {takeover: 'planned pregnancy', type: 'baby', count: 3},
+    ]    
+    let W = 900, H = 300,
+        margin = {top: 50, right: 50, bottom: 50, left: 100},
+        width = W - margin.left - margin.right,
+        height = H - margin.top - margin.bottom;
+        layout = false,
+        T = 400;
+    const category1 = Array.from(new Set(data.map(d => d.takeover))).sort();
+    y = d3.scaleBand()
+        .domain(category1)
+        .range([0, height])
+        .padding(0.33);
+    let colorScaleBarChart = d3.schemePaired.slice(0,3).reverse();
+    let yAxis = d3.axisLeft(y);
+    legendYOffset = -40;
+    legendXOffset = 20;
+    labelOffset = 140;
+    swatch = 20;
+
     // data wrangling
     const category2 = Array.from(new Set(data.map(d => d.type))).sort();
     const group = d3.rollup(data, v => d3.sum(v, d => d.count), d => d.takeover, d => d.type);
@@ -62,11 +59,17 @@ async function makeHorizontalStackedBar() {
         .range([0, width]);
     let xAxis = d3.axisBottom(x).ticks(5);
 
+    let svg = d3.select("#stacked-grouped-bar-chart").append("svg")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet")
+      .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
     // start with stacked bars
     rect = svg.selectAll("g")
       .data(series)
       .join("g")
-        .attr("fill", (d, i) => color[i])
+        .attr("fill", (d, i) => colorScaleBarChart[i])
       .selectAll('rect')
       .data(d => d)
       .join('rect')
@@ -84,13 +87,9 @@ async function makeHorizontalStackedBar() {
 
     svg.append("g")
         .attr("class", "y axis")
-        .call(yAxis);
-
-    // labels
-    svg.append('text')
-        .attr('transform', `translate(-5, 5)`)
-        .attr('class', 'ylabel')
-        .text('Intervention')
+        .call(yAxis)
+      .selectAll(".tick text")
+        .call(wrap, 80);
 
     // Add a legend for the color values.
     legend = svg.selectAll(".legend")
@@ -102,7 +101,7 @@ async function makeHorizontalStackedBar() {
     legend.append("rect")
         .attr("width", swatch)
         .attr("height", swatch)
-        .style("fill", (d, i) => color[i]);
+        .style("fill", (d, i) => colorScaleBarChart[i]);
 
     legend.append("text")
         .attr("x", 26)
@@ -126,10 +125,11 @@ function transitionStacked() {
     transitionLegend(stacked=true)
 }
 
-function transitionGrouped() {    
+function transitionGrouped() {
+    const numBars = d3.max(rect.data(), d => d.idx) + 1
     rect.transition().duration(T)
-        .attr("y", (d, i) => y(d.data.takeover) + y.bandwidth() / n * d.idx)
-        .attr("height", y.bandwidth() / n)
+        .attr("y", (d, i) => y(d.data.takeover) + y.bandwidth() / numBars * d.idx)
+        .attr("height", y.bandwidth() / numBars)
       .transition()
         .attr("x", 0)
         .on('end', () => d3.select('#toggle').text('No, change it back!'));
@@ -146,8 +146,39 @@ function transitionLegend(stacked) {
         })
 }
 
-makeHorizontalStackedBar()
+// wraps axis text to two lines
+function wrap(text, width) {
+    text.each(function() {
+        let text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineHeight = 0.7, // em
+            y = text.attr("y"),
+            dy = parseFloat(text.attr("dy")),
+            tspan = text.text(null)
+              .append("tspan")
+                .attr("x", -15)
+                .attr("y", y)
+                .attr("dy", `${words.length > 1 ? dy-0.5 : dy}em`);
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan")
+                    .attr("x", -15)
+                    .attr("y", y)
+                    .attr("dy", `${lineHeight+dy}em`)
+                    .text(word);
+            }
+        }
+    });
+};
 
+makeHorizontalStackedBar()
 
 </script>
 </body>
