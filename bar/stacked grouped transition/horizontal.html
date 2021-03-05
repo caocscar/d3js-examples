@@ -8,68 +8,52 @@
 </head>
 <body>
 <div id="stacked-grouped-bar-chart"></div>
-<button id="toggle" onclick="update()">Grouped Bar Chart</button>
+<button id="toggle" onclick="updateBarChart()">Grouped Bar Chart</button>
 <script>
 
 // Add normalized stack bar chart in future    
 async function makeHorizontalStackedBar() {
-
-    const data = [
-        {takeover: 'unplanned pregnancy', type: 'girl', count: 18},
-        {takeover: 'unplanned pregnancy', type: 'boy', count: 11},
-        {takeover: 'planned pregnancy', type: 'girl', count: 24},
-        {takeover: 'planned pregnancy', type: 'boy', count: 2},
-        {takeover: 'unplanned pregnancy', type: 'baby', count: 3},
-        {takeover: 'planned pregnancy', type: 'baby', count: 3},
-    ]    
+    // constants
     let W = 900, H = 300,
         margin = {top: 50, right: 50, bottom: 50, left: 100},
         width = W - margin.left - margin.right,
         height = H - margin.top - margin.bottom;
-        layout = false,
+        grouped = false,
         T = 400;
-    const category1 = Array.from(new Set(data.map(d => d.takeover))).sort();
-    y = d3.scaleBand()
-        .domain(category1)
-        .range([0, height])
-        .padding(0.33);
-    let colorScaleBarChart = d3.schemePaired.slice(0,3).reverse();
-    let yAxis = d3.axisLeft(y);
     legendYOffset = -40;
     legendXOffset = 20;
     labelOffset = 140;
     swatch = 20;
+    let colorScaleBarChart = d3.schemePaired.slice(0,3).reverse();
 
-    // data wrangling
-    const category2 = Array.from(new Set(data.map(d => d.type))).sort();
-    const group = d3.rollup(data, v => d3.sum(v, d => d.count), d => d.takeover, d => d.type);
-    const stackInput = Array.from(group, ([key,value]) => {
-        let row = {};
-        row['takeover'] = key;
-        category2.forEach(d => { row[d] = value.has(d) ? value.get(d) : 0 });
-        return row;
-    })
+    // data
+    series = updateData();
+    const category1 = series.map(d => d.map(v => v['data']['takeover']))[0].sort();
+    const category2 = Object.keys(series[0][0]['data']).slice(1);
 
-    series = d3.stack()
-        .keys(category2)(stackInput)
-        .map((d,i) => (d.forEach((v, j) => v.idx = i), d));
-
+    // axes
+    y = d3.scaleBand()
+        .domain(category1)
+        .range([0, height])
+        .padding(0.33);
+    let yAxis = d3.axisLeft(y);
     x = d3.scaleLinear()
         .domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
         .range([0, width]);
     let xAxis = d3.axisBottom(x).ticks(5);
 
-    let svg = d3.select("#stacked-grouped-bar-chart").append("svg")
+    // set up svg
+    let svgStackGrp = d3.select("#stacked-grouped-bar-chart").append("svg")
         .attr("viewBox", `0 0 ${W} ${H}`)
         .attr("preserveAspectRatio", "xMidYMid meet")
       .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // start with stacked bars
-    rect = svg.selectAll("g")
+    // add stacked bars
+    rect = svgStackGrp.selectAll("g")
       .data(series)
       .join("g")
-        .attr("fill", (d, i) => colorScaleBarChart[i])
+        .attr("fill", (_, i) => colorScaleBarChart[i])
       .selectAll('rect')
       .data(d => d)
       .join('rect')
@@ -80,39 +64,41 @@ async function makeHorizontalStackedBar() {
         .attr("width", d => x(d[1] - d[0]));
 
     // add axes
-    svg.append("g")
+    svgStackGrp.append("g")
         .attr("class", "x axis")
         .attr("transform", `translate(0,${height})`)
         .call(xAxis);
 
-    svg.append("g")
+    svgStackGrp.append("g")
         .attr("class", "y axis")
         .call(yAxis)
       .selectAll(".tick text")
         .call(wrap, 80);
 
-    // Add a legend for the color values.
-    legend = svg.selectAll(".legend")
+    // add legend
+    legend = svgStackGrp.selectAll(".legend")
       .data(category2)
       .join("g")
         .attr("class", "legend")
-        .attr("transform", (d, i) => `translate(${legendXOffset + i * labelOffset}, ${legendYOffset})`)
+        .attr("transform", (_, i) => `translate(${legendXOffset + i * labelOffset}, ${legendYOffset})`)
 
     legend.append("rect")
         .attr("width", swatch)
         .attr("height", swatch)
-        .style("fill", (d, i) => colorScaleBarChart[i]);
+        .style("fill", (_, i) => colorScaleBarChart[i]);
 
     legend.append("text")
         .attr("x", 26)
         .attr("y", 10)
         .attr("dy", ".35em")
-        .text(d => d) 
+        .text(d => d)
+
+    addToggleButton(svgStackGrp, margin);
 }
 
-function update() {
-    layout ? transitionStacked() : transitionGrouped();
-    layout = !layout
+function updateBarChart() {
+    grouped ? transitionStacked() : transitionGrouped();
+    grouped = !grouped;
 }
 
 function transitionStacked() {
@@ -177,6 +163,69 @@ function wrap(text, width) {
         }
     });
 };
+
+function addToggleButton(svgStackGrp, margin) {
+    let toggle = svgStackGrp.append("g")
+        .attr("id", "bar-toggle")
+        .attr("transform", `translate(${-margin.left}, -30)`);
+
+    toggle.append("rect")
+        .attr("x", 0)
+        .attr("y", -20)
+        .attr("width", 100)
+        .attr("height", 30)
+        .attr("rx", "5px")
+        .attr("fill", "#ff9c17");
+
+    toggle.append("text")
+        .attr("x", 9)
+        .attr("y", 0)
+        .text("Change Data")
+        .on("click", () => updateChartData());   
+}
+
+function updateChartData() {
+    const series = updateData();
+    x.domain([0, d3.max([40, d3.max(series, d => d3.max(d, d => d[1]))])]).nice();
+    d3.select(".x.axis")
+      .transition().duration(T).delay(0)
+        .call(d3.axisBottom(x).ticks(5));
+    updateBars(series, 0)
+}
+
+function updateBars(series, delay=0) {
+    d3.selectAll(".lily").data(series.flat())
+      .join("rect")
+      .transition().duration(T).delay(delay)
+        .attr("x", d => grouped ? 0 : x(d[0]))
+        .attr("width", d => x(d[1] - d[0]));
+}
+
+function updateData() {
+    const data = [
+        {takeover: 'unplanned pregnancy', type: 'girl', count: getRandomInt()},
+        {takeover: 'unplanned pregnancy', type: 'boy', count: getRandomInt()},
+        {takeover: 'planned pregnancy', type: 'girl', count: getRandomInt()},
+        {takeover: 'planned pregnancy', type: 'boy', count: getRandomInt()},
+        {takeover: 'unplanned pregnancy', type: 'baby', count: getRandomInt()},
+        {takeover: 'planned pregnancy', type: 'baby', count: getRandomInt()},
+    ]
+    const category2 = Array.from(new Set(data.map(d => d.type))).sort();
+    const group = d3.rollup(data, v => d3.sum(v, d => d.count), d => d.takeover, d => d.type);
+    const stackInput = Array.from(group, ([key,value]) => {
+        let row = {};
+        row['takeover'] = key;
+        category2.forEach(d => { row[d] = value.has(d) ? value.get(d) : 0 });
+        return row;
+    })
+    return d3.stack()
+        .keys(category2)(stackInput)
+        .map((d,i) => (d.forEach((v, j) => v.idx = i), d));
+}
+
+function getRandomInt(max=15) {
+    return Math.floor(Math.random() * max + 1);
+}
 
 makeHorizontalStackedBar()
 
