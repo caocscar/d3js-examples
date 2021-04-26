@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Time Series Chart in D3 v6</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="timeseries.css">
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <!-- tippy -->
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+</head>
+<body>
+<div id="timeline"></div>
+<script>
+dayRange = [d3.timeDay.offset(d3.timeDay(new Date), -14), d3.timeDay(new Date)];
+const yTicksFocus = 4;
+
+// parse the date / time
+const parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+const formatDate = d3.timeFormat("%b %e - %H%:%M");
+
+const shuttleId = {
+    "marty": "Marty",
+    "mchale": "McHale (WAMS)",
+    "mojo": "Mojo",
+    "molly": "Molly",
+    "morocca": "Morocca",
+};
+const statusObj = {
+    "autonomy": "Autonomy",
+    "manual-only": "Manual-only",
+    "grounded-prod": "Grounded",
+};
+// color scale
+let colorScale = d3.scaleOrdinal()
+    .domain(Object.values(statusObj))
+    .range(["#369040", "orange", "red"])
+    .unknown("#fff");
+
+async function make_hbar_chart(filename) {
+    data = await d3.csv(filename, typeTimeline);
+
+    // set the dimensions and margins of the graph
+    const W = 900;
+    const H = 300;
+    const margin = {top: 40, right: 90, bottom: 100, left: 20};
+    width = W - margin.left - margin.right;
+    height = H - margin.top - margin.bottom;
+    const margin2 = {top: H - 60, right: margin.right, bottom: 30, left: margin.left};
+    const height2 = H - margin2.top - margin2.bottom;
+
+    // scale the range of the data
+    startDate = new Date(2021, 2, 17) // d3.min(data, d => d.startTime);
+    endDate = d3.timeDay.offset(d3.max(data, d => d.endTime), 0);
+
+    // set the ranges
+    xContext = d3.scaleTime()
+        .domain([startDate, endDate])
+        .range([0, width]);
+    yContext = d3.scaleBand()
+        .domain(Object.keys(shuttleId))
+        .range([0, height2])
+        .padding(0.4);
+    xFocus = d3.scaleTime()
+        .domain(xContext.domain())
+        .range([0, width]);
+    yFocus = d3.scaleBand()
+        .domain(Object.keys(shuttleId))
+        .range([0, height])
+        .padding(0.2);
+    // sets ticks for timetable graph
+    xAxisFocus = d3.axisBottom(xFocus)
+        .tickSizeOuter(0)
+        .tickFormat(multiDateFormat);
+    
+    const yAxisFocus = d3.axisRight(yFocus)
+        .ticks(yTicksFocus)
+        .tickFormat(d => shuttleId[d]);
+    const xAxisContext = d3.axisBottom(xContext)
+        .tickSizeOuter(0)
+        .tickFormat(multiDateFormat);
+
+    // Add brush in x-dimension
+    brush = d3.brushX()
+        .extent([[0, 0], [width, height2]])
+        .on("brush", brushed)
+        .on("end", brushended) // add brush snapping
+
+    // append svg
+    const svgTimeline = d3.select("#timeline").append("svg")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+        
+    // focus is the micro level view
+    focus = svgTimeline.append("g")
+        .attr("class", "focus")
+        .attr("transform", `translate(${margin.left},${margin.top})`)
+
+    // context is the macro level view
+    const context = svgTimeline.append("g")
+        .attr("class", "context")
+        .attr("transform", `translate(${margin2.left},${margin2.top})`);
+
+    // clipping rectangle
+    focus.append("defs").append("clipPath")
+        .attr("id", "clip-timeline")
+      .append("rect")
+        .attr("width", width)
+        .attr("height", H - margin.top - margin2.bottom);
+
+    // add the focus bar chart
+    barsFocus = focus.selectAll(".bar")
+      .data(data)
+      .join("rect")
+        .attr("class", "bar timeline-ttip")
+        .attr("x", d => xFocus(d.startTime))
+        .attr("y", d => yFocus(d.mayId) + yFocus.bandwidth() / 4 * (d.status.toLowerCase() === "autonomy") )
+        .attr("width", d => xFocus(d.endTime) - xFocus(d.startTime))
+        .attr("height", d => d.status.toLowerCase() === "autonomy" ? yFocus.bandwidth() / 2 : yFocus.bandwidth() )
+        .attr("fill", d => colorScale(d.status))
+        .attr("data-tippy-content", d => createTableTooltip(d));
+
+    // add the focus x-axis
+    focus.append("g")
+        .attr("class", "xFocus-axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(xAxisFocus);
+
+    // add the focus y-axis
+    focus.append("g")
+        .attr("class", "yFocus-axis")
+        .attr("transform", `translate(${width},0)`)
+        .call(yAxisFocus)
+        .call(g => g.select(".domain").remove());
+      
+    focus.append("text")
+        .attr("class", "yFocus-label")
+        .attr("transform", `translate(${width},0)`)
+        .attr("x", 0)
+        .attr("y", 0)
+        .text("Shuttle");
+
+    // add the context bar chart
+    context.selectAll(".bar")
+      .data(data)
+      .join("rect")
+        .attr("class", "bar")
+        .attr("x", d => xFocus(d.startTime))
+        .attr("y", d => yContext(d.mayId))
+        .attr("width", d => xFocus(d.endTime) - xFocus(d.startTime))
+        .attr("height", yContext.bandwidth())
+        .attr("fill", d => colorScale(d.status));
+
+    // add the context x-axis
+    context.append("g")
+        .attr("class", "xContext-axis")
+        .attr("transform", `translate(0,${height2})`)
+        .call(xAxisContext);
+
+    // add the context brush
+    const brushStartDate = d3.timeDay.offset(d3.timeSecond.offset(endDate), -14);
+    xBrush = context.append("g")
+        .attr("class", "brush")
+        .call(brush)
+        .call(brush.move, [xFocus(brushStartDate), xFocus(endDate)]); // initialize brush selection
+
+    // add context info icon
+    context.append("g")
+        .attr("transform", `translate(${width + 10},${height2 - 15})`)
+        .html(feather.icons.info.toSvg({
+            width: 14,
+            height: 14,
+            "data-tippy-content": "adjust grey bar to change timeframe"
+        }))
+
+    // legend
+    const side = yFocus.bandwidth();
+    const xref = width / 3;
+    const yref = 10;
+    svgTimeline.selectAll(".swatch")
+      .data(colorScale.range())
+      .join("rect")
+        .attr("class", "swatch")
+        .attr("x", (_, i) => xref + i * 120)
+        .attr("y", yref)
+        .attr("width", side)
+        .attr("height", side)
+        .attr("fill", d => d);      
+
+    svgTimeline.selectAll(".swatch-label")
+      .data(colorScale.domain())
+      .join("text")
+        .attr("class", "swatch-label")
+        .attr("x", (_, i) => xref + i * 120 + side * 1.3)
+        .attr("y", yref + side / 2)
+        .attr("dy", "0.35em")
+        .text(d => d);
+
+    const config = {
+        allowHTML: true,
+        followCursor: true,
+        theme: "alex",
+    };
+    tippy(".timeline-ttip", config);
+    tippy("svg.feather-info", config);
+};
+
+// brush function
+function brushed() {
+    const selection = d3.event.selection || xContext.range(); // default brush
+    xFocus.domain(selection.map(xContext.invert, xContext)); // new focus x-domain
+    focus.select(".xFocus-axis")
+        .call(xAxisFocus);
+    barsFocus.attr("x", d => xFocus(d.startTime))
+        .attr("width", d => xFocus(d.endTime) - xFocus(d.startTime))    
+}
+
+// brush snapping function
+function brushended() {
+    if (!d3.event.sourceEvent) return; // Only transition after input.
+    if (!d3.event.selection) brushed(); // Empty selection returns default brush
+    let d0 = d3.event.selection.map(xContext.invert),
+        d1 = d0.map(d3.timeDay.round);
+
+    // If empty when rounded, use floor & ceil instead.
+    if (d1[0] >= d1[1]) {
+        d1[0] = d3.timeDay.floor(d0[0]);
+        d1[1] = d3.timeDay.offset(d1[0]);
+    }
+
+    d3.select(this)
+      .transition()
+        .call(d3.event.target.move, d1.map(xContext));
+}
+
+function typeTimeline(d) {
+    d.mayId = d.may_id;
+    d.status = statusObj[d.new_value];
+    d.startTime = parseDate(d.start_time);
+    d.endTime = parseDate(d.end_time);
+    d.duration = +d.duration;
+    delete d.may_id;
+    delete d.new_value;
+    delete d.start_time;
+    delete d.end_time;
+    return d;
+}
+
+// define filter conditions
+function multiDateFormat(date) {
+    // define tick formats
+    const fmtHour = d3.timeFormat("%I%p");
+    const fmtDay = d3.timeFormat("%a %e");
+    const fmtWeek = d3.timeFormat("%b %e");
+    const fmtMonth = d3.timeFormat("%b");
+    const fmtYear = d3.timeFormat("%Y");
+    return (d3.timeDay(date) < date ? fmtHour
+        : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? fmtDay : fmtWeek)
+        : d3.timeYear(date) < date ? fmtMonth
+        : fmtYear)(date).replace("PM", "pm");
+}
+
+formatDuration = d => {
+    const formatFloat = d3.format(".0f");
+    return d < 7200 ? `${formatFloat(d / 60)} minutes`
+        : d < 86400*2 ? `${formatFloat(d / 3600)} hrs`
+        : `${formatFloat(d / 86400)} days`
+}
+
+createTableTooltip = (d) => {
+    return `<table cellpadding="4">
+        <tr><th></th><th>${d.status}</th></tr>
+        <tr><td>Start Time</td><td align="right">${formatDate(d.startTime)}</td></tr>
+        <tr><td>End Time</td><td align="right">${formatDate(d.endTime)}</td></tr>
+        <tr><td>Duration</td><td align="right">${formatDuration(d.duration)}</td></tr>
+        </table>`
+}
+
+make_hbar_chart("reliability.csv");
+
+</script>
+</body>
