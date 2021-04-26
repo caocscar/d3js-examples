@@ -27,7 +27,7 @@ async function makeHorizontalStackedBar() {
     let colorScaleBarChart = d3.schemePaired.slice(0,3).reverse();
 
     // data
-    series = updateData();
+    series = updateBarData();
     const category1 = series.map(d => d.map(v => v['data']['takeover']))[0].sort();
     const category2 = Object.keys(series[0][0]['data']).slice(1);
 
@@ -185,7 +185,7 @@ function addToggleButton(svgStackGrp, margin) {
 }
 
 function updateChartData() {
-    const series = updateData();
+    const series = updateBarData();
     x.domain([0, d3.max([40, d3.max(series, d => d3.max(d, d => d[1]))])]).nice();
     d3.select(".x.axis")
       .transition().duration(T).delay(0)
@@ -201,14 +201,14 @@ function updateBars(series, delay=0) {
         .attr("width", d => x(d[1] - d[0]));
 }
 
-function updateData() {
+function updateBarData() {
     const data = [
         {takeover: 'unplanned pregnancy', type: 'girl', count: getRandomInt()},
         {takeover: 'unplanned pregnancy', type: 'boy', count: getRandomInt()},
         {takeover: 'planned pregnancy', type: 'girl', count: getRandomInt()},
         {takeover: 'planned pregnancy', type: 'boy', count: getRandomInt()},
-        {takeover: 'unplanned pregnancy', type: 'baby', count: getRandomInt()},
-        {takeover: 'planned pregnancy', type: 'baby', count: getRandomInt()},
+        // {takeover: 'unplanned pregnancy', type: 'baby', count: getRandomInt()},
+        // {takeover: 'planned pregnancy', type: 'baby', count: getRandomInt()},
     ]
     const category2 = Array.from(new Set(data.map(d => d.type))).sort();
     const group = d3.rollup(data, v => d3.sum(v, d => d.count), d => d.takeover, d => d.type);
