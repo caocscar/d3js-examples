@@ -1,3 +1,7 @@
+function highlightStep(step) {
+  d3.selectAll("#instructions li").classed("highlight", (d,i) => i == step-1);
+}
+
 const drawPath = () => {
   let pieces = splitPath();
   let segments = g.selectAll("g.segment")
@@ -47,14 +51,10 @@ function splitPath() {
       segs.push([pt.x, pt.y]);
     }
     angle = Math.atan2(segs[1][1] - segs[0][1], segs[1][0] - segs[0][0]) * 180 / Math.PI;
-    pieces.push({segs: segs, angle: angle});
+    pieces.push({segs: segs, angle: angle}); // angle is for segment separator
     total += d;
   });
   return pieces;
-}
-
-function highlightStep(step) {
-  d3.selectAll("#instructions li").classed("highlight", (d,i) => i == step-1);
 }
 
 function drawSegments(pieces) {
@@ -85,6 +85,7 @@ function drawSegments(pieces) {
       .style("stroke-width", '6');
 }
 
+// main section
 let margin = {top: 20, right: 20, bottom: 20, left: 20},
     width = 500 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
@@ -95,6 +96,7 @@ let margin = {top: 20, right: 20, bottom: 20, left: 20},
     b = 9.4,
     theta = d3.range(0,100,1);
 
+// define pts to draw
 theta = theta.map(d => d/4)
 let pts = theta.map(t => [(a+b*t)*Math.cos(t)+width/2, (a+b*t)*Math.sin(t)+height/2])//A*(2 + Math.sin(0.07*x) + Math.cos(0.05*x))])
 

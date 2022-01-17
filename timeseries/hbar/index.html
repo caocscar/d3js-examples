@@ -262,14 +262,14 @@ function multiDateFormat(date) {
         : fmtYear)(date).replace("PM", "pm");
 }
 
-formatDuration = d => {
+function formatDuration(d) {
     const formatFloat = d3.format(".0f");
     return d < 7200 ? `${formatFloat(d / 60)} minutes`
         : d < 86400*2 ? `${formatFloat(d / 3600)} hrs`
         : `${formatFloat(d / 86400)} days`
 }
 
-createTableTooltip = (d) => {
+function createTableTooltip(d) {
     return `<table cellpadding="4">
         <tr><th></th><th>${d.status}</th></tr>
         <tr><td>Start Time</td><td align="right">${formatDate(d.startTime)}</td></tr>
