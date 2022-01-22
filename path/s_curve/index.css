@@ -23,3 +23,8 @@ line.sep {
   stroke-width: 0;
   stroke: white;
 }
+/* Tippy Tooltips */
+.tippy-box[data-theme ~= 'mayniac'] {
+  background-color: #00BCEE;
+  color: #fff;
+}

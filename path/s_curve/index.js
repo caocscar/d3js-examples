@@ -1,10 +1,22 @@
+const startDate = new Date(2017, 3, 1);
+let years = 5;
+const parseDate = d3.timeParse("%Y-%m-%d");
+const formatDate = d3.timeFormat("%b %e, %Y");
+let line = d3.line().curve(d3.curveNatural);
+let c1 = d3.schemePRGn[11];
+c1[0] = '#531a5d';
+let c2 = d3.schemeSpectral[9];
+let colors = c1.concat(c2);
+let segmentLength = 400;
+let horizontal = false; // chart orientation
+
 function highlightStep(step) {
     d3.selectAll("#instructions li").classed("highlight", (d, i) => i == step-1);
 }
 
-function drawPath() {
+function drawPath(path, numDays) {    
     let N = 4;
-    let pieces = splitPath(N);
+    let pieces = splitPath(N, path);
     arrayPts = [];
     pieces.map((d, i) => {
         let keep = d.segs.filter((seg, k) => k % N === 0) // dot spacing
@@ -13,18 +25,19 @@ function drawPath() {
     });
     let wayPts = [].concat(...arrayPts)
 
-    startingCircles = drawStartingDates();
-
+    startingCircles = drawStartingDates(path, numDays);
     drawSegments(pieces);
 
-    let ppl = svg.selectAll(".ppl")
+    let ppl = svg.selectAll(".mayniac")
       .data(startingCircles)
       .join("circle")
-        .attr("class", "ppl")
+        .attr("class", "mayniac")
         .attr("cx", d => d.x)
         .attr("cy", d => d.y)
-        .attr("r", 5)
+        .attr("r", 8)
+        .attr("data-tippy-content", d => createTooltip(d))
         .style("fill", "black")
+        .style("opacity", 0.5)
 
     // let dots = svg.selectAll(".waypoints")
     //   .data(wayPts)
@@ -46,7 +59,10 @@ function drawPath() {
         // });
 };
 
-function splitPath(N) {
+function splitPath(N, path) {
+    let p = path.node();
+    let pathLength = p.getTotalLength();
+
     highlightStep(2)
     const numPieces = years * 4; // Quarters
     let pieces = [];
@@ -89,99 +105,115 @@ function drawSegments(pieces) {
         })
 }
 
-function drawStartingDates() {
-    return days.map(day => {
-        let pt = p.getPointAtLength(day * pathLength / numDays);
-        return {x: pt.x, y: pt.y};
+function drawStartingDates(path, numDays) {
+    let p = path.node();
+    let pathLength = p.getTotalLength();
+    return mayData.map(d => {
+        let day = d3.timeDay.count(startDate, d.HireDate);        
+        let pt = p.getPointAtLength((numDays - day) * pathLength / numDays);
+        d.x = pt.x;
+        d.y = pt.y;
+        return d;
     })
 }
 
-let data = [
-  {date: "2017-05-01"},
-  {date: "2018-01-01"},
-  {date: "2018-05-01"},
-  {date: "2019-01-01"},
-  {date: "2019-05-01"},
-  {date: "2020-01-01"},
-  {date: "2020-05-01"},
-  {date: "2020-10-19"},
-  {date: "2021-01-01"},
-  {date: "2021-05-01"},
-  {date: "2022-01-01"},
-  {date: "2022-03-31"},
-];
-data = data.map(d => d3.timeParse("%Y-%m-%d")(d.date));
+async function initChart(filename) {
+    mayData = await d3.csv(filename, typeMay);
+    
+    // main section
+    let margin = {top: 20, right: 20, bottom: 20, left: 20};
+    let radius = segmentLength / 3.14;
+    let yrOffset = radius * 4;
+    let marginOffset = radius + 10;
+    let leftOffset = 20;
+    let anchorPts = [];
+    let width, height;
 
-// main section
-let margin = {top: 20, right: 20, bottom: 20, left: 20};
-let c1 = d3.schemePRGn[11];
-let c2 = d3.schemeSpectral[9];
-let colors = c1.concat(c2);
-let years = 5;
-let yrOffset = 200;
-let marginOffset = 20;
-let minorDimension = yrOffset / 2 + marginOffset * 2;
-let anchorPts = [];
-let horizontal = true; // chart orientation
-let width, height;
+    // date handling
+    const month = (new Date).getMonth();
+    const currentYear = (new Date).getFullYear();
+    const endDate = month < 3 ? new Date(currentYear, 2, 31)
+        : month < 6 ? new Date(currentYear, 5, 30)
+        : month < 9 ? new Date(currentYear, 8, 30)
+        : new Date(currentYear, 11, 31);
+    const numDays = d3.timeDay.count(startDate, endDate);
 
-// date handling
-const startDate = new Date(2017, 3, 1);
-const month = (new Date).getMonth();
-const currentYear = (new Date).getFullYear();
-const endDate = month < 3 ? new Date(currentYear, 2, 31)
-    : month < 6 ? new Date(currentYear, 5, 30)
-    : month < 9 ? new Date(currentYear, 8, 30)
-    : new Date(currentYear, 11, 31);
-const numDays = d3.timeDay.count(startDate, endDate);
+    // define anchorPts to draw path
+    for (let i=0; i<years; i++) {
+        anchorPts.push([i * yrOffset, marginOffset]);
+        anchorPts.push([i * yrOffset, segmentLength + marginOffset]);
+        anchorPts.push([i * yrOffset + yrOffset / 4, segmentLength + marginOffset + radius])
+        anchorPts.push([i * yrOffset + yrOffset / 2, segmentLength + marginOffset]);
+        anchorPts.push([i * yrOffset + yrOffset / 2, marginOffset]);
+        anchorPts.push([i * yrOffset + yrOffset * 3 / 4, marginOffset - radius])
+    }
+    anchorPts.push([years * yrOffset, marginOffset]);
+    if (horizontal) { // horizontal direction
+        anchorPts = anchorPts.map(d => [d[0] + leftOffset, d[1]]);
+        width = years * yrOffset + marginOffset * 2;
+        height = segmentLength + 2 * marginOffset;
+    } else { // vertical direction
+        anchorPts = anchorPts.map(d => [d[1], d[0] + leftOffset]);
+        width = segmentLength + 2 * marginOffset;;
+        height = years * yrOffset + marginOffset * 2;
+    }
 
-let days = data.map(d => d3.timeDay.count(startDate, d));
+    // draw svg
+    svg = d3.select("#chart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-// define anchorPts to draw path
-for (let i=0; i<years; i++) {
-    anchorPts.push([i * yrOffset, marginOffset]);
-    anchorPts.push([i * yrOffset, minorDimension - marginOffset]);
-    anchorPts.push([i * yrOffset + yrOffset / 2, minorDimension - marginOffset]);
-    anchorPts.push([i * yrOffset + yrOffset / 2, marginOffset]);
+    let path = svg.append("path")
+        .attr("class", "init")
+        .attr("d", line(anchorPts))
+
+    svg.selectAll(".anchors")
+      .data(anchorPts)
+      .join("circle")
+        .attr("class", "anchors")
+        .attr("cx", d => d[0])
+        .attr("cy", d => d[1])
+        .attr("visibility", "hidden")
+        .attr("r", 5)
+
+    let p = path.node();
+    let pathLength = p.getTotalLength();
+
+    highlightStep(1)
+    path.attr("stroke-dasharray", `${pathLength} ${pathLength}`) // dashLength spaceLength
+        .attr("stroke-dashoffset", pathLength) // offset in negative x direction
+    .transition().duration(1000).ease(d3.easeLinear)
+        .attr("stroke-dashoffset", 0) // no offset
+        .on("end", drawPath(path, numDays));
+
+    addTooltips();
 }
-anchorPts.push([years * yrOffset, marginOffset]);
-if (horizontal) { // horizontal direction
-    anchorPts = anchorPts.map(d => [d[0] + marginOffset, d[1]]);
-    width = years * yrOffset + marginOffset * 2;
-    height = minorDimension;
-} else { // vertical direction
-    anchorPts = anchorPts.map(d => [d[1], d[0] + marginOffset]);
-    width = minorDimension;
-    height = years * yrOffset + marginOffset * 2;
+
+function typeMay(d) {
+    d.Number = +d.Number;
+    d.FirstName = d.FirstName;
+    d.LastName = d.LastName;
+    d.Location = d.Location;
+    d.HireDate = parseDate(d.HireDate);
+    d.AcceptedDate = parseDate(d.AcceptedDate);
+    return d;
 }
 
-// draw svg
-let svg = d3.select("#chart").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+function addTooltips() {
+    const mayniacTooltip = {
+        allowHTML: true,
+        followCursor: true,
+        theme: 'mayniac',
+    };
+    tippy(".mayniac", mayniacTooltip);
+}
 
-let line = d3.line().curve(d3.curveNatural)
-let path = svg.append("path")
-    .attr("class", "init")
-    .attr("d", line(anchorPts))
+function createTooltip(d) {
+    return `<div>${formatDate(d.HireDate)}</div>
+     <div>#${d.Number} - ${d.FirstName} ${d.LastName}</div>`
+}
 
-svg.selectAll(".anchors")
-  .data(anchorPts)
-  .join("circle")
-    .attr("class", "anchors")
-    .attr("cx", d => d[0])
-    .attr("cy", d => d[1])
-    .attr("visibility", "hidden")
-    .attr("r", 5)
 
-let p = path.node()
-let pathLength = p.getTotalLength()
-
-highlightStep(1)
-path.attr("stroke-dasharray", `${pathLength} ${pathLength}`) // dashLength spaceLength
-    .attr("stroke-dashoffset", pathLength) // offset in negative x direction
-  .transition().duration(1000).ease(d3.easeLinear)
-    .attr("stroke-dashoffset", 0) // no offset
-    .on("end", drawPath);
+initChart('maynumber.csv');
