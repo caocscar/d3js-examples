@@ -15,7 +15,7 @@ path {
 path.init {
   stroke-width: 2;
 }
-path.piece {
+path.segment {
   stroke-width: 24;
   stroke: none;
 }

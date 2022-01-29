@@ -8,13 +8,11 @@ c1[0] = '#531a5d';
 let c2 = d3.schemeSpectral[9];
 let colors = c1.concat(c2);
 let segmentLength = 400;
+let width, height;
+
 let horizontal = false; // chart orientation
 
-function highlightStep(step) {
-    d3.selectAll("#instructions li").classed("highlight", (d, i) => i == step-1);
-}
-
-function drawPath(path, numDays) {    
+function drawFinalPath(path, numDays) {    
     let N = 4;
     let pieces = splitPath(N, path);
     arrayPts = [];
@@ -24,39 +22,29 @@ function drawPath(path, numDays) {
         arrayPts.push(pts)
     });
     let wayPts = [].concat(...arrayPts)
+    drawSegments(pieces, path);
+    drawStartingCircles(path, numDays);
 
-    startingCircles = drawStartingDates(path, numDays);
-    drawSegments(pieces);
-
-    let ppl = svg.selectAll(".mayniac")
-      .data(startingCircles)
-      .join("circle")
-        .attr("class", "mayniac")
-        .attr("cx", d => d.x)
-        .attr("cy", d => d.y)
-        .attr("r", 8)
-        .attr("data-tippy-content", d => createTooltip(d))
-        .style("fill", "black")
-        .style("opacity", 0.5)
-
+    // draw waypoints
     // let dots = svg.selectAll(".waypoints")
     //   .data(wayPts)
     //   .join("circle")
     //     .attr("class", "waypoints")
     //     .attr("cx", d => d.seg[0])
     //     .attr("cy", d => d.seg[1])
-    //     .attr("r", 0)
+    //     .attr("r", 2)
     //     .style("fill", d => colors[d.id])
 
+    // // transition to final radius
     // highlightStep(3)
     // dots.transition()
-    //     .delay((_, i) => i * 10) // delay in drawing the next dot
-    //     .attr("r", 3)
-        // .on("end", (_, i) => {
-        //     if (i === wayPts.length - 1) {
-        //         drawSegments(pieces);
-        //     };
-        // });
+    //     .delay((_, i) => i * 20) // delay in drawing the next dot
+    //     .attr("r", 6)
+    //     .on("end", (_, i) => {
+    //         if (i === wayPts.length - 1) {
+    //             drawSegments(pieces);
+    //         };
+    //     });
 };
 
 function splitPath(N, path) {
@@ -86,26 +74,49 @@ function splitPath(N, path) {
     return pieces;
 }
 
-function drawSegments(pieces) {
-    let lines = svg.selectAll("path.piece")
+function drawSegments(pieces, path) {
+    let p = path.node();
+    let pathLength = p.getTotalLength();
+    let lines = svg.selectAll("path.segment")
       .data(pieces)
       .join("path")
-        .attr("class", "piece")
-        .attr("d", d => line(d.segs));
-
-    highlightStep(4);
-    const T = 150;
-    lines.transition().duration(0)
-        .delay((_, i) => i*T)
+        .attr("class", "segment")
+        .attr("d", d => line(d.segs))
         .style("stroke", (_, i) => colors[i])
-        .on("end", (_, i) => {
-            if (i === pieces.length - 1) {
-                d3.selectAll("#instructions li").classed("highlight", false)
-            }
-        })
+        .style("stroke-width", 24)
+        .attr("stroke-dasharray", `${pathLength} ${pathLength}`) // dashLength spaceLength
+        .attr("stroke-dashoffset", pathLength) // offset in negative x direction
+
+    // highlightStep(4);
+    // transition segments
+    const T = 150;
+    lines.transition().duration(6 * T)
+        .delay((_, i) => i * T)
+        .style("stroke-width", 24)
+        .attr("stroke-dashoffset", 0) // no offset
 }
 
-function drawStartingDates(path, numDays) {
+function drawStartingCircles(path, numDays) {
+    // draw starting circles
+    startingCircles = getStartingDates(path, numDays);
+    let ppl = svg.selectAll(".mayniac")
+      .data(startingCircles)
+      .join("circle")
+        .attr("class", "mayniac")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", 0)
+        .attr("data-tippy-content", d => createTooltip(d))
+        .style("fill", "black")
+        .style("opacity", 0.5)
+
+    // transition starting circles to appear
+    ppl.transition()
+      .delay((d, i) => d.delay * 3)
+      .attr("r", 8)
+}
+
+function getStartingDates(path, numDays) {
     let p = path.node();
     let pathLength = p.getTotalLength();
     return mayData.map(d => {
@@ -113,21 +124,17 @@ function drawStartingDates(path, numDays) {
         let pt = p.getPointAtLength((numDays - day) * pathLength / numDays);
         d.x = pt.x;
         d.y = pt.y;
+        d.delay = numDays - day;
         return d;
     })
 }
 
 async function initChart(filename) {
+    // load data
     mayData = await d3.csv(filename, typeMay);
     
-    // main section
+    // constants
     let margin = {top: 20, right: 20, bottom: 20, left: 20};
-    let radius = segmentLength / 3.14;
-    let yrOffset = radius * 4;
-    let marginOffset = radius + 10;
-    let leftOffset = 20;
-    let anchorPts = [];
-    let width, height;
 
     // date handling
     const month = (new Date).getMonth();
@@ -138,7 +145,50 @@ async function initChart(filename) {
         : new Date(currentYear, 11, 31);
     const numDays = d3.timeDay.count(startDate, endDate);
 
+    let anchorPts = defineAnchorPts()
+
+    // construct svg
+    svg = d3.select("#chart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    // draw anchor pts for path
+    svg.selectAll(".anchors")
+      .data(anchorPts)
+      .join("circle")
+        .attr("class", "anchors")
+        .attr("cx", d => d[0])
+        .attr("cy", d => d[1])
+        .attr("visibility", "hidden")
+        .attr("r", 5)
+
+    // draw initial skinny path thru anchor pts
+    let path = svg.append("path")
+        .attr("class", "init")
+        .attr("d", line(anchorPts))
+        .attr("visibility", "hidden");
+
+    // calculate some path length
+    let p = path.node();
+    let pathLength = p.getTotalLength();
+
+    path.attr("stroke-dasharray", `${pathLength} ${pathLength}`) // dashLength spaceLength
+        .attr("stroke-dashoffset", 0*pathLength) // offset in negative x direction
+
+    drawFinalPath(path, numDays);
+    addTooltips();
+}
+
+function defineAnchorPts() {
     // define anchorPts to draw path
+    let anchorPts = [];
+    let radius = segmentLength / 3.14;
+    let yrOffset = radius * 4;
+    let marginOffset = radius + 10;
+    let leftOffset = 20;
+
     for (let i=0; i<years; i++) {
         anchorPts.push([i * yrOffset, marginOffset]);
         anchorPts.push([i * yrOffset, segmentLength + marginOffset]);
@@ -157,38 +207,7 @@ async function initChart(filename) {
         width = segmentLength + 2 * marginOffset;;
         height = years * yrOffset + marginOffset * 2;
     }
-
-    // draw svg
-    svg = d3.select("#chart").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    let path = svg.append("path")
-        .attr("class", "init")
-        .attr("d", line(anchorPts))
-
-    svg.selectAll(".anchors")
-      .data(anchorPts)
-      .join("circle")
-        .attr("class", "anchors")
-        .attr("cx", d => d[0])
-        .attr("cy", d => d[1])
-        .attr("visibility", "hidden")
-        .attr("r", 5)
-
-    let p = path.node();
-    let pathLength = p.getTotalLength();
-
-    highlightStep(1)
-    path.attr("stroke-dasharray", `${pathLength} ${pathLength}`) // dashLength spaceLength
-        .attr("stroke-dashoffset", pathLength) // offset in negative x direction
-    .transition().duration(1000).ease(d3.easeLinear)
-        .attr("stroke-dashoffset", 0) // no offset
-        .on("end", drawPath(path, numDays));
-
-    addTooltips();
+    return anchorPts;
 }
 
 function typeMay(d) {
@@ -212,8 +231,11 @@ function addTooltips() {
 
 function createTooltip(d) {
     return `<div>${formatDate(d.HireDate)}</div>
-     <div>#${d.Number} - ${d.FirstName} ${d.LastName}</div>`
+     <div>#${d.Number} - ${d.FirstName} ${d.LastName[0]}</div>`
 }
 
-
 initChart('maynumber.csv');
+
+function highlightStep(step) {
+    d3.selectAll("#instructions li").classed("highlight", (d, i) => i == step-1);
+}
