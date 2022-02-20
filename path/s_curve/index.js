@@ -10,7 +10,7 @@ let colors = c1.concat(c2);
 let segmentLength = 400;
 let width, height;
 
-let horizontal = false; // chart orientation
+const horizontal = false; // chart orientation
 
 function drawFinalPath(path, numDays) {    
     let N = 4;
@@ -180,6 +180,7 @@ async function initChart(filename) {
 
     drawFinalPath(path, numDays);
     addTooltips();
+    addYearLabels();
 }
 
 function defineAnchorPts() {
@@ -236,6 +237,20 @@ function createTooltip(mayniacs) {
         html += `<div>#${d.Number} - ${d.FirstName} ${d.LastName[0]}</div>`
     });
     return html;
+}
+
+function addYearLabels() {
+    const years = ['2021', '2020', '2019', '2018', '2017'];
+    if (!horizontal) {
+        svg.selectAll('.years')
+          .data(years)
+          .join('text')
+            .attr('class', 'years')
+            .attr('x', 150)
+            .attr('y', (_, i) => 400 + 510 * i)
+            .attr('dy', '0.35em')
+            .text(d => d);
+    }
 }
 
 initChart('maynumber.csv');
