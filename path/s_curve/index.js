@@ -83,7 +83,7 @@ function drawSegments(pieces, path) {
         .attr("class", "segment")
         .attr("d", d => line(d.segs))
         .style("stroke", (_, i) => colors[i])
-        .style("stroke-width", 24)
+        .style("stroke-width", 48)
         .attr("stroke-dasharray", `${pathLength} ${pathLength}`) // dashLength spaceLength
         .attr("stroke-dashoffset", pathLength) // offset in negative x direction
 
@@ -92,7 +92,6 @@ function drawSegments(pieces, path) {
     const T = 150;
     lines.transition().duration(6 * T)
         .delay((_, i) => i * T)
-        .style("stroke-width", 24)
         .attr("stroke-dashoffset", 0) // no offset
 }
 
@@ -106,7 +105,7 @@ function drawStartingCircles(path, numDays) {
         .attr("cx", d => d.x)
         .attr("cy", d => d.y)
         .attr("r", 0)
-        .attr("data-tippy-content", d => createTooltip(d))
+        .attr("data-tippy-content", d => createTooltip(d.value))
         .style("fill", "black")
         .style("opacity", 0.5)
 
@@ -119,7 +118,7 @@ function drawStartingCircles(path, numDays) {
 function getStartingDates(path, numDays) {
     let p = path.node();
     let pathLength = p.getTotalLength();
-    return mayData.map(d => {
+    return sC.map(d => {
         let day = d3.timeDay.count(startDate, d.HireDate);        
         let pt = p.getPointAtLength((numDays - day) * pathLength / numDays);
         d.x = pt.x;
@@ -131,7 +130,9 @@ function getStartingDates(path, numDays) {
 
 async function initChart(filename) {
     // load data
-    mayData = await d3.csv(filename, typeMay);
+    mayData = await d3.csv(filename, typeMay); // array of objects
+    startingCohort = d3.groups(mayData, d => d.HireDate);
+    sC = startingCohort.map(d => ({HireDate: d[0], value: d[1]}));
     
     // constants
     let margin = {top: 20, right: 20, bottom: 20, left: 20};
@@ -229,9 +230,12 @@ function addTooltips() {
     tippy(".mayniac", mayniacTooltip);
 }
 
-function createTooltip(d) {
-    return `<div>${formatDate(d.HireDate)}</div>
-     <div>#${d.Number} - ${d.FirstName} ${d.LastName[0]}</div>`
+function createTooltip(mayniacs) {
+    let html = `<div>${formatDate(mayniacs[0].HireDate)}</div>`;
+    mayniacs.forEach(d => {
+        html += `<div>#${d.Number} - ${d.FirstName} ${d.LastName[0]}</div>`
+    });
+    return html;
 }
 
 initChart('maynumber.csv');

@@ -2,6 +2,9 @@ body {
   font-family: Helvetica;
   font-size: 16px;
 }
+#header {
+
+}
 ol li {
   margin-bottom: 10px;
 }
@@ -16,7 +19,6 @@ path.init {
   stroke-width: 2;
 }
 path.segment {
-  stroke-width: 24;
   stroke: none;
 }
 line.sep {
