@@ -1,0 +1,13 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.divider {
+    fill: none;
+    stroke: #00274c;
+    stroke-width: 6px;
+}
+
+.eqn {
+    font-size: 22px;
+}
