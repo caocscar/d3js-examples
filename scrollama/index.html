@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- google fonts API -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+
+    <link rel="stylesheet" href="text.css">
+    <style>
+        #equation {
+            background-color: cornflowerblue;
+        }
+    </style>
+</head>
+<body>
+<svg id="equation"></svg>
+<script>
+
+let margin = {top: 20, right: 20, bottom: 20, left: 20};
+let width = 960 - margin.left - margin.right;
+let height = 300 - margin.top - margin.bottom;
+
+let eqn = d3.select("#equation")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+equalSignOffset = 50;
+lineLength = 220;
+xColumn1 = 20;
+yRow1 = 40;
+xColumn2 = xColumn1 + 280 + 2 * equalSignOffset;
+yRow2 = yRow1 + 25 + 100;
+xColumn3 = xColumn2 + lineLength + 2 * equalSignOffset;
+
+// first row
+eqn.append("text")
+    .attr("class", "eqn")
+    .attr("id", "metric")
+    .attr("x", xColumn1)
+    .attr("y", yRow1 + 25)
+    .attr("dy", "0.35em")
+    .text("kilometers per intervention")
+
+eqn.append("text")
+    .attr("class", "equal-sign")
+    .attr("x", xColumn2 - equalSignOffset)
+    .attr("y", yRow1 + 25)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .style("font-size", 48)
+    .text("=");      
+
+eqn.append("line")
+    .attr("class", "divider")
+    .attr("x1", xColumn2)
+    .attr("x2", xColumn2 + lineLength)
+    .attr("y1", yRow1 + 25)
+    .attr("y2", yRow1 + 25)
+    .style("stroke-width", 5);   
+
+eqn.append("text")
+    .attr("class", "eqn")
+    .attr("x", xColumn2 + 0.5 * lineLength)
+    .attr("y", yRow1)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .text("kilometers driven");
+
+eqn.append("text")
+    .attr("class", "eqn")
+    .attr("x", xColumn2 + 0.5 * lineLength)
+    .attr("y", yRow1 + 50)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .text("# of interventions");
+
+eqn.append("text")
+    .attr("class", "equal-sign")
+    .attr("x", xColumn3 - equalSignOffset)
+    .attr("y", yRow1 + 25)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .style("font-size", 48)
+    .text("=");
+
+eqn.append("line")
+    .attr("class", "divider")
+    .attr("x1", xColumn3)
+    .attr("x2", xColumn3 + 0.5 * lineLength)
+    .attr("y1", yRow1 + 25)
+    .attr("y2", yRow1 + 25)
+    .style("stroke-width", 5);  
+
+eqn.append("text")
+    .attr("class", "eqn")
+    .attr("x", xColumn3 + 0.25 * lineLength)
+    .attr("y", yRow1)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .text("100");
+
+eqn.append("text")
+    .attr("class", "eqn")
+    .attr("x", xColumn3 + 0.25 * lineLength)
+    .attr("y", yRow1 + 50)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .text("5");
+
+// second row
+eqn.append("text")
+    .attr("class", "equal-sign")
+    .attr("x", xColumn2 - equalSignOffset)
+    .attr("y", yRow1 + 25 + 100)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .style("font-size", 48)
+    .text("=");
+
+eqn.append("text")
+    .attr("class", "answer")
+    .attr("x", xColumn2)
+    .attr("y", yRow2)
+    .attr("dy", "0.35em")
+    .style("font-size", 48)
+    .text("20");
+
+</script>
+</body>
+</html>
