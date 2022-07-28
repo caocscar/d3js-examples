@@ -1,134 +1,181 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Scrollama: Sticky Side Example</title>
+	<meta name="description" content="Scrollama: Sticky Side Example" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="style.css" />
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+	<style>
+		#scrolly {
+			position: relative;
+			display: -webkit-box;ß
+			display: -ms-flexbox;
+			display: flex;
+			background-color: #f3f3f3;
+			padding: 1rem;
+		}
 
-    <!-- google fonts API -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+		#scrolly>* {
+			-webkit-box-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+		}
 
-    <link rel="stylesheet" href="text.css">
-    <style>
-        #equation {
-            background-color: cornflowerblue;
-        }
-    </style>
+		article {
+			position: relative;
+			padding: 0 1rem;ß
+			max-width: 20rem;
+		}
+
+		figure {
+			position: -webkit-sticky;
+			position: sticky;
+			width: 100%;
+			margin: 0;
+			-webkit-transform: translate3d(0, 0, 0);
+			-moz-transform: translate3d(0, 0, 0);
+			transform: translate3d(0, 0, 0);
+			background-color: #369040;
+			z-index: 0;
+		}
+
+		figure p {
+			text-align: center;
+			padding: 1rem;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			-moz-transform: translate(-50%, -50%);
+			-webkit-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+			font-size: 8rem;
+			font-weight: 900;
+			color: #fff;
+		}
+
+		.step {
+			margin: 0 auto 2rem auto;
+			background-color: #3b3b3b;
+			color: #fff;
+		}
+
+		.step:last-child {
+			margin-bottom: 0;
+		}
+
+		.step.is-active {
+			background-color: goldenrod;
+			color: #3b3b3b;
+		}
+
+		.step p {
+			text-align: end;
+			padding: 1rem;
+			font-size: 1.5rem;
+		}
+	</style>
 </head>
+
 <body>
-<svg id="equation"></svg>
-<script>
+	<main>
+		<section id="intro">
+			<h1 class="intro__hed">Sticky Side Example</h1>
+			<p class="intro__dek">
+				Start scrolling to see how it works.
+			</p>
+		</section>
 
-let margin = {top: 20, right: 20, bottom: 20, left: 20};
-let width = 960 - margin.left - margin.right;
-let height = 300 - margin.top - margin.bottom;
+		<section id="scrolly">
+			<article>
+				<div class="step" data-step="1">
+					<p>STEP 1</p>
+				</div>
+				<div class="step" data-step="2">
+					<p>STEP 2</p>
+				</div>
+				<div class="step" data-step="3">
+					<p>STEP 3</p>
+				</div>
+				<div class="step" data-step="4">ß
+					<p>STEP 4</p>
+				</div>
+			</article>
+			<figure>
+				<p>Look Here</p> 
+			</figure>
+		</section>
 
-let eqn = d3.select("#equation")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+		<section id="outro"></section>
+	</main>
 
-equalSignOffset = 50;
-lineLength = 220;
-xColumn1 = 20;
-yRow1 = 40;
-xColumn2 = xColumn1 + 280 + 2 * equalSignOffset;
-yRow2 = yRow1 + 25 + 100;
-xColumn3 = xColumn2 + lineLength + 2 * equalSignOffset;
+	<!-- <div class='debug'></div> -->
+	<script>
+		// using d3 for convenience
+		let main = d3.select("main");
+		let scrolly = main.select("#scrolly");
+		let figure = scrolly.select("figure");
+		let article = scrolly.select("article");
+		let step = article.selectAll(".step");
 
-// first row
-eqn.append("text")
-    .attr("class", "eqn")
-    .attr("id", "metric")
-    .attr("x", xColumn1)
-    .attr("y", yRow1 + 25)
-    .attr("dy", "0.35em")
-    .text("kilometers per intervention")
+		// initialize the scrollama
+		let scroller = scrollama();
 
-eqn.append("text")
-    .attr("class", "equal-sign")
-    .attr("x", xColumn2 - equalSignOffset)
-    .attr("y", yRow1 + 25)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "middle")
-    .style("font-size", 48)
-    .text("=");      
+		// generic window resize listener event
+		function handleResize() {
+			// 1. update height of step elements
+			let stepH = Math.floor(window.innerHeight * 0.75);
+			step.style("height", `${stepH}px`);
 
-eqn.append("line")
-    .attr("class", "divider")
-    .attr("x1", xColumn2)
-    .attr("x2", xColumn2 + lineLength)
-    .attr("y1", yRow1 + 25)
-    .attr("y2", yRow1 + 25)
-    .style("stroke-width", 5);   
+			let figureHeight = window.innerHeight / 2;
+			let figureMarginTop = (window.innerHeight - figureHeight) / 2;
 
-eqn.append("text")
-    .attr("class", "eqn")
-    .attr("x", xColumn2 + 0.5 * lineLength)
-    .attr("y", yRow1)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "middle")
-    .text("kilometers driven");
+			figure
+				.style("height", `${figureHeight}px`)
+				.style("top", `${figureMarginTop}px`);
 
-eqn.append("text")
-    .attr("class", "eqn")
-    .attr("x", xColumn2 + 0.5 * lineLength)
-    .attr("y", yRow1 + 50)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "middle")
-    .text("# of interventions");
+			// 3. tell scrollama to update new element dimensions
+			scroller.resize();
+		}
 
-eqn.append("text")
-    .attr("class", "equal-sign")
-    .attr("x", xColumn3 - equalSignOffset)
-    .attr("y", yRow1 + 25)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "middle")
-    .style("font-size", 48)
-    .text("=");
+		// scrollama event handlers
+		function handleStepEnter(response) {
+			console.log(response);
+			// response = { element, direction, index }
 
-eqn.append("line")
-    .attr("class", "divider")
-    .attr("x1", xColumn3)
-    .attr("x2", xColumn3 + 0.5 * lineLength)
-    .attr("y1", yRow1 + 25)
-    .attr("y2", yRow1 + 25)
-    .style("stroke-width", 5);  
+			// add color to current step only
+			step.classed("is-active", function (d, i) {
+				return i === response.index;
+			});
 
-eqn.append("text")
-    .attr("class", "eqn")
-    .attr("x", xColumn3 + 0.25 * lineLength)
-    .attr("y", yRow1)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "middle")
-    .text("100");
+			// update graphic based on step
+			figure.select("p").text(response.index + 1);
+		}
+		
+		function init() {
 
-eqn.append("text")
-    .attr("class", "eqn")
-    .attr("x", xColumn3 + 0.25 * lineLength)
-    .attr("y", yRow1 + 50)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "middle")
-    .text("5");
+			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
+			handleResize();
 
-// second row
-eqn.append("text")
-    .attr("class", "equal-sign")
-    .attr("x", xColumn2 - equalSignOffset)
-    .attr("y", yRow1 + 25 + 100)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "middle")
-    .style("font-size", 48)
-    .text("=");
+			// 2. setup the scroller passing options
+			// 		this will also initialize trigger observations
+			// 3. bind scrollama event handlers (this can be chained like below)
+			scroller
+				.setup({
+					step: "#scrolly article .step",
+					offset: 0.33,
+					debug: false
+				})
+				.onStepEnter(handleStepEnter);
+		}
 
-eqn.append("text")
-    .attr("class", "answer")
-    .attr("x", xColumn2)
-    .attr("y", yRow2)
-    .attr("dy", "0.35em")
-    .style("font-size", 48)
-    .text("20");
-
-</script>
+		// kick things off
+		init();
+	</script>
 </body>
+
 </html>
