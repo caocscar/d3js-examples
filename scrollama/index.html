@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -8,12 +7,16 @@
 	<meta name="description" content="Scrollama: Sticky Side Example" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="stylesheet" href="style.css" />
+	<!-- google fonts API -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+	<!-- d3v7 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+	<!-- scrollama -->
     <script src="https://unpkg.com/scrollama"></script>
 	<style>
 		#scrolly {
 			position: relative;
-			display: -webkit-box;ß
+			display: -webkit-box;
 			display: -ms-flexbox;
 			display: flex;
 			background-color: #f3f3f3;
@@ -28,7 +31,7 @@
 
 		article {
 			position: relative;
-			padding: 0 1rem;ß
+			padding: 0 1rem;
 			max-width: 20rem;
 		}
 
@@ -72,48 +75,60 @@
 			background-color: goldenrod;
 			color: #3b3b3b;
 		}
-
-		.step p {
-			text-align: end;
-			padding: 1rem;
-			font-size: 1.5rem;
-		}
 	</style>
 </head>
 
 <body>
 	<main>
+    <!-- Intro Section -->
 		<section id="intro">
-			<h1 class="intro__hed">Sticky Side Example</h1>
-			<p class="intro__dek">
-				Start scrolling to see how it works.
+			<h1 class="intro-header">Kilometers Per Intervention</h1>
+			<p class="intro-text">
+        Scroll down to see what happens.
 			</p>
 		</section>
-
+    <!-- Scrolling Section -->
 		<section id="scrolly">
 			<article>
 				<div class="step" data-step="1">
-					<p>STEP 1</p>
+					<p>
+            Phase 1
+					</p>
 				</div>
 				<div class="step" data-step="2">
-					<p>STEP 2</p>
+					<p>
+						Phase 2
+					</p>
 				</div>
 				<div class="step" data-step="3">
-					<p>STEP 3</p>
+					<p>
+            Phase 3
+					</p>
 				</div>
-				<div class="step" data-step="4">ß
-					<p>STEP 4</p>
+				<div class="step" data-step="4">
+					<p>
+            Phase 4
+          </p>
 				</div>
-			</article>
+				<div class="step" data-step="5">
+					<p>
+            Phase 5
+          </p>
+				</div>        
+				<div class="step" data-step="6">
+					<p>
+            Phase 6
+          </p>
+				</div> 
+      </article>
 			<figure>
 				<p>Look Here</p> 
 			</figure>
 		</section>
-
+    <!-- Outro Section -->
 		<section id="outro"></section>
 	</main>
 
-	<!-- <div class='debug'></div> -->
 	<script>
 		// using d3 for convenience
 		let main = d3.select("main");
@@ -148,7 +163,7 @@
 			// response = { element, direction, index }
 
 			// add color to current step only
-			step.classed("is-active", function (d, i) {
+			step.classed("is-active", function (_, i) {
 				return i === response.index;
 			});
 
@@ -157,10 +172,8 @@
 		}
 		
 		function init() {
-
 			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
 			handleResize();
-
 			// 2. setup the scroller passing options
 			// 		this will also initialize trigger observations
 			// 3. bind scrollama event handlers (this can be chained like below)
@@ -175,6 +188,7 @@
 
 		// kick things off
 		init();
+
 	</script>
 </body>
 
