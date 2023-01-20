@@ -97,7 +97,7 @@ let margin = {top: 20, right: 20, bottom: 20, left: 20},
     theta = d3.range(0,100,1);
 
 // define pts to draw
-theta = theta.map(d => d/4)
+theta = theta.map(d => d/4);
 let pts = theta.map(t => [(a+b*t)*Math.cos(t)+width/2, (a+b*t)*Math.sin(t)+height/2])//A*(2 + Math.sin(0.07*x) + Math.cos(0.05*x))])
 
 let g = d3.select("#chart").append("svg")
@@ -106,12 +106,12 @@ let g = d3.select("#chart").append("svg")
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-let line = d3.line().curve(d3.curveNatural)
+let line = d3.line().curve(d3.curveNatural);
 let path = g.append("path")
     .attr("class", "init")
     .attr("d", line(pts))
-let p = path.node()
-let pLength = p.getTotalLength()
+let p = path.node();
+let pLength = p.getTotalLength();
 
 highlightStep(1)
 path.attr("stroke-dasharray", `${pLength} ${pLength}`) // dashLength spaceLength
