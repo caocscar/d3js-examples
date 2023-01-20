@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Scrollama: Sticky Side Example</title>
+	<meta name="description" content="Scrollama: Sticky Side Example" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="style.css" />
+	<!-- google fonts API -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+	<!-- d3v7 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+	<!-- scrollama -->
+    <script src="https://unpkg.com/scrollama"></script>
+	<style>
+		#scrolly {
+			position: relative;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
+			background-color: #f3f3f3;
+			padding: 1rem;
+		}
+
+		#scrolly>* {
+			-webkit-box-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+		}
+
+		article {
+			position: relative;
+			padding: 0 1rem;
+			max-width: 20rem;
+		}
+
+		figure {
+			position: -webkit-sticky;
+			position: sticky;
+			width: 100%;
+			margin: 0;
+			-webkit-transform: translate3d(0, 0, 0);
+			-moz-transform: translate3d(0, 0, 0);
+			transform: translate3d(0, 0, 0);
+			background-color: #369040;
+			z-index: 0;
+		}
+
+		figure p {
+			text-align: center;
+			padding: 1rem;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			-moz-transform: translate(-50%, -50%);
+			-webkit-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+			font-size: 8rem;
+			font-weight: 900;
+			color: #fff;
+		}
+
+		.step {
+			margin: 0 auto 2rem auto;
+			background-color: #3b3b3b;
+			color: #fff;
+		}
+
+		.step:last-child {
+			margin-bottom: 0;
+		}
+
+		.step.is-active {
+			background-color: goldenrod;
+			color: #3b3b3b;
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<section id="intro">
+			<h1 class="intro-header">Kilometers Per Intervention</h1>
+			<p class="intro-text">
+				This is a key internal metric we track here at May. 
+				We want to use this space to breakdown how we define it and how we arrive at our numbers.
+			</p>
+		</section>
+
+		<section id="scrolly">
+			<article>
+				<div class="step" data-step="1">
+					<p>
+						This metric basically tells us how far we can go before an intervention happens. 
+					  We’ll define what an intervention is shortly.						
+					</p>
+				</div>
+				<div class="step" data-step="2">
+					<p>
+						First, here’s the equation used to define the metric. Pretty simple!
+					</p>
+				</div>
+				<div class="step" data-step="3">
+					<p>
+						The top part is how far we’ve driven in autonomy mode. 
+            When we drive in manual mode (the opposite of autonomy), 
+						we don’t count that driven distance in our calculations. 
+					</p>
+				</div>
+				<div class="step" data-step="4">
+					<p>
+            The bottom part is the number of interventions we’ve had over that same time frame. 
+            To start off with, we can define an intervention as any time we drop from autonomy mode to manual mode. 
+            We’ll look at special cases later.
+          </p>
+				</div>
+				<div class="step" data-step="5">
+					<p>
+            This says we were able to travel 1.0 km (on average) before an intervention happened.
+          </p>
+				</div>        
+				<div class="step" data-step="6">
+					<p>
+            Now, let’s look at some of the reasons why interventions happen. 
+            One, we enter a manual only zone. 
+            This is dictated by our ODD. ODD stands for Operational Design Domain. 
+            It’s a fancy way of saying the situations that we’ve designed the autonomy system to handle. 
+            For example, we do not allow our autonomy system to make unprotected left turns. 
+            It can’t handle every situation at the moment. 
+            We’re always working on expanding our ODD. 
+          </p>
+				</div> 
+      </article>
+			<figure>
+				<p>Look Here</p> 
+			</figure>
+		</section>
+
+		<section id="outro"></section>
+	</main>
+
+	<script>
+		// using d3 for convenience
+		let main = d3.select("main");
+		let scrolly = main.select("#scrolly");
+		let figure = scrolly.select("figure");
+		let article = scrolly.select("article");
+		let step = article.selectAll(".step");
+
+		// initialize the scrollama
+		let scroller = scrollama();
+
+		// generic window resize listener event
+		function handleResize() {
+			// 1. update height of step elements
+			let stepH = Math.floor(window.innerHeight * 0.75);
+			step.style("height", `${stepH}px`);
+
+			let figureHeight = window.innerHeight / 2;
+			let figureMarginTop = (window.innerHeight - figureHeight) / 2;
+
+			figure
+				.style("height", `${figureHeight}px`)
+				.style("top", `${figureMarginTop}px`);
+
+			// 3. tell scrollama to update new element dimensions
+			scroller.resize();
+		}
+
+		// scrollama event handlers
+		function handleStepEnter(response) {
+			console.log(response);
+			// response = { element, direction, index }
+
+			// add color to current step only
+			step.classed("is-active", function (d, i) {
+				return i === response.index;
+			});
+
+			// update graphic based on step
+			figure.select("p").text(response.index + 1);
+		}
+		
+		function init() {
+			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
+			handleResize();
+			// 2. setup the scroller passing options
+			// 		this will also initialize trigger observations
+			// 3. bind scrollama event handlers (this can be chained like below)
+			scroller
+				.setup({
+					step: "#scrolly article .step",
+					offset: 0.33,
+					debug: false
+				})
+				.onStepEnter(handleStepEnter);
+		}
+
+		// kick things off
+		init();
+
+	</script>
+</body>
+
+</html>
