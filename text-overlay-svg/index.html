@@ -56,13 +56,9 @@
         .attr("x", 50)
         .attr("y", 0.5 * H)
         .attr("dy", "0.35em")
-        .attr("text-anchor", "start")
-        .style("font-size", "16px")
         .text("Request")
-      .clone(true).lower() // background shadow effect
-        .attr("fill", "none")
-        .attr("stroke", "white")
-        .attr("stroke-width", 16);
+      .clone(true).lower()
+        .attr("class", "background-shadow-effect");
 
     svgRequest.append("line").lower()
         .attr("x1", 0)
@@ -84,13 +80,10 @@
         .attr("x", 0)
         .attr("y", 0.5 * H)
         .attr("dy", "0.35em")
-        .attr("text-anchor", "start")
-        .style("font-size", "16px")
         .text("Waiting for Vehicle")
-      .clone(true).lower() // background shadow effect
-        .attr("fill", "none")
-        .attr("stroke", "white")
-        .attr("stroke-width", 16);
+      .clone(true).lower()
+        .attr("class", "background-shadow-effect");
+
 
     svgWaiting.append("line").lower()
         .attr("x1", 0)
@@ -111,13 +104,9 @@
         .attr("x", 0)
         .attr("y", 0.5 * H)
         .attr("dy", "0.35em")
-        .attr("text-anchor", "start")
-        .style("font-size", "16px")
         .text("Pickup")
-      .clone(true).lower() // background shadow effect
-        .attr("fill", "none")
-        .attr("stroke", "white")
-        .attr("stroke-width", 16);
+      .clone(true).lower()
+        .attr("class", "background-shadow-effect");
 
     svgPickup.append("line").lower()
         .attr("x1", 0)
@@ -138,13 +127,9 @@
         .attr("x", 0)
         .attr("y", 0.5 * H)
         .attr("dy", "0.35em")
-        .attr("text-anchor", "start")
-        .style("font-size", "16px")
-        .text("On route/dropoff")
-      .clone(true).lower() // background shadow effect
-        .attr("fill", "none")
-        .attr("stroke", "white")
-        .attr("stroke-width", 28);
+        .text("On-route/dropoff")
+      .clone(true).lower()
+        .attr("class", "background-shadow-effect stroke-width-28");
 
     svgOnroute.append("line").lower()
         .attr("x1", 0)
