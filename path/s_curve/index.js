@@ -83,7 +83,7 @@ function drawSegments(pieces, path) {
         .attr("class", "segment")
         .attr("d", d => line(d.segs))
         .style("stroke", (_, i) => colors[i])
-        .style("stroke-width", 48)
+        .style("stroke-width", 36)
         .attr("stroke-dasharray", `${pathLength} ${pathLength}`) // dashLength spaceLength
         .attr("stroke-dashoffset", pathLength) // offset in negative x direction
 
@@ -92,7 +92,8 @@ function drawSegments(pieces, path) {
     const T = 150;
     lines.transition().duration(6 * T)
         .delay((_, i) => i * T)
-        .attr("stroke-dashoffset", 0) // no offset
+        .attr("stroke-dashoffset", 0); // no offset
+
 }
 
 function drawStartingCircles(path, numDays) {
@@ -112,7 +113,7 @@ function drawStartingCircles(path, numDays) {
     // transition starting circles to appear
     ppl.transition()
       .delay((d, i) => d.delay * 3)
-      .attr("r", 8)
+      .attr("r", 10)
 }
 
 function getStartingDates(path, numDays) {
@@ -240,17 +241,23 @@ function createTooltip(mayniacs) {
 }
 
 function addYearLabels() {
-    const years = ['2021', '2020', '2019', '2018', '2017'];
+    const years = d3.range(2017,2022).reverse();
     if (!horizontal) {
         svg.selectAll('.years')
           .data(years)
           .join('text')
             .attr('class', 'years')
-            .attr('x', 150)
+            .attr('x', 300)
             .attr('y', (_, i) => 400 + 510 * i)
             .attr('dy', '0.35em')
+            .attr('opacity', 0)
             .text(d => d);
     }
+    // transition year label
+    svg.selectAll(".years")
+      .transition().duration(1000)
+      .delay(1100)
+        .attr("opacity", 1);
 }
 
 initChart('maynumber.csv');

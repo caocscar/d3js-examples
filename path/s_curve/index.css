@@ -2,29 +2,42 @@ body {
   font-family: Helvetica;
   font-size: 16px;
 }
-#header {
 
+#header {
+  margin-left: 220px;
 }
-ol li {
+
+ul li {
+  margin-left: 200px;
   margin-bottom: 10px;
 }
+
 li.highlight {
   background: yellow;
 }
+
 path {
   fill: none;
   stroke: #999;
 }
+
 path.init {
   stroke-width: 2;
 }
+
 path.segment {
   stroke: none;
 }
+
 line.sep {
   stroke-width: 0;
   stroke: white;
 }
+
+.years {
+  font-size: 2em;
+}
+
 /* Tippy Tooltips */
 .tippy-box[data-theme ~= 'mayniac'] {
   background-color: #00BCEE;
