@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- google fonts API -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+
+    <link rel="stylesheet" href="text-overlay-svg.css"> 
+</head>
+<body>
+  <!-- marker definitions for arrows -->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 1">
+    <defs>
+      <!-- dimensions of marker canvas and reference point to place marker -->
+      <marker id="request-arrowcircle" markerWidth="4" markerHeight="4" refX="0" refY="2" orient="auto">
+        <!-- points to draw a polygon within the marker space -->
+        <circle fill="#98C949" cx="2" cy="2" r="2"">
+        </marker>        
+      <marker id="request-arrowhead" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+        <polygon fill="#98C949" points="0 0, 4 2, 0 4">
+      </marker>
+      <marker id="waiting-for-vehicle-arrowhead" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+        <polygon fill="#00BCEE" points="0 0, 4 2, 0 4">
+      </marker>
+      <marker id="pickup-arrowhead" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+        <polygon fill="#FF9C18" points="0 0, 4 2, 0 4">
+      </marker>
+      <marker id="on-route-dropoff-arrowcircle" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+        <circle fill="#FF6868" cx="2" cy="2" r="2"">
+      </marker>
+    </defs>
+  </svg>
+
+  <div id="request-svg"></div>
+  <div id="waiting-for-vehicle-svg"></div>
+  <div id="pickup-svg"></div>
+  <div id="on-route-dropoff-svg"></div>
+
+  <script>
+
+    const lineWidth = 4;
+    const markerHeight = 4 * lineWidth;
+    const H = markerHeight * 2;
+    const markerWidth = 4 * lineWidth;
+    const W = 350;
+
+    // request section
+    const svgRequest = d3.select("#request-svg").append("svg")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+
+    svgRequest.append("text")
+        .attr("class", "text-overlay")
+        .attr("x", 50)
+        .attr("y", 0.5 * H)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "start")
+        .style("font-size", "16px")
+        .text("Request")
+      .clone(true).lower() // background shadow effect
+        .attr("fill", "none")
+        .attr("stroke", "white")
+        .attr("stroke-width", 16);
+
+    svgRequest.append("line").lower()
+        .attr("x1", 0)
+        .attr("y1", 0.5 * H) 
+        .attr("x2", W - markerWidth)
+        .attr("y2", 0.5 * H)
+        .attr("stroke", "#98C949")
+        .attr("stroke-width", lineWidth)
+        .attr("marker-start", "url(#request-arrowcircle)")
+        .attr("marker-end", "url(#request-arrowhead)");
+
+    // waiting for vehicle section
+    const svgWaiting = d3.select("#waiting-for-vehicle-svg").append("svg")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+
+    svgWaiting.append("text")
+        .attr("class", "text-overlay")
+        .attr("x", 0)
+        .attr("y", 0.5 * H)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "start")
+        .style("font-size", "16px")
+        .text("Waiting for Vehicle")
+      .clone(true).lower() // background shadow effect
+        .attr("fill", "none")
+        .attr("stroke", "white")
+        .attr("stroke-width", 16);
+
+    svgWaiting.append("line").lower()
+        .attr("x1", 0)
+        .attr("y1", 0.5 * H) 
+        .attr("x2", W - markerWidth)
+        .attr("y2", 0.5 * H)
+        .attr("stroke", "#00BCEE")
+        .attr("stroke-width", lineWidth)
+        .attr("marker-end", "url(#waiting-for-vehicle-arrowhead)");
+
+    // pickup section
+    const svgPickup = d3.select("#pickup-svg").append("svg")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+
+    svgPickup.append("text")
+        .attr("class", "text-overlay")
+        .attr("x", 0)
+        .attr("y", 0.5 * H)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "start")
+        .style("font-size", "16px")
+        .text("Pickup")
+      .clone(true).lower() // background shadow effect
+        .attr("fill", "none")
+        .attr("stroke", "white")
+        .attr("stroke-width", 16);
+
+    svgPickup.append("line").lower()
+        .attr("x1", 0)
+        .attr("y1", 0.5 * H) 
+        .attr("x2", W - markerWidth)
+        .attr("y2", 0.5 * H)
+        .attr("stroke", "#FF9C18")
+        .attr("stroke-width", lineWidth)
+        .attr("marker-end", "url(#pickup-arrowhead)");
+
+    // on-route/dropoff section
+    const svgOnroute = d3.select("#on-route-dropoff-svg").append("svg")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+
+    svgOnroute.append("text")
+        .attr("class", "text-overlay")
+        .attr("x", 0)
+        .attr("y", 0.5 * H)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "start")
+        .style("font-size", "16px")
+        .text("On route/dropoff")
+      .clone(true).lower() // background shadow effect
+        .attr("fill", "none")
+        .attr("stroke", "white")
+        .attr("stroke-width", 28);
+
+    svgOnroute.append("line").lower()
+        .attr("x1", 0)
+        .attr("y1", 0.5 * H) 
+        .attr("x2", W - markerWidth)
+        .attr("y2", 0.5 * H)
+        .attr("stroke", "#FF6868")
+        .attr("stroke-width", lineWidth)
+        .attr("marker-end", "url(#on-route-dropoff-arrowcircle)");        
+
+</script>
+</body>
+</html>
