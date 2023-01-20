@@ -1,0 +1,117 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Ann Arbor",
+          "isActive": true
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.739,
+            42.274
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Grand Rapids, MI",
+          "isActive": false
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -85.679,
+            42.966
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Arlington",
+          "isActive": true
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -97.114,
+            32.729
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Indianapolis",
+          "isActive": true
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.175,
+            39.774
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Detroit",
+          "isActive": false
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.049,
+            42.334
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Providence",
+          "isActive": false
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -71.426,
+            41.829
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Columbus",
+          "isActive": false
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.000,
+            39.962
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Higashihiroshima",
+          "isActive": true
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            132.713,
+            34.404
+          ]
+        }
+      }
+    ]
+  }
