@@ -40,11 +40,12 @@
 
   <script>
 
-    const lineWidth = 4;
+    const lineWidth = 6;
     const markerHeight = 4 * lineWidth;
     const H = markerHeight * 2;
     const markerWidth = 4 * lineWidth;
     const W = 350;
+    const fontsizeJourneyHeaders = "20px";
 
     // request section
     const svgRequest = d3.select("#request-svg").append("svg")
@@ -53,9 +54,10 @@
 
     svgRequest.append("text")
         .attr("class", "text-overlay")
-        .attr("x", 50)
+        .attr("x", 65)
         .attr("y", 0.5 * H)
         .attr("dy", "0.35em")
+        .attr("font-size", fontsizeJourneyHeaders) // font-size needs to be specified here for cloning purposes
         .text("Request")
       .clone(true).lower()
         .attr("class", "background-shadow-effect");
@@ -80,10 +82,10 @@
         .attr("x", 0)
         .attr("y", 0.5 * H)
         .attr("dy", "0.35em")
+        .attr("font-size", fontsizeJourneyHeaders)
         .text("Waiting for Vehicle")
       .clone(true).lower()
         .attr("class", "background-shadow-effect");
-
 
     svgWaiting.append("line").lower()
         .attr("x1", 0)
@@ -104,6 +106,7 @@
         .attr("x", 0)
         .attr("y", 0.5 * H)
         .attr("dy", "0.35em")
+        .attr("font-size", fontsizeJourneyHeaders)
         .text("Pickup")
       .clone(true).lower()
         .attr("class", "background-shadow-effect");
@@ -127,9 +130,10 @@
         .attr("x", 0)
         .attr("y", 0.5 * H)
         .attr("dy", "0.35em")
+        .attr("font-size", fontsizeJourneyHeaders)
         .text("On-route/dropoff")
       .clone(true).lower()
-        .attr("class", "background-shadow-effect stroke-width-28");
+        .attr("class", "background-shadow-effect stroke-width-42");
 
     svgOnroute.append("line").lower()
         .attr("x1", 0)
@@ -138,7 +142,7 @@
         .attr("y2", 0.5 * H)
         .attr("stroke", "#FF6868")
         .attr("stroke-width", lineWidth)
-        .attr("marker-end", "url(#on-route-dropoff-arrowcircle)");        
+        .attr("marker-end", "url(#on-route-dropoff-arrowcircle)");
 
 </script>
 </body>
